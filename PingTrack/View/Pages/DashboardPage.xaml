@@ -16,12 +16,14 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="80"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="80"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.ColumnSpan="3"
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="5"
                    Text="Главная панель"
                    FontSize="22"
                    FontWeight="Bold"
@@ -29,32 +31,40 @@
                    VerticalAlignment="Center"
                    HorizontalAlignment="Center"/>
 
-        <Border Grid.Row="1" Grid.Column="0"
-                Style="{StaticResource Card}">
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock Text="Игроков зарегистрировано" FontSize="14"/>
-                <TextBlock Text="—" FontSize="26" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"/>
-            </StackPanel>
+        <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="Игроков зарегистрировано" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Row="1" Text="—" FontSize="26" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Center"/>
+            </Grid>
         </Border>
 
-        <Border Grid.Row="1" Grid.Column="1"
-                Style="{StaticResource Card}">
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock Text="Ближайшие занятия" FontSize="14"/>
-                <TextBlock Text="—" FontSize="26" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"/>
-            </StackPanel>
+        <Border Grid.Row="1" Grid.Column="2" Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="Ближайшие занятия" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Row="1" Text="—" FontSize="26" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Center"/>
+            </Grid>
         </Border>
 
-        <Border Grid.Row="1" Grid.Column="2"
-                Style="{StaticResource Card}">
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock Text="Средняя посещаемость" FontSize="14"/>
-                <TextBlock Text="—" FontSize="26" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"/>
-            </StackPanel>
+        <Border Grid.Row="1" Grid.Column="3" Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="Средняя посещаемость" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Row="1" Text="—" FontSize="26" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Center"/>
+            </Grid>
         </Border>
 
-        <Border Grid.Row="2" Grid.ColumnSpan="3"
-                Style="{StaticResource Card}">
+        <Border Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Style="{StaticResource Card}">
             <TextBlock Text="Здесь появится статистика и расписание"
                        FontSize="14"
                        FontStyle="Italic"

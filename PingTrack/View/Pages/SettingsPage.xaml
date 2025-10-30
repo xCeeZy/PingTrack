@@ -22,59 +22,41 @@
 
         <TextBlock Grid.Row="0" Grid.ColumnSpan="3"
                    Text="Настройки приложения"
-                   FontSize="22"
-                   FontWeight="Bold"
+                   FontSize="22" FontWeight="Bold"
                    Foreground="{StaticResource PrimaryBrush}"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-        <Border Grid.Row="1" Grid.Column="1"
-                Style="{StaticResource Card}">
+        <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Card}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="60"/>
                     <RowDefinition Height="60"/>
-                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="80"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="220"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0"
-                           Text="Тема оформления:"
-                           VerticalAlignment="Center"
-                           FontSize="14"/>
-
-                <ComboBox x:Name="ThemeComboBox"
-                          Grid.Row="0" Grid.Column="1"
-                          Height="34"
-                          VerticalAlignment="Center">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Тема оформления:" VerticalAlignment="Center" FontSize="14"/>
+                <ComboBox x:Name="ThemeComboBox" Grid.Row="0" Grid.Column="1" Height="34" VerticalAlignment="Center">
                     <ComboBoxItem Content="Светлая (по умолчанию)" IsSelected="True"/>
                     <ComboBoxItem Content="Тёмная"/>
                 </ComboBox>
 
-                <TextBlock Grid.Row="1" Grid.Column="0"
-                           Text="Язык интерфейса:"
-                           VerticalAlignment="Center"
-                           FontSize="14"/>
-
-                <ComboBox x:Name="LanguageComboBox"
-                          Grid.Row="1" Grid.Column="1"
-                          Height="34"
-                          VerticalAlignment="Center">
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Язык интерфейса:" VerticalAlignment="Center" FontSize="14"/>
+                <ComboBox x:Name="LanguageComboBox" Grid.Row="1" Grid.Column="1" Height="34" VerticalAlignment="Center">
                     <ComboBoxItem Content="Русский" IsSelected="True"/>
                     <ComboBoxItem Content="English"/>
                 </ComboBox>
 
-                <Button x:Name="SaveSettingsButton"
-                        Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-                        Content="Сохранить изменения"
-                        Style="{StaticResource PrimaryButton}"
-                        Width="220"
-                        Height="36"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"/>
+                <Grid Grid.Row="2" Grid.ColumnSpan="2">
+                    <Button x:Name="SaveSettingsButton"
+                            Content="Сохранить изменения"
+                            Style="{StaticResource PrimaryButton}"
+                            Width="220" Height="36"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
             </Grid>
         </Border>
     </Grid>
