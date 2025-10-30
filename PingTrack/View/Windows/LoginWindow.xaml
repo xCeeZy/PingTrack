@@ -1,0 +1,100 @@
+﻿<Window x:Class="PingTrack.View.Windows.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PingTrack.View.Windows"
+        mc:Ignorable="d"
+        Title="Авторизация — PingTrack"
+        WindowStartupLocation="CenterScreen"
+        Width="420" Height="480"
+        Background="{StaticResource WindowBrush}"
+        ResizeMode="NoResize">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <!-- Заголовок -->
+            <RowDefinition Height="60"/>
+            <!-- Промежуток -->
+            <RowDefinition Height="40"/>
+            <!-- Метка "Логин" -->
+            <RowDefinition Height="40"/>
+            <!-- Поле логина -->
+            <RowDefinition Height="40"/>
+            <!-- Метка "Пароль" -->
+            <RowDefinition Height="40"/>
+            <!-- Поле пароля -->
+            <RowDefinition Height="60"/>
+            <!-- Кнопка -->
+            <RowDefinition Height="*"/>
+            <!-- Остаток -->
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Логотип / название -->
+        <TextBlock Grid.Row="0" Grid.Column="1"
+                   Text="PingTrack"
+                   FontSize="28"
+                   FontWeight="Bold"
+                   Foreground="{StaticResource PrimaryBrush}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+
+        <!-- Метка "Логин" -->
+        <TextBlock Grid.Row="2" Grid.Column="1"
+                   Text="Логин"
+                   FontSize="15"
+                   VerticalAlignment="Center"
+                   Foreground="{StaticResource TextBrush}"/>
+
+        <!-- Поле логина -->
+        <TextBox x:Name="LoginTextBox"
+                 Grid.Row="3" Grid.Column="1"
+                 Height="30"
+                 BorderBrush="#33000000"
+                 BorderThickness="1"
+                 Background="White"
+                 FontSize="14"
+                 VerticalContentAlignment="Center"/>
+
+        <!-- Метка "Пароль" -->
+        <TextBlock Grid.Row="4" Grid.Column="1"
+                   Text="Пароль"
+                   FontSize="15"
+                   VerticalAlignment="Center"
+                   Foreground="{StaticResource TextBrush}"/>
+
+        <!-- Поле пароля -->
+        <PasswordBox x:Name="PasswordBox"
+                     Grid.Row="5" Grid.Column="1"
+                     Height="30"
+                     BorderBrush="#33000000"
+                     BorderThickness="1"
+                     Background="White"
+                     FontSize="14"
+                     VerticalContentAlignment="Center"/>
+
+        <!-- Кнопка входа -->
+        <Button x:Name="LoginButton"
+                Grid.Row="6" Grid.Column="1"
+                Content="Войти"
+                Height="34"
+                Background="{StaticResource PrimaryBrush}"
+                Foreground="White"
+                FontWeight="SemiBold"
+                BorderThickness="0"
+                Cursor="Hand"
+                Click="LoginButton_Click">
+            <Button.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="6"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+    </Grid>
+</Window>
