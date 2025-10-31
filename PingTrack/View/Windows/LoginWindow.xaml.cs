@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PingTrack.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,16 +27,25 @@ namespace PingTrack.View.Windows
             string login = LoginTextBox.Text.Trim();
             string password = PasswordBox.Password.Trim();
 
-            if (login == "admin" && password == "1234")
+            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
             {
-                MainWindow main = new MainWindow();
-                main.Show();
-                this.Close();
+                MessageBox.Show("Введите логин и пароль.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
-            else
+
+            Users user = App.db.Users.FirstOrDefault(u => u.Login == login && u.Password == password && u.IsActive == true);
+
+            if (user == null)
             {
                 MessageBox.Show("Неверный логин или пароль.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
+
+            string roleName = user.Roles.Role_Name;
+
+            MainWindow main = new MainWindow(roleName, login);
+            main.Show();
+            Close();
         }
     }
 }

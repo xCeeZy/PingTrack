@@ -27,7 +27,8 @@
                    Text="Игроки секции"
                    FontSize="22" FontWeight="Bold"
                    Foreground="{StaticResource PrimaryBrush}"
-                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
 
         <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Style="{StaticResource Card}">
             <DataGrid x:Name="PlayersDataGrid"
@@ -38,12 +39,12 @@
                       IsReadOnly="True"
                       RowHeaderWidth="0"
                       GridLinesVisibility="None"
-                      ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                      ItemsSource="{Binding}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="ФИО" Binding="{Binding FullName}" Width="*"/>
-                    <DataGridTextColumn Header="Возраст" Binding="{Binding Age}" Width="120"/>
-                    <DataGridTextColumn Header="Группа" Binding="{Binding Group}" Width="200"/>
-                    <DataGridTextColumn Header="Контактный номер" Binding="{Binding Phone}" Width="200"/>
+                    <DataGridTextColumn Header="ФИО" Binding="{Binding Full_Name}" Width="*"/>
+                    <DataGridTextColumn Header="Дата рождения" Binding="{Binding Birth_Date, StringFormat=d}" Width="150"/>
+                    <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="150"/>
+                    <DataGridTextColumn Header="Группа" Binding="{Binding Groups.Group_Name}" Width="150"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
@@ -53,17 +54,21 @@
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
+
             <Button x:Name="AddPlayerButton"
                     Content="Добавить игрока"
                     Style="{StaticResource PrimaryButton}"
                     Width="160" Height="36"
-                    HorizontalAlignment="Center"/>
+                    HorizontalAlignment="Center"
+                    Click="AddPlayerButton_Click"/>
+
             <Button x:Name="DeletePlayerButton"
                     Grid.Column="1"
                     Content="Удалить"
                     Style="{StaticResource BaseButton}"
                     Width="120" Height="36"
-                    HorizontalAlignment="Center"/>
+                    HorizontalAlignment="Center"
+                    Click="DeletePlayerButton_Click"/>
         </Grid>
     </Grid>
 </Page>

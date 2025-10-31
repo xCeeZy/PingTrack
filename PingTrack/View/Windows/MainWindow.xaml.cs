@@ -18,10 +18,45 @@ namespace PingTrack.View.Windows
 {
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        private string userRole;
+        private string userName;
+
+        public MainWindow(string role, string login)
         {
             InitializeComponent();
-            MainFrame.Navigate(new DashboardPage());
+            userRole = role;
+            userName = login;
+
+            RoleText.Text = "Роль: " + role;
+            UserText.Text = "Пользователь: " + login;
+
+            ApplyRolePermissions();
+        }
+
+        private void ApplyRolePermissions()
+        {
+            if (userRole == "Студент")
+            {
+                PlayersBtn.Visibility = Visibility.Collapsed;
+                GroupsBtn.Visibility = Visibility.Collapsed;
+                TrainingsBtn.Visibility = Visibility.Collapsed;
+                ReportsBtn.Visibility = Visibility.Collapsed;
+            }
+
+            if (userRole == "Тренер")
+            {
+                ReportsBtn.Visibility = Visibility.Collapsed;
+            }
+
+            if (userRole == "Администратор")
+            {
+                DashboardBtn.Visibility = Visibility.Visible;
+                PlayersBtn.Visibility = Visibility.Visible;
+                GroupsBtn.Visibility = Visibility.Visible;
+                TrainingsBtn.Visibility = Visibility.Visible;
+                JournalBtn.Visibility = Visibility.Visible;
+                ReportsBtn.Visibility = Visibility.Visible;
+            }
         }
 
         private void DashboardBtn_Click(object sender, RoutedEventArgs e)
@@ -31,27 +66,27 @@ namespace PingTrack.View.Windows
 
         private void PlayersBtn_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Страница 'Игроки' пока не создана.");
+            MainFrame.Navigate(new PlayersPage());
         }
 
         private void GroupsBtn_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Страница 'Группы' пока не создана.");
+            MainFrame.Navigate(new GroupsPage());
         }
 
         private void TrainingsBtn_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Страница 'Занятия' пока не создана.");
+            MainFrame.Navigate(new TrainingsPage());
         }
 
         private void JournalBtn_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Страница 'Журнал' пока не создана.");
+            MainFrame.Navigate(new JournalPage());
         }
 
         private void ReportsBtn_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Страница 'Отчёты' пока не создана.");
+            MainFrame.Navigate(new ReportsPage());
         }
     }
 }

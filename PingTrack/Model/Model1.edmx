@@ -1,0 +1,632 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="Хранилище RusakovPingTrackModel" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Attendance">
+          <Key>
+            <PropertyRef Name="ID_Record" />
+          </Key>
+          <Property Name="ID_Record" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ID_Training" Type="int" Nullable="false" />
+          <Property Name="ID_Player" Type="int" Nullable="false" />
+          <Property Name="Is_Present" Type="bit" Nullable="false" />
+          <Property Name="Score" Type="int" />
+        </EntityType>
+        <EntityType Name="Groups">
+          <Key>
+            <PropertyRef Name="ID_Group" />
+          </Key>
+          <Property Name="ID_Group" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Group_Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ID_Level" Type="int" Nullable="false" />
+          <Property Name="ID_Coach" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Levels">
+          <Key>
+            <PropertyRef Name="ID_Level" />
+          </Key>
+          <Property Name="ID_Level" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Level_Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Players">
+          <Key>
+            <PropertyRef Name="ID_Player" />
+          </Key>
+          <Property Name="ID_Player" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Full_Name" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Birth_Date" Type="date" Nullable="false" />
+          <Property Name="Phone" Type="nchar" MaxLength="11" />
+          <Property Name="ID_Group" Type="int" Nullable="false" />
+          <Property Name="ID_User" Type="int" />
+        </EntityType>
+        <EntityType Name="Roles">
+          <Key>
+            <PropertyRef Name="ID_Role" />
+          </Key>
+          <Property Name="ID_Role" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Role_Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Training_Types">
+          <Key>
+            <PropertyRef Name="ID_Type" />
+          </Key>
+          <Property Name="ID_Type" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Type_Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Trainings">
+          <Key>
+            <PropertyRef Name="ID_Training" />
+          </Key>
+          <Property Name="ID_Training" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Date" Type="date" Nullable="false" />
+          <Property Name="Time" Type="time" Precision="7" Nullable="false" />
+          <Property Name="ID_Group" Type="int" Nullable="false" />
+          <Property Name="ID_Coach" Type="int" Nullable="false" />
+          <Property Name="ID_Type" Type="int" Nullable="false" />
+          <Property Name="Note" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="Users">
+          <Key>
+            <PropertyRef Name="ID_User" />
+          </Key>
+          <Property Name="ID_User" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Login" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Password" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ID_Role" Type="int" Nullable="false" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+          <Property Name="Created_At" Type="datetime" Nullable="false" />
+        </EntityType>
+        <Association Name="FK__Attendanc__ID_Pl__4D94879B">
+          <End Role="Players" Type="Self.Players" Multiplicity="1" />
+          <End Role="Attendance" Type="Self.Attendance" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Players">
+              <PropertyRef Name="ID_Player" />
+            </Principal>
+            <Dependent Role="Attendance">
+              <PropertyRef Name="ID_Player" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Attendanc__ID_Tr__4CA06362">
+          <End Role="Trainings" Type="Self.Trainings" Multiplicity="1" />
+          <End Role="Attendance" Type="Self.Attendance" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Trainings">
+              <PropertyRef Name="ID_Training" />
+            </Principal>
+            <Dependent Role="Attendance">
+              <PropertyRef Name="ID_Training" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Groups__ID_Coach__3F466844">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Groups" Type="Self.Groups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="ID_User" />
+            </Principal>
+            <Dependent Role="Groups">
+              <PropertyRef Name="ID_Coach" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Groups__ID_Level__3E52440B">
+          <End Role="Levels" Type="Self.Levels" Multiplicity="1" />
+          <End Role="Groups" Type="Self.Groups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Levels">
+              <PropertyRef Name="ID_Level" />
+            </Principal>
+            <Dependent Role="Groups">
+              <PropertyRef Name="ID_Level" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Players__ID_Grou__4222D4EF">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="1" />
+          <End Role="Players" Type="Self.Players" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="ID_Group" />
+            </Principal>
+            <Dependent Role="Players">
+              <PropertyRef Name="ID_Group" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Players__ID_User__4316F928">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="Players" Type="Self.Players" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="ID_User" />
+            </Principal>
+            <Dependent Role="Players">
+              <PropertyRef Name="ID_User" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Trainings__ID_Co__48CFD27E">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Trainings" Type="Self.Trainings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="ID_User" />
+            </Principal>
+            <Dependent Role="Trainings">
+              <PropertyRef Name="ID_Coach" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Trainings__ID_Gr__47DBAE45">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="1" />
+          <End Role="Trainings" Type="Self.Trainings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="ID_Group" />
+            </Principal>
+            <Dependent Role="Trainings">
+              <PropertyRef Name="ID_Group" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Trainings__ID_Ty__49C3F6B7">
+          <End Role="Training_Types" Type="Self.Training_Types" Multiplicity="1" />
+          <End Role="Trainings" Type="Self.Trainings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Training_Types">
+              <PropertyRef Name="ID_Type" />
+            </Principal>
+            <Dependent Role="Trainings">
+              <PropertyRef Name="ID_Type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Users__ID_Role__398D8EEE">
+          <End Role="Roles" Type="Self.Roles" Multiplicity="1" />
+          <End Role="Users" Type="Self.Users" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="ID_Role" />
+            </Principal>
+            <Dependent Role="Users">
+              <PropertyRef Name="ID_Role" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Хранилище RusakovPingTrackModelContainer">
+          <EntitySet Name="Attendance" EntityType="Self.Attendance" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Groups" EntityType="Self.Groups" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Levels" EntityType="Self.Levels" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Players" EntityType="Self.Players" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Roles" EntityType="Self.Roles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Training_Types" EntityType="Self.Training_Types" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Trainings" EntityType="Self.Trainings" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__Attendanc__ID_Pl__4D94879B" Association="Self.FK__Attendanc__ID_Pl__4D94879B">
+            <End Role="Players" EntitySet="Players" />
+            <End Role="Attendance" EntitySet="Attendance" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Attendanc__ID_Tr__4CA06362" Association="Self.FK__Attendanc__ID_Tr__4CA06362">
+            <End Role="Trainings" EntitySet="Trainings" />
+            <End Role="Attendance" EntitySet="Attendance" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Groups__ID_Coach__3F466844" Association="Self.FK__Groups__ID_Coach__3F466844">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Groups" EntitySet="Groups" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Groups__ID_Level__3E52440B" Association="Self.FK__Groups__ID_Level__3E52440B">
+            <End Role="Levels" EntitySet="Levels" />
+            <End Role="Groups" EntitySet="Groups" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Players__ID_Grou__4222D4EF" Association="Self.FK__Players__ID_Grou__4222D4EF">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="Players" EntitySet="Players" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Players__ID_User__4316F928" Association="Self.FK__Players__ID_User__4316F928">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Players" EntitySet="Players" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Trainings__ID_Co__48CFD27E" Association="Self.FK__Trainings__ID_Co__48CFD27E">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Trainings" EntitySet="Trainings" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Trainings__ID_Gr__47DBAE45" Association="Self.FK__Trainings__ID_Gr__47DBAE45">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="Trainings" EntitySet="Trainings" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Trainings__ID_Ty__49C3F6B7" Association="Self.FK__Trainings__ID_Ty__49C3F6B7">
+            <End Role="Training_Types" EntitySet="Training_Types" />
+            <End Role="Trainings" EntitySet="Trainings" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Users__ID_Role__398D8EEE" Association="Self.FK__Users__ID_Role__398D8EEE">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="Users" EntitySet="Users" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="RusakovPingTrackModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Attendance">
+          <Key>
+            <PropertyRef Name="ID_Record" />
+          </Key>
+          <Property Name="ID_Record" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ID_Training" Type="Int32" Nullable="false" />
+          <Property Name="ID_Player" Type="Int32" Nullable="false" />
+          <Property Name="Is_Present" Type="Boolean" Nullable="false" />
+          <Property Name="Score" Type="Int32" />
+          <NavigationProperty Name="Players" Relationship="Self.FK__Attendanc__ID_Pl__4D94879B" FromRole="Attendance" ToRole="Players" />
+          <NavigationProperty Name="Trainings" Relationship="Self.FK__Attendanc__ID_Tr__4CA06362" FromRole="Attendance" ToRole="Trainings" />
+        </EntityType>
+        <EntityType Name="Groups">
+          <Key>
+            <PropertyRef Name="ID_Group" />
+          </Key>
+          <Property Name="ID_Group" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Group_Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ID_Level" Type="Int32" Nullable="false" />
+          <Property Name="ID_Coach" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Users" Relationship="Self.FK__Groups__ID_Coach__3F466844" FromRole="Groups" ToRole="Users" />
+          <NavigationProperty Name="Levels" Relationship="Self.FK__Groups__ID_Level__3E52440B" FromRole="Groups" ToRole="Levels" />
+          <NavigationProperty Name="Players" Relationship="Self.FK__Players__ID_Grou__4222D4EF" FromRole="Groups" ToRole="Players" />
+          <NavigationProperty Name="Trainings" Relationship="Self.FK__Trainings__ID_Gr__47DBAE45" FromRole="Groups" ToRole="Trainings" />
+        </EntityType>
+        <EntityType Name="Levels">
+          <Key>
+            <PropertyRef Name="ID_Level" />
+          </Key>
+          <Property Name="ID_Level" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Level_Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Groups" Relationship="Self.FK__Groups__ID_Level__3E52440B" FromRole="Levels" ToRole="Groups" />
+        </EntityType>
+        <EntityType Name="Players">
+          <Key>
+            <PropertyRef Name="ID_Player" />
+          </Key>
+          <Property Name="ID_Player" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Full_Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Birth_Date" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="Phone" Type="String" MaxLength="11" FixedLength="true" Unicode="true" />
+          <Property Name="ID_Group" Type="Int32" Nullable="false" />
+          <Property Name="ID_User" Type="Int32" />
+          <NavigationProperty Name="Attendance" Relationship="Self.FK__Attendanc__ID_Pl__4D94879B" FromRole="Players" ToRole="Attendance" />
+          <NavigationProperty Name="Groups" Relationship="Self.FK__Players__ID_Grou__4222D4EF" FromRole="Players" ToRole="Groups" />
+          <NavigationProperty Name="Users" Relationship="Self.FK__Players__ID_User__4316F928" FromRole="Players" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="Roles">
+          <Key>
+            <PropertyRef Name="ID_Role" />
+          </Key>
+          <Property Name="ID_Role" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Role_Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Users" Relationship="Self.FK__Users__ID_Role__398D8EEE" FromRole="Roles" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="Training_Types">
+          <Key>
+            <PropertyRef Name="ID_Type" />
+          </Key>
+          <Property Name="ID_Type" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Type_Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Trainings" Relationship="Self.FK__Trainings__ID_Ty__49C3F6B7" FromRole="Training_Types" ToRole="Trainings" />
+        </EntityType>
+        <EntityType Name="Trainings">
+          <Key>
+            <PropertyRef Name="ID_Training" />
+          </Key>
+          <Property Name="ID_Training" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Date" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="Time" Type="Time" Nullable="false" Precision="7" />
+          <Property Name="ID_Group" Type="Int32" Nullable="false" />
+          <Property Name="ID_Coach" Type="Int32" Nullable="false" />
+          <Property Name="ID_Type" Type="Int32" Nullable="false" />
+          <Property Name="Note" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Attendance" Relationship="Self.FK__Attendanc__ID_Tr__4CA06362" FromRole="Trainings" ToRole="Attendance" />
+          <NavigationProperty Name="Groups" Relationship="Self.FK__Trainings__ID_Gr__47DBAE45" FromRole="Trainings" ToRole="Groups" />
+          <NavigationProperty Name="Training_Types" Relationship="Self.FK__Trainings__ID_Ty__49C3F6B7" FromRole="Trainings" ToRole="Training_Types" />
+          <NavigationProperty Name="Users" Relationship="Self.FK__Trainings__ID_Co__48CFD27E" FromRole="Trainings" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="Users">
+          <Key>
+            <PropertyRef Name="ID_User" />
+          </Key>
+          <Property Name="ID_User" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Login" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ID_Role" Type="Int32" Nullable="false" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <Property Name="Created_At" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Groups" Relationship="Self.FK__Groups__ID_Coach__3F466844" FromRole="Users" ToRole="Groups" />
+          <NavigationProperty Name="Players" Relationship="Self.FK__Players__ID_User__4316F928" FromRole="Users" ToRole="Players" />
+          <NavigationProperty Name="Roles" Relationship="Self.FK__Users__ID_Role__398D8EEE" FromRole="Users" ToRole="Roles" />
+          <NavigationProperty Name="Trainings" Relationship="Self.FK__Trainings__ID_Co__48CFD27E" FromRole="Users" ToRole="Trainings" />
+        </EntityType>
+        <Association Name="FK__Attendanc__ID_Pl__4D94879B">
+          <End Role="Players" Type="Self.Players" Multiplicity="1" />
+          <End Role="Attendance" Type="Self.Attendance" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Players">
+              <PropertyRef Name="ID_Player" />
+            </Principal>
+            <Dependent Role="Attendance">
+              <PropertyRef Name="ID_Player" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Attendanc__ID_Tr__4CA06362">
+          <End Role="Trainings" Type="Self.Trainings" Multiplicity="1" />
+          <End Role="Attendance" Type="Self.Attendance" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Trainings">
+              <PropertyRef Name="ID_Training" />
+            </Principal>
+            <Dependent Role="Attendance">
+              <PropertyRef Name="ID_Training" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Groups__ID_Coach__3F466844">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Groups" Type="Self.Groups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="ID_User" />
+            </Principal>
+            <Dependent Role="Groups">
+              <PropertyRef Name="ID_Coach" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Groups__ID_Level__3E52440B">
+          <End Role="Levels" Type="Self.Levels" Multiplicity="1" />
+          <End Role="Groups" Type="Self.Groups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Levels">
+              <PropertyRef Name="ID_Level" />
+            </Principal>
+            <Dependent Role="Groups">
+              <PropertyRef Name="ID_Level" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Players__ID_Grou__4222D4EF">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="1" />
+          <End Role="Players" Type="Self.Players" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="ID_Group" />
+            </Principal>
+            <Dependent Role="Players">
+              <PropertyRef Name="ID_Group" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Trainings__ID_Gr__47DBAE45">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="1" />
+          <End Role="Trainings" Type="Self.Trainings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="ID_Group" />
+            </Principal>
+            <Dependent Role="Trainings">
+              <PropertyRef Name="ID_Group" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Players__ID_User__4316F928">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="Players" Type="Self.Players" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="ID_User" />
+            </Principal>
+            <Dependent Role="Players">
+              <PropertyRef Name="ID_User" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Users__ID_Role__398D8EEE">
+          <End Role="Roles" Type="Self.Roles" Multiplicity="1" />
+          <End Role="Users" Type="Self.Users" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="ID_Role" />
+            </Principal>
+            <Dependent Role="Users">
+              <PropertyRef Name="ID_Role" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Trainings__ID_Ty__49C3F6B7">
+          <End Role="Training_Types" Type="Self.Training_Types" Multiplicity="1" />
+          <End Role="Trainings" Type="Self.Trainings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Training_Types">
+              <PropertyRef Name="ID_Type" />
+            </Principal>
+            <Dependent Role="Trainings">
+              <PropertyRef Name="ID_Type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Trainings__ID_Co__48CFD27E">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Trainings" Type="Self.Trainings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="ID_User" />
+            </Principal>
+            <Dependent Role="Trainings">
+              <PropertyRef Name="ID_Coach" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="RusakovPingTrackEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Attendance" EntityType="Self.Attendance" />
+          <EntitySet Name="Groups" EntityType="Self.Groups" />
+          <EntitySet Name="Levels" EntityType="Self.Levels" />
+          <EntitySet Name="Players" EntityType="Self.Players" />
+          <EntitySet Name="Roles" EntityType="Self.Roles" />
+          <EntitySet Name="Training_Types" EntityType="Self.Training_Types" />
+          <EntitySet Name="Trainings" EntityType="Self.Trainings" />
+          <EntitySet Name="Users" EntityType="Self.Users" />
+          <AssociationSet Name="FK__Attendanc__ID_Pl__4D94879B" Association="Self.FK__Attendanc__ID_Pl__4D94879B">
+            <End Role="Players" EntitySet="Players" />
+            <End Role="Attendance" EntitySet="Attendance" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Attendanc__ID_Tr__4CA06362" Association="Self.FK__Attendanc__ID_Tr__4CA06362">
+            <End Role="Trainings" EntitySet="Trainings" />
+            <End Role="Attendance" EntitySet="Attendance" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Groups__ID_Coach__3F466844" Association="Self.FK__Groups__ID_Coach__3F466844">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Groups" EntitySet="Groups" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Groups__ID_Level__3E52440B" Association="Self.FK__Groups__ID_Level__3E52440B">
+            <End Role="Levels" EntitySet="Levels" />
+            <End Role="Groups" EntitySet="Groups" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Players__ID_Grou__4222D4EF" Association="Self.FK__Players__ID_Grou__4222D4EF">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="Players" EntitySet="Players" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Trainings__ID_Gr__47DBAE45" Association="Self.FK__Trainings__ID_Gr__47DBAE45">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="Trainings" EntitySet="Trainings" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Players__ID_User__4316F928" Association="Self.FK__Players__ID_User__4316F928">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Players" EntitySet="Players" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Users__ID_Role__398D8EEE" Association="Self.FK__Users__ID_Role__398D8EEE">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="Users" EntitySet="Users" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Trainings__ID_Ty__49C3F6B7" Association="Self.FK__Trainings__ID_Ty__49C3F6B7">
+            <End Role="Training_Types" EntitySet="Training_Types" />
+            <End Role="Trainings" EntitySet="Trainings" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Trainings__ID_Co__48CFD27E" Association="Self.FK__Trainings__ID_Co__48CFD27E">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Trainings" EntitySet="Trainings" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="Хранилище RusakovPingTrackModelContainer" CdmEntityContainer="RusakovPingTrackEntities">
+          <EntitySetMapping Name="Attendance">
+            <EntityTypeMapping TypeName="RusakovPingTrackModel.Attendance">
+              <MappingFragment StoreEntitySet="Attendance">
+                <ScalarProperty Name="ID_Record" ColumnName="ID_Record" />
+                <ScalarProperty Name="ID_Training" ColumnName="ID_Training" />
+                <ScalarProperty Name="ID_Player" ColumnName="ID_Player" />
+                <ScalarProperty Name="Is_Present" ColumnName="Is_Present" />
+                <ScalarProperty Name="Score" ColumnName="Score" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Groups">
+            <EntityTypeMapping TypeName="RusakovPingTrackModel.Groups">
+              <MappingFragment StoreEntitySet="Groups">
+                <ScalarProperty Name="ID_Group" ColumnName="ID_Group" />
+                <ScalarProperty Name="Group_Name" ColumnName="Group_Name" />
+                <ScalarProperty Name="ID_Level" ColumnName="ID_Level" />
+                <ScalarProperty Name="ID_Coach" ColumnName="ID_Coach" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Levels">
+            <EntityTypeMapping TypeName="RusakovPingTrackModel.Levels">
+              <MappingFragment StoreEntitySet="Levels">
+                <ScalarProperty Name="ID_Level" ColumnName="ID_Level" />
+                <ScalarProperty Name="Level_Name" ColumnName="Level_Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Players">
+            <EntityTypeMapping TypeName="RusakovPingTrackModel.Players">
+              <MappingFragment StoreEntitySet="Players">
+                <ScalarProperty Name="ID_Player" ColumnName="ID_Player" />
+                <ScalarProperty Name="Full_Name" ColumnName="Full_Name" />
+                <ScalarProperty Name="Birth_Date" ColumnName="Birth_Date" />
+                <ScalarProperty Name="Phone" ColumnName="Phone" />
+                <ScalarProperty Name="ID_Group" ColumnName="ID_Group" />
+                <ScalarProperty Name="ID_User" ColumnName="ID_User" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Roles">
+            <EntityTypeMapping TypeName="RusakovPingTrackModel.Roles">
+              <MappingFragment StoreEntitySet="Roles">
+                <ScalarProperty Name="ID_Role" ColumnName="ID_Role" />
+                <ScalarProperty Name="Role_Name" ColumnName="Role_Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Training_Types">
+            <EntityTypeMapping TypeName="RusakovPingTrackModel.Training_Types">
+              <MappingFragment StoreEntitySet="Training_Types">
+                <ScalarProperty Name="ID_Type" ColumnName="ID_Type" />
+                <ScalarProperty Name="Type_Name" ColumnName="Type_Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Trainings">
+            <EntityTypeMapping TypeName="RusakovPingTrackModel.Trainings">
+              <MappingFragment StoreEntitySet="Trainings">
+                <ScalarProperty Name="ID_Training" ColumnName="ID_Training" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="Time" ColumnName="Time" />
+                <ScalarProperty Name="ID_Group" ColumnName="ID_Group" />
+                <ScalarProperty Name="ID_Coach" ColumnName="ID_Coach" />
+                <ScalarProperty Name="ID_Type" ColumnName="ID_Type" />
+                <ScalarProperty Name="Note" ColumnName="Note" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="RusakovPingTrackModel.Users">
+              <MappingFragment StoreEntitySet="Users">
+                <ScalarProperty Name="ID_User" ColumnName="ID_User" />
+                <ScalarProperty Name="Login" ColumnName="Login" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="ID_Role" ColumnName="ID_Role" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="Created_At" ColumnName="Created_At" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Нет" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

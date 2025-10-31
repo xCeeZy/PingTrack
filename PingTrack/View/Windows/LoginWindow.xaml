@@ -14,29 +14,21 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
-            <!-- Заголовок -->
             <RowDefinition Height="60"/>
-            <!-- Промежуток -->
             <RowDefinition Height="40"/>
-            <!-- Метка "Логин" -->
             <RowDefinition Height="40"/>
-            <!-- Поле логина -->
             <RowDefinition Height="40"/>
-            <!-- Метка "Пароль" -->
             <RowDefinition Height="40"/>
-            <!-- Поле пароля -->
             <RowDefinition Height="60"/>
-            <!-- Кнопка -->
             <RowDefinition Height="*"/>
-            <!-- Остаток -->
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="260"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Логотип / название -->
         <TextBlock Grid.Row="0" Grid.Column="1"
                    Text="PingTrack"
                    FontSize="28"
@@ -45,14 +37,12 @@
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"/>
 
-        <!-- Метка "Логин" -->
         <TextBlock Grid.Row="2" Grid.Column="1"
                    Text="Логин"
                    FontSize="15"
                    VerticalAlignment="Center"
                    Foreground="{StaticResource TextBrush}"/>
 
-        <!-- Поле логина -->
         <TextBox x:Name="LoginTextBox"
                  Grid.Row="3" Grid.Column="1"
                  Height="30"
@@ -60,16 +50,15 @@
                  BorderThickness="1"
                  Background="White"
                  FontSize="14"
-                 VerticalContentAlignment="Center"/>
+                 VerticalContentAlignment="Center"
+                 TextAlignment="Left"/>
 
-        <!-- Метка "Пароль" -->
         <TextBlock Grid.Row="4" Grid.Column="1"
                    Text="Пароль"
                    FontSize="15"
                    VerticalAlignment="Center"
                    Foreground="{StaticResource TextBrush}"/>
 
-        <!-- Поле пароля -->
         <PasswordBox x:Name="PasswordBox"
                      Grid.Row="5" Grid.Column="1"
                      Height="30"
@@ -79,7 +68,6 @@
                      FontSize="14"
                      VerticalContentAlignment="Center"/>
 
-        <!-- Кнопка входа -->
         <Button x:Name="LoginButton"
                 Grid.Row="6" Grid.Column="1"
                 Content="Войти"
