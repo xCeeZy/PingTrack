@@ -62,6 +62,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AppData\AuthenticationService.cs" />
+    <Compile Include="AppData\Feedback.cs" />
+    <Compile Include="AppData\JournalGridItem.cs" />
+    <Compile Include="AppData\PaginationService.cs" />
     <Compile Include="Model\Attendance.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -119,6 +123,9 @@
     <Compile Include="View\Pages\TrainingsPage.xaml.cs">
       <DependentUpon>TrainingsPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\Pages\UsersPage.xaml.cs">
+      <DependentUpon>UsersPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Windows\AddEditAttendanceWindow.xaml.cs">
       <DependentUpon>AddEditAttendanceWindow.xaml</DependentUpon>
     </Compile>
@@ -130,6 +137,9 @@
     </Compile>
     <Compile Include="View\Windows\AddEditTrainingWindow.xaml.cs">
       <DependentUpon>AddEditTrainingWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Windows\AddEditUserWindow.xaml.cs">
+      <DependentUpon>AddEditUserWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Windows\LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
@@ -162,6 +172,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\Pages\UsersPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\Windows\AddEditAttendanceWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -175,6 +189,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Windows\AddEditTrainingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Windows\AddEditUserWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
