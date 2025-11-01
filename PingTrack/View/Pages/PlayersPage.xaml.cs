@@ -1,4 +1,5 @@
-﻿using PingTrack.Model;
+﻿using PingTrack.AppData;
+using PingTrack.Model;
 using PingTrack.View.Windows;
 using System;
 using System.Collections.Generic;
@@ -19,52 +20,95 @@ namespace PingTrack.View.Pages
 {
     public partial class PlayersPage : Page
     {
+        #region Поля
+        private PaginationService<Players> pagination;
+        #endregion
+
+        #region Конструктор
         public PlayersPage()
         {
             InitializeComponent();
+            pagination = new PaginationService<Players>(10);
             LoadPlayers();
             PlayersDataGrid.MouseDoubleClick += PlayersDataGrid_MouseDoubleClick;
+            AddPlayerButton.Click += AddPlayerButton_Click;
+            DeletePlayerButton.Click += DeletePlayerButton_Click;
+            NextPageButton.Click += NextPageButton_Click;
+            PrevPageButton.Click += PrevPageButton_Click;
         }
+        #endregion
 
+        #region Загрузка данных
         private void LoadPlayers()
         {
-            PlayersDataGrid.ItemsSource = App.db.Players.ToList();
+            List<Players> data = App.db.Players
+                .Include("Groups")
+                .OrderBy(p => p.Full_Name)
+                .ToList();
+
+            pagination.SetItems(data);
+            UpdatePage();
+        }
+        #endregion
+
+        #region Пагинация
+        private void UpdatePage()
+        {
+            List<Players> current = pagination.GetCurrentPage();
+            PlayersDataGrid.ItemsSource = current;
+            PageInfoText.Text = "Страница " + pagination.CurrentPage + " из " + pagination.TotalPages;
+            PrevPageButton.IsEnabled = pagination.HasPreviousPage;
+            NextPageButton.IsEnabled = pagination.HasNextPage;
         }
 
+        private void NextPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            pagination.NextPage();
+            UpdatePage();
+        }
+
+        private void PrevPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            pagination.PreviousPage();
+            UpdatePage();
+        }
+        #endregion
+
+        #region Добавление, редактирование, удаление
         private void AddPlayerButton_Click(object sender, RoutedEventArgs e)
         {
-            var window = new AddEditPlayerWindow();
+            AddEditPlayerWindow window = new AddEditPlayerWindow();
             if (window.ShowDialog() == true)
                 LoadPlayers();
         }
 
         private void DeletePlayerButton_Click(object sender, RoutedEventArgs e)
         {
-            var selectedPlayer = PlayersDataGrid.SelectedItem as Players;
+            Players selectedPlayer = PlayersDataGrid.SelectedItem as Players;
             if (selectedPlayer == null)
             {
-                MessageBox.Show("Выберите игрока для удаления.", "Внимание",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                Feedback.ShowWarning("Ошибка", "Выберите игрока для удаления.");
                 return;
             }
 
-            if (MessageBox.Show($"Удалить игрока {selectedPlayer.Full_Name}?",
-                "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-            {
-                App.db.Players.Remove(selectedPlayer);
-                App.db.SaveChanges();
-                LoadPlayers();
-            }
+            bool confirm = Feedback.AskQuestion("Подтверждение", "Удалить игрока " + selectedPlayer.Full_Name + "?");
+            if (!confirm) return;
+
+            App.db.Players.Remove(selectedPlayer);
+            App.db.SaveChanges();
+            Feedback.ShowInfo("Успех", "Игрок успешно удалён.");
+            LoadPlayers();
         }
 
         private void PlayersDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var selectedPlayer = PlayersDataGrid.SelectedItem as Players;
+            Players selectedPlayer = PlayersDataGrid.SelectedItem as Players;
             if (selectedPlayer == null) return;
 
-            var window = new AddEditPlayerWindow(selectedPlayer);
+            AddEditPlayerWindow window = new AddEditPlayerWindow(selectedPlayer);
             if (window.ShowDialog() == true)
                 LoadPlayers();
         }
+        #endregion
     }
 }

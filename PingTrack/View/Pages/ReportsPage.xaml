@@ -9,28 +9,36 @@
       Title="Отчёты"
       Background="{StaticResource WindowBrush}">
 
-    <Grid>
+    <Grid Margin="20">
+        <!--#region Структура сетки-->
         <Grid.RowDefinitions>
-            <RowDefinition Height="80"/>
-            <RowDefinition Height="120"/>
+            <RowDefinition Height="70"/>
+            <RowDefinition Height="130"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="84"/>
+            <RowDefinition Height="80"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="60"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="60"/>
         </Grid.ColumnDefinitions>
+        <!--#endregion-->
 
-        <TextBlock Grid.Row="0" Grid.Column="1"
+        <!--#region Заголовок-->
+        <TextBlock Grid.Row="0"
                    Text="Отчёты и статистика"
-                   FontSize="22"
+                   FontSize="24"
                    FontWeight="Bold"
                    Foreground="{StaticResource PrimaryBrush}"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"/>
+        <!--#endregion-->
 
-        <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Card}">
+        <!--#region Параметры фильтрации-->
+        <Border Grid.Row="1"
+                Background="White"
+                CornerRadius="6"
+                Padding="16"
+                BorderBrush="#22000000"
+                BorderThickness="1">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
@@ -46,50 +54,93 @@
                     <RowDefinition Height="44"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Тип отчёта:" FontSize="14" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
-                <ComboBox x:Name="ReportTypeComboBox" Grid.Row="1" Grid.Column="0" Height="32" FontSize="14" SelectedIndex="0">
+                <TextBlock Grid.Row="0" Grid.Column="0" 
+                           Text="Тип отчёта:" 
+                           FontSize="14" 
+                           Foreground="{StaticResource TextBrush}" 
+                           VerticalAlignment="Center"/>
+                <ComboBox x:Name="ReportTypeComboBox" 
+                          Grid.Row="1" Grid.Column="0" 
+                          Height="34" 
+                          FontSize="14" 
+                          SelectedIndex="0">
                     <ComboBoxItem Content="Посещаемость по игрокам"/>
                     <ComboBoxItem Content="Посещаемость по группам"/>
                     <ComboBoxItem Content="Рейтинг активности"/>
                     <ComboBoxItem Content="Общая статистика тренировок"/>
                 </ComboBox>
 
-                <TextBlock Grid.Row="0" Grid.Column="2" Text="Группа:" FontSize="14" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
-                <ComboBox x:Name="GroupComboBox" Grid.Row="1" Grid.Column="2" Height="32" FontSize="14" DisplayMemberPath="Group_Name" SelectedValuePath="ID_Group"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" 
+                           Text="Группа:" 
+                           FontSize="14" 
+                           Foreground="{StaticResource TextBrush}" 
+                           VerticalAlignment="Center"/>
+                <ComboBox x:Name="GroupComboBox" 
+                          Grid.Row="1" Grid.Column="2" 
+                          Height="32" 
+                          FontSize="14" 
+                          DisplayMemberPath="Group_Name" 
+                          SelectedValuePath="ID_Group"/>
 
-                <TextBlock Grid.Row="0" Grid.Column="4" Text="С даты:" FontSize="14" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
-                <DatePicker x:Name="StartDatePicker" Grid.Row="1" Grid.Column="4" Height="32" FontSize="14"/>
+                <TextBlock Grid.Row="0" Grid.Column="4" 
+                           Text="С даты:" 
+                           FontSize="14" 
+                           Foreground="{StaticResource TextBrush}" 
+                           VerticalAlignment="Center"/>
+                <DatePicker x:Name="StartDatePicker" 
+                            Grid.Row="1" Grid.Column="4" 
+                            Height="32" 
+                            FontSize="14"/>
 
-                <TextBlock Grid.Row="0" Grid.Column="6" Text="По дату:" FontSize="14" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
-                <DatePicker x:Name="EndDatePicker" Grid.Row="1" Grid.Column="6" Height="32" FontSize="14"/>
+                <TextBlock Grid.Row="0" Grid.Column="6" 
+                           Text="По дату:" 
+                           FontSize="14" 
+                           Foreground="{StaticResource TextBrush}" 
+                           VerticalAlignment="Center"/>
+                <DatePicker x:Name="EndDatePicker" 
+                            Grid.Row="1" Grid.Column="6" 
+                            Height="32" 
+                            FontSize="14"/>
             </Grid>
         </Border>
+        <!--#endregion-->
 
-        <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource Card}">
+        <!--#region Таблица отчётов-->
+        <Border Grid.Row="2"
+                Background="White"
+                CornerRadius="6"
+                Padding="10"
+                BorderBrush="#22000000"
+                BorderThickness="1">
             <DataGrid x:Name="ReportsDataGrid"
                       AutoGenerateColumns="False"
                       CanUserAddRows="False"
                       IsReadOnly="True"
                       HeadersVisibility="Column"
-                      ColumnHeaderHeight="32"
+                      ColumnHeaderHeight="36"
                       RowHeaderWidth="0"
                       GridLinesVisibility="None"
-                      ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                      VerticalAlignment="Stretch"
+                      HorizontalAlignment="Stretch"
+                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Группа" Binding="{Binding Group}" Width="auto"/>
+                    <DataGridTextColumn Header="Группа" Binding="{Binding Group}" Width="200"/>
                     <DataGridTextColumn Header="Всего занятий" Binding="{Binding TotalTrainings}" Width="160"/>
                     <DataGridTextColumn Header="Присутствий" Binding="{Binding PresentCount}" Width="140"/>
                     <DataGridTextColumn Header="Посещаемость (%)" Binding="{Binding AttendancePercent}" Width="180"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
+        <!--#endregion-->
 
-        <Grid Grid.Row="3" Grid.Column="1">
+        <!--#region Кнопки действий-->
+        <Grid Grid.Row="3" VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="220"/>
-                <ColumnDefinition Width="32"/>
-                <ColumnDefinition Width="180"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
@@ -97,13 +148,18 @@
                     Grid.Column="1"
                     Content="Сформировать отчёт"
                     Style="{StaticResource PrimaryButton}"
-                    Height="38"/>
+                    Width="200"
+                    Height="38"
+                    HorizontalAlignment="Right"/>
 
             <Button x:Name="ExportButton"
                     Grid.Column="3"
                     Content="Экспорт в Excel"
                     Style="{StaticResource BaseButton}"
-                    Height="38"/>
+                    Width="160"
+                    Height="38"
+                    HorizontalAlignment="Left"/>
         </Grid>
+        <!--#endregion-->
     </Grid>
 </Page>

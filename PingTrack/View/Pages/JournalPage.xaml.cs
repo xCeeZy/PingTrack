@@ -1,4 +1,5 @@
-﻿using PingTrack.Model;
+﻿using PingTrack.AppData;
+using PingTrack.Model;
 using PingTrack.View.Windows;
 using System;
 using System.Collections.Generic;
@@ -19,16 +20,23 @@ namespace PingTrack.View.Pages
 {
     public partial class JournalPage : Page
     {
+        #region Поля
         private readonly string userRole;
+        private PaginationService<object> pagination;
+        #endregion
 
+        #region Конструктор
         public JournalPage(string role)
         {
             InitializeComponent();
             userRole = role;
+            pagination = new PaginationService<object>(10);
             LoadJournal();
             JournalDataGrid.MouseDoubleClick += JournalDataGrid_MouseDoubleClick;
             AddRecordButton.Click += AddRecordButton_Click;
             DeleteRecordButton.Click += DeleteRecordButton_Click;
+            NextPageButton.Click += NextPageButton_Click;
+            PrevPageButton.Click += PrevPageButton_Click;
 
             if (userRole == "Студент")
             {
@@ -38,32 +46,57 @@ namespace PingTrack.View.Pages
                 DeleteRecordButton.Visibility = Visibility.Collapsed;
             }
         }
+        #endregion
 
+        #region Загрузка данных
         private void LoadJournal()
         {
-            List<object> data = App.db.Attendance
+            List<JournalGridItem> data = App.db.Attendance
                 .Include("Trainings")
                 .Include("Players")
                 .Include("Trainings.Training_Types")
                 .Include("Players.Groups")
                 .ToList()
-                .Select(a => new
+                .Select(a => new JournalGridItem
                 {
-                    a.ID_Record,
+                    ID_Record = a.ID_Record,
                     Date = a.Trainings.Date.ToString("dd.MM.yyyy"),
                     Player = a.Players.Full_Name,
                     Group = a.Players.Groups.Group_Name,
                     Training = a.Trainings.Training_Types.Type_Name,
-                    Presence = a.Is_Present ? "Присутствовал" : "Отсутствовал",
-                    a.Score
+                    IsPresent = a.Is_Present
                 })
-                .OrderByDescending(x => x.Date)
-                .Cast<object>()
                 .ToList();
 
-            JournalDataGrid.ItemsSource = data;
+            pagination.SetItems(data.Cast<object>().ToList());
+            UpdatePage();
+        }
+        #endregion
+
+        #region Навигация страниц
+        private void UpdatePage()
+        {
+            List<object> current = pagination.GetCurrentPage();
+            JournalDataGrid.ItemsSource = current;
+            PageInfoText.Text = "Страница " + pagination.CurrentPage + " из " + pagination.TotalPages;
+            PrevPageButton.IsEnabled = pagination.HasPreviousPage;
+            NextPageButton.IsEnabled = pagination.HasNextPage;
         }
 
+        private void NextPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            pagination.NextPage();
+            UpdatePage();
+        }
+
+        private void PrevPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            pagination.PreviousPage();
+            UpdatePage();
+        }
+        #endregion
+
+        #region Добавление, редактирование, удаление
         private void AddRecordButton_Click(object sender, RoutedEventArgs e)
         {
             AddEditAttendanceWindow window = new AddEditAttendanceWindow(userRole);
@@ -77,9 +110,10 @@ namespace PingTrack.View.Pages
         {
             if (JournalDataGrid.SelectedItem == null) return;
 
-            dynamic selected = JournalDataGrid.SelectedItem;
-            int id = selected.ID_Record;
-            Attendance record = App.db.Attendance.FirstOrDefault(x => x.ID_Record == id);
+            JournalGridItem selected = JournalDataGrid.SelectedItem as JournalGridItem;
+            if (selected == null) return;
+
+            Attendance record = App.db.Attendance.FirstOrDefault(x => x.ID_Record == selected.ID_Record);
             if (record == null) return;
 
             AddEditAttendanceWindow window = new AddEditAttendanceWindow(userRole, record);
@@ -93,21 +127,24 @@ namespace PingTrack.View.Pages
         {
             if (JournalDataGrid.SelectedItem == null)
             {
-                MessageBox.Show("Выберите запись для удаления.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Feedback.ShowWarning("Ошибка", "Выберите запись для удаления.");
                 return;
             }
 
-            dynamic selected = JournalDataGrid.SelectedItem;
-            int id = selected.ID_Record;
-            Attendance record = App.db.Attendance.FirstOrDefault(x => x.ID_Record == id);
+            JournalGridItem selected = JournalDataGrid.SelectedItem as JournalGridItem;
+            if (selected == null) return;
+
+            Attendance record = App.db.Attendance.FirstOrDefault(x => x.ID_Record == selected.ID_Record);
             if (record == null) return;
 
-            if (MessageBox.Show("Удалить выбранную запись?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-            {
-                App.db.Attendance.Remove(record);
-                App.db.SaveChanges();
-                LoadJournal();
-            }
+            bool confirm = Feedback.AskQuestion("Подтверждение", "Удалить выбранную запись?");
+            if (!confirm) return;
+
+            App.db.Attendance.Remove(record);
+            App.db.SaveChanges();
+            Feedback.ShowInfo("Успех", "Запись успешно удалена.");
+            LoadJournal();
         }
+        #endregion
     }
 }

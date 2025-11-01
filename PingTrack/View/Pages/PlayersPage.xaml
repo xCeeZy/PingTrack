@@ -6,69 +6,99 @@
       xmlns:local="clr-namespace:PingTrack.View.Pages"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-       Title="Игроки"
+      Title="Игроки"
       Background="{StaticResource WindowBrush}">
 
-    <Grid>
+    <Grid Margin="20">
+        <!--#region Структура сетки-->
         <Grid.RowDefinitions>
-            <RowDefinition Height="80"/>
+            <RowDefinition Height="70"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="70"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="80"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="200"/>
-            <ColumnDefinition Width="200"/>
-            <ColumnDefinition Width="80"/>
         </Grid.ColumnDefinitions>
+        <!--#endregion-->
 
-        <TextBlock Grid.Row="0" Grid.ColumnSpan="5"
+        <!--#region Заголовок-->
+        <TextBlock Grid.Row="0"
                    Text="Игроки секции"
-                   FontSize="22" FontWeight="Bold"
+                   FontSize="24"
+                   FontWeight="Bold"
                    Foreground="{StaticResource PrimaryBrush}"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"/>
+        <!--#endregion-->
 
-        <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Style="{StaticResource Card}">
+        <!--#region Таблица-->
+        <Border Grid.Row="1"
+                Background="White"
+                CornerRadius="6"
+                Padding="10"
+                BorderBrush="#22000000"
+                BorderThickness="1">
             <DataGrid x:Name="PlayersDataGrid"
                       AutoGenerateColumns="False"
                       HeadersVisibility="Column"
-                      ColumnHeaderHeight="32"
+                      ColumnHeaderHeight="36"
                       CanUserAddRows="False"
                       IsReadOnly="True"
                       RowHeaderWidth="0"
                       GridLinesVisibility="None"
-                      ItemsSource="{Binding}">
+                      VerticalAlignment="Stretch"
+                      HorizontalAlignment="Stretch"
+                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="ФИО" Binding="{Binding Full_Name}" Width="auto"/>
-                    <DataGridTextColumn Header="Дата рождения" Binding="{Binding Birth_Date, StringFormat=d}" Width="150"/>
+                    <DataGridTextColumn Header="ФИО" Binding="{Binding Full_Name}" Width="240"/>
+                    <DataGridTextColumn Header="Дата рождения" Binding="{Binding Birth_Date, StringFormat=d}" Width="160"/>
                     <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="150"/>
-                    <DataGridTextColumn Header="Группа" Binding="{Binding Groups.Group_Name}" Width="150"/>
+                    <DataGridTextColumn Header="Группа" Binding="{Binding Groups.Group_Name}" Width="180"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
+        <!--#endregion-->
 
-        <Grid Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2">
+        <!--#region Нижняя панель управления-->
+        <Grid Grid.Row="2" VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Button x:Name="AddPlayerButton"
-                    Content="Добавить игрока"
-                    Style="{StaticResource PrimaryButton}"
-                    Width="160" Height="36"
-                    HorizontalAlignment="Center"
-                    Click="AddPlayerButton_Click"/>
+            <!-- Левая навигация -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button x:Name="PrevPageButton"
+                        Content="Назад"
+                        Style="{StaticResource BaseButton}"
+                        Width="100" Height="34"/>
+                <TextBlock x:Name="PageInfoText"
+                           Text="Страница 1 из 1"
+                           FontSize="13"
+                           Foreground="{StaticResource TextBrush}"
+                           VerticalAlignment="Center"
+                           Margin="12,0,12,0"/>
+                <Button x:Name="NextPageButton"
+                        Content="Вперёд"
+                        Style="{StaticResource BaseButton}"
+                        Width="100" Height="34"/>
+            </StackPanel>
 
-            <Button x:Name="DeletePlayerButton"
-                    Grid.Column="1"
-                    Content="Удалить"
-                    Style="{StaticResource BaseButton}"
-                    Width="120" Height="36"
-                    HorizontalAlignment="Center"
-                    Click="DeletePlayerButton_Click"/>
+            <!-- Правая панель -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button x:Name="AddPlayerButton"
+                        Content="Добавить игрока"
+                        Style="{StaticResource PrimaryButton}"
+                        Width="160" Height="36"
+                        Margin="0,0,12,0"/>
+                <Button x:Name="DeletePlayerButton"
+                        Content="Удалить"
+                        Style="{StaticResource BaseButton}"
+                        Width="120" Height="36"/>
+            </StackPanel>
         </Grid>
+        <!--#endregion-->
     </Grid>
 </Page>

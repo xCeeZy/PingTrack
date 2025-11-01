@@ -6,67 +6,83 @@
       xmlns:local="clr-namespace:PingTrack.View.Pages"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-       Title="Группы"
+      Title="Группы"
       Background="{StaticResource WindowBrush}">
 
-    <Grid>
+    <Grid Margin="20">
+        <!--#region Структура сетки-->
         <Grid.RowDefinitions>
-            <RowDefinition Height="80"/>
+            <RowDefinition Height="70"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="70"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="80"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="200"/>
-            <ColumnDefinition Width="200"/>
-            <ColumnDefinition Width="80"/>
-        </Grid.ColumnDefinitions>
+        <!--#endregion-->
 
-        <TextBlock Grid.Row="0" Grid.ColumnSpan="5"
+        <!--#region Заголовок-->
+        <TextBlock Grid.Row="0"
                    Text="Группы секции"
-                   FontSize="22" FontWeight="Bold"
+                   FontSize="24"
+                   FontWeight="Bold"
                    Foreground="{StaticResource PrimaryBrush}"
-                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+        <!--#endregion-->
 
-        <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Style="{StaticResource Card}">
+        <!--#region Таблица групп-->
+        <Border Grid.Row="1"
+                Background="White"
+                CornerRadius="6"
+                Padding="12"
+                BorderBrush="#22000000"
+                BorderThickness="1">
             <DataGrid x:Name="GroupsDataGrid"
                       AutoGenerateColumns="False"
-                      HeadersVisibility="Column"
-                      ColumnHeaderHeight="32"
                       CanUserAddRows="False"
                       IsReadOnly="True"
+                      HeadersVisibility="Column"
+                      ColumnHeaderHeight="36"
                       RowHeaderWidth="0"
                       GridLinesVisibility="None"
-                      ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Название группы" Binding="{Binding Name}" Width="auto"/>
+                    <DataGridTextColumn Header="Название группы" Binding="{Binding Name}" Width="*"/>
                     <DataGridTextColumn Header="Тренер" Binding="{Binding Coach}" Width="200"/>
                     <DataGridTextColumn Header="Количество игроков" Binding="{Binding PlayerCount}" Width="180"/>
-                    <DataGridTextColumn Header="Уровень подготовки" Binding="{Binding Level}" Width="180"/>
+                    <DataGridTextColumn Header="Уровень подготовки" Binding="{Binding Level}" Width="200"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
+        <!--#endregion-->
 
-        <Grid Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2">
+        <!--#region Нижняя панель кнопок-->
+        <Grid Grid.Row="2" VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
+
             <Button x:Name="AddGroupButton"
-        Content="Добавить группу"
-        Style="{StaticResource PrimaryButton}"
-        Width="160" Height="36"
-        HorizontalAlignment="Center"
-        Click="AddGroupButton_Click"/>
+                    Grid.Column="1"
+                    Content="Добавить группу"
+                    Style="{StaticResource PrimaryButton}"
+                    Width="180"
+                    Height="38"
+                    HorizontalAlignment="Right"
+                    Click="AddGroupButton_Click"/>
 
             <Button x:Name="DeleteGroupButton"
-        Grid.Column="1"
-        Content="Удалить"
-        Style="{StaticResource BaseButton}"
-        Width="120" Height="36"
-        HorizontalAlignment="Center"
-        Click="DeleteGroupButton_Click"/>
+                    Grid.Column="3"
+                    Content="Удалить"
+                    Style="{StaticResource BaseButton}"
+                    Width="140"
+                    Height="38"
+                    HorizontalAlignment="Left"
+                    Click="DeleteGroupButton_Click"/>
         </Grid>
+        <!--#endregion-->
     </Grid>
 </Page>
