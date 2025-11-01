@@ -119,6 +119,9 @@
     <Compile Include="View\Pages\TrainingsPage.xaml.cs">
       <DependentUpon>TrainingsPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\Windows\AddEditAttendanceWindow.xaml.cs">
+      <DependentUpon>AddEditAttendanceWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Windows\AddEditGroupWindow.xaml.cs">
       <DependentUpon>AddEditGroupWindow.xaml</DependentUpon>
     </Compile>
@@ -156,6 +159,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Pages\TrainingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Windows\AddEditAttendanceWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -222,9 +229,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\Fonts\" />
-    <Folder Include="Resources\Images\" />
-    <Folder Include="View\Windows\NewFolder1\" />
-    <Folder Include="View\Windows\NewFolder2\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Model\Model1.Context.tt">
@@ -237,6 +241,7 @@
       <DependentUpon>Model1.edmx</DependentUpon>
       <LastGenOutput>Model1.cs</LastGenOutput>
     </Content>
+    <Resource Include="Resources\Images\logo.png" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

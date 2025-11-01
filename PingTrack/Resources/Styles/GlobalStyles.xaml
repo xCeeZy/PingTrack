@@ -173,4 +173,27 @@
         <Setter Property="Background" Value="White"/>
     </Style>
 
+    <!-- 📋 Единый стиль для всех DataGrid -->
+    <Style TargetType="DataGrid">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="{StaticResource StrokeStrongBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="RowBackground" Value="#FFFDFDFD"/>
+        <Setter Property="AlternatingRowBackground" Value="#FFF6F6F6"/>
+        <Setter Property="HeadersVisibility" Value="Column"/>
+        <Setter Property="GridLinesVisibility" Value="None"/>
+        <Setter Property="HorizontalScrollBarVisibility" Value="Auto"/>
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+        <Setter Property="CanUserAddRows" Value="False"/>
+        <Setter Property="CanUserResizeRows" Value="False"/>
+        <Setter Property="CanUserResizeColumns" Value="True"/>
+        <Setter Property="CanUserSortColumns" Value="True"/>
+        <Setter Property="RowHeaderWidth" Value="0"/>
+        <Setter Property="IsReadOnly" Value="True"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+        <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource StrokeStrongBrush}"/>
+        <Setter Property="VerticalGridLinesBrush" Value="{StaticResource StrokeStrongBrush}"/>
+    </Style>
+
 </ResourceDictionary>

@@ -41,7 +41,7 @@
                       GridLinesVisibility="None"
                       ItemsSource="{Binding}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="ФИО" Binding="{Binding Full_Name}" Width="*"/>
+                    <DataGridTextColumn Header="ФИО" Binding="{Binding Full_Name}" Width="auto"/>
                     <DataGridTextColumn Header="Дата рождения" Binding="{Binding Birth_Date, StringFormat=d}" Width="150"/>
                     <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="150"/>
                     <DataGridTextColumn Header="Группа" Binding="{Binding Groups.Group_Name}" Width="150"/>

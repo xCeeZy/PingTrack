@@ -18,18 +18,16 @@ namespace PingTrack.View.Windows
 {
     public partial class MainWindow : Window
     {
-        private string userRole;
-        private string userName;
+        private readonly string userRole;
+        private readonly string userName;
 
         public MainWindow(string role, string login)
         {
             InitializeComponent();
             userRole = role;
             userName = login;
-
             RoleText.Text = "Роль: " + role;
             UserText.Text = "Пользователь: " + login;
-
             ApplyRolePermissions();
         }
 
@@ -47,46 +45,42 @@ namespace PingTrack.View.Windows
             {
                 ReportsBtn.Visibility = Visibility.Collapsed;
             }
-
-            if (userRole == "Администратор")
-            {
-                DashboardBtn.Visibility = Visibility.Visible;
-                PlayersBtn.Visibility = Visibility.Visible;
-                GroupsBtn.Visibility = Visibility.Visible;
-                TrainingsBtn.Visibility = Visibility.Visible;
-                JournalBtn.Visibility = Visibility.Visible;
-                ReportsBtn.Visibility = Visibility.Visible;
-            }
         }
 
         private void DashboardBtn_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Navigate(new DashboardPage());
+            DashboardPage page = new DashboardPage();
+            MainFrame.Navigate(page);
         }
 
         private void PlayersBtn_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Navigate(new PlayersPage());
+            PlayersPage page = new PlayersPage();
+            MainFrame.Navigate(page);
         }
 
         private void GroupsBtn_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Navigate(new GroupsPage());
+            GroupsPage page = new GroupsPage();
+            MainFrame.Navigate(page);
         }
 
         private void TrainingsBtn_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Navigate(new TrainingsPage());
+            TrainingsPage page = new TrainingsPage();
+            MainFrame.Navigate(page);
         }
 
         private void JournalBtn_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Navigate(new JournalPage());
+            JournalPage page = new JournalPage(userRole);
+            MainFrame.Navigate(page);
         }
 
         private void ReportsBtn_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Navigate(new ReportsPage());
+            ReportsPage page = new ReportsPage();
+            MainFrame.Navigate(page);
         }
     }
 }

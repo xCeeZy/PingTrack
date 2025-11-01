@@ -41,7 +41,7 @@
                       ScrollViewer.HorizontalScrollBarVisibility="Auto">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Дата" Binding="{Binding Date}" Width="150"/>
-                    <DataGridTextColumn Header="Игрок" Binding="{Binding Player}" Width="*"/>
+                    <DataGridTextColumn Header="Игрок" Binding="{Binding Player}" Width="auto"/>
                     <DataGridTextColumn Header="Группа" Binding="{Binding Group}" Width="200"/>
                     <DataGridTextColumn Header="Занятие" Binding="{Binding Training}" Width="200"/>
                     <DataGridCheckBoxColumn Header="Присутствие" Binding="{Binding IsPresent}" Width="120"/>

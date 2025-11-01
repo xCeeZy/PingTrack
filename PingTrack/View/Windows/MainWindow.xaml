@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PingTrack"
         mc:Ignorable="d"
-        Title="PingTrack"
+       Title="PingTrack"
         WindowStartupLocation="CenterScreen"
         Width="1100" Height="680"
         Background="{StaticResource WindowBrush}"
@@ -13,7 +13,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="56"/>
+            <RowDefinition Height="90"/>
             <RowDefinition Height="1"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -24,22 +24,21 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Верхняя панель -->
         <Border Grid.Row="0" Grid.ColumnSpan="3" Background="{StaticResource PanelBrush}">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="300"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0"
-                           Text="PingTrack"
-                           FontSize="18"
-                           FontWeight="Bold"
-                           Foreground="{StaticResource PrimaryBrush}"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Center"/>
+                <Image Grid.Column="0"
+                       Source="C:\Users\rusak\source\repos\PingTrack\PingTrack\Resources\Images\logo.png"
+                       Width="440"
+                       Height="108"
+                       Stretch="Uniform"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"/>
 
                 <StackPanel Grid.Column="2"
                             Orientation="Horizontal"
@@ -48,30 +47,30 @@
                     <TextBlock x:Name="UserText"
                                Text="Пользователь: —"
                                FontSize="13"
-                               Foreground="{StaticResource TextBrush}"/>
-                    <TextBlock Text="   "/>
+                               Foreground="{StaticResource TextBrush}"
+                               VerticalAlignment="Center"/>
+                    <Rectangle Width="12"/>
                     <TextBlock x:Name="RoleText"
                                Text="Роль: —"
                                FontSize="13"
-                               Foreground="{StaticResource TextBrush}"/>
+                               Foreground="{StaticResource TextBrush}"
+                               VerticalAlignment="Center"/>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <!-- Горизонтальная линия под шапкой -->
         <Border Grid.Row="1" Grid.ColumnSpan="3" Background="#22000000"/>
 
-        <!-- Левая панель -->
         <Border Grid.Row="2" Grid.Column="0" Background="{StaticResource PanelBrush}">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="70"/>
-                    <RowDefinition Height="44"/>
-                    <RowDefinition Height="44"/>
-                    <RowDefinition Height="44"/>
-                    <RowDefinition Height="44"/>
-                    <RowDefinition Height="44"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0"
@@ -79,8 +78,8 @@
                            FontWeight="SemiBold"
                            FontSize="15"
                            Foreground="{StaticResource TextBrush}"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Center"/>
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
 
                 <Button x:Name="DashboardBtn"
                         Grid.Row="1"
@@ -120,10 +119,8 @@
             </Grid>
         </Border>
 
-        <!-- Вертикальная линия между меню и контентом -->
         <Border Grid.Row="2" Grid.Column="1" Background="#22000000"/>
 
-        <!-- Основной контент -->
         <Border Grid.Row="2" Grid.Column="2" Background="{StaticResource WindowBrush}">
             <Frame x:Name="MainFrame"
                    NavigationUIVisibility="Hidden"

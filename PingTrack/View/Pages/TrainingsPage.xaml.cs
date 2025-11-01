@@ -12,9 +12,20 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using PingTrack.View.Windows;
 
 namespace PingTrack.View.Pages
 {
+    public sealed class TrainingGridItem
+    {
+        public int ID_Training { get; set; }
+        public string Date { get; set; }
+        public string Time { get; set; }
+        public string Group { get; set; }
+        public string Coach { get; set; }
+        public string Type { get; set; }
+    }
+
     public partial class TrainingsPage : Page
     {
         public TrainingsPage()
@@ -28,59 +39,62 @@ namespace PingTrack.View.Pages
 
         private void LoadTrainings()
         {
-            TrainingsDataGrid.ItemsSource = App.db.Trainings
-                .Select(t => new
+            List<TrainingGridItem> data = App.db.Trainings
+                .ToList()
+                .Select(t => new TrainingGridItem
                 {
-                    t.ID_Training,
+                    ID_Training = t.ID_Training,
                     Date = t.Date.ToString("dd.MM.yyyy"),
                     Time = t.Time.ToString(@"hh\:mm"),
-                    Group = t.Groups.Group_Name,
-                    Coach = t.Users.Login,
-                    Type = t.Training_Types.Type_Name
+                    Group = t.Groups != null ? t.Groups.Group_Name : "-",
+                    Coach = t.Users != null ? t.Users.Login : "-",
+                    Type = t.Training_Types != null ? t.Training_Types.Type_Name : "-"
                 })
                 .ToList();
+
+            TrainingsDataGrid.ItemsSource = data;
         }
 
         private void AddTrainingButton_Click(object sender, RoutedEventArgs e)
         {
-            var window = new AddEditTrainingWindow();
-            if (window.ShowDialog() == true)
-                LoadTrainings();
+            AddEditTrainingWindow window = new AddEditTrainingWindow();
+            bool? result = window.ShowDialog();
+            if (result == true) LoadTrainings();
         }
 
         private void TrainingsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (TrainingsDataGrid.SelectedItem is null) return;
+            if (TrainingsDataGrid.SelectedItem == null) return;
 
-            dynamic selected = TrainingsDataGrid.SelectedItem;
+            TrainingGridItem selected = (TrainingGridItem)TrainingsDataGrid.SelectedItem;
             int id = selected.ID_Training;
-            var training = App.db.Trainings.FirstOrDefault(x => x.ID_Training == id);
+            PingTrack.Model.Trainings training = App.db.Trainings.FirstOrDefault(x => x.ID_Training == id);
+            if (training == null) return;
 
-            var window = new AddEditTrainingWindow(training);
-            if (window.ShowDialog() == true)
-                LoadTrainings();
+            AddEditTrainingWindow window = new AddEditTrainingWindow(training);
+            bool? result = window.ShowDialog();
+            if (result == true) LoadTrainings();
         }
 
         private void DeleteTrainingButton_Click(object sender, RoutedEventArgs e)
         {
-            if (TrainingsDataGrid.SelectedItem is null)
+            if (TrainingsDataGrid.SelectedItem == null)
             {
                 MessageBox.Show("Выберите занятие для удаления.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            dynamic selected = TrainingsDataGrid.SelectedItem;
+            TrainingGridItem selected = (TrainingGridItem)TrainingsDataGrid.SelectedItem;
             int id = selected.ID_Training;
-            var training = App.db.Trainings.FirstOrDefault(x => x.ID_Training == id);
+            PingTrack.Model.Trainings training = App.db.Trainings.FirstOrDefault(x => x.ID_Training == id);
+            if (training == null) return;
 
-            if (training != null)
+            MessageBoxResult confirm = MessageBox.Show("Удалить выбранное занятие?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (confirm == MessageBoxResult.Yes)
             {
-                if (MessageBox.Show("Удалить выбранное занятие?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                {
-                    App.db.Trainings.Remove(training);
-                    App.db.SaveChanges();
-                    LoadTrainings();
-                }
+                App.db.Trainings.Remove(training);
+                App.db.SaveChanges();
+                LoadTrainings();
             }
         }
     }

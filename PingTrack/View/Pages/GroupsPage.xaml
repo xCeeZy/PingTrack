@@ -40,7 +40,7 @@
                       GridLinesVisibility="None"
                       ScrollViewer.HorizontalScrollBarVisibility="Auto">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Название группы" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTextColumn Header="Название группы" Binding="{Binding Name}" Width="auto"/>
                     <DataGridTextColumn Header="Тренер" Binding="{Binding Coach}" Width="200"/>
                     <DataGridTextColumn Header="Количество игроков" Binding="{Binding PlayerCount}" Width="180"/>
                     <DataGridTextColumn Header="Уровень подготовки" Binding="{Binding Level}" Width="180"/>
