@@ -7,18 +7,20 @@
         mc:Ignorable="d"
         Title="Пользователь"
         WindowStartupLocation="CenterScreen"
-        Width="420" Height="360"
+        Width="420" Height="440"
         Background="{StaticResource WindowBrush}"
         ResizeMode="NoResize">
-    <!--#region Контент окна-->
+
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
             <RowDefinition Height="60"/>
             <RowDefinition Height="60"/>
             <RowDefinition Height="60"/>
+            <RowDefinition Height="70"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
@@ -26,42 +28,76 @@
 
         <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
                    Text="Данные пользователя"
-                   FontSize="18" FontWeight="SemiBold"
+                   FontSize="18"
+                   FontWeight="SemiBold"
                    Foreground="{StaticResource PrimaryBrush}"
-                   VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
 
         <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
             <TextBlock Text="Логин" FontSize="14" Foreground="{StaticResource TextBrush}"/>
-            <TextBox x:Name="LoginBox" Height="34" FontSize="14" VerticalContentAlignment="Center"/>
+            <TextBox x:Name="LoginBox"
+                     Height="34"
+                     FontSize="14"
+                     VerticalContentAlignment="Center"/>
         </StackPanel>
 
         <StackPanel Grid.Row="2" Grid.ColumnSpan="2">
             <TextBlock Text="Пароль" FontSize="14" Foreground="{StaticResource TextBrush}"/>
-            <PasswordBox x:Name="PasswordBox" Height="34" FontSize="14"/>
+            <PasswordBox x:Name="PasswordBox"
+                         Height="34"
+                         FontSize="14"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal" VerticalAlignment="Center">
+        <StackPanel Grid.Row="3" Grid.ColumnSpan="2">
+            <TextBlock Text="ФИО" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+            <TextBox x:Name="FullNameBox"
+                     Height="34"
+                     FontSize="14"
+                     VerticalContentAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="4" Grid.ColumnSpan="2"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center" Height="64">
             <StackPanel Width="220">
                 <TextBlock Text="Роль" FontSize="14" Foreground="{StaticResource TextBrush}"/>
-                <ComboBox x:Name="RoleComboBox" Height="34" FontSize="14"
-                          DisplayMemberPath="Role_Name" SelectedValuePath="ID_Role"/>
+                <ComboBox x:Name="RoleComboBox"
+                          Height="36"
+                          FontSize="14"
+                          DisplayMemberPath="Role_Name"
+                          SelectedValuePath="ID_Role"/>
             </StackPanel>
-            <CheckBox x:Name="IsActiveCheckBox" Content="Активен" FontSize="14"
-                      VerticalAlignment="Bottom" Margin="20,0,0,6"/>
+
+            <CheckBox x:Name="IsActiveCheckBox"
+                      Content="Активен"
+                      FontSize="14"
+                      VerticalAlignment="Bottom"
+                      Margin="24,0,0,8"/>
         </StackPanel>
 
-        <Grid Grid.Row="4" Grid.ColumnSpan="2">
+        <Grid Grid.Row="5" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="SaveButton" Content="Сохранить"
-                    Style="{StaticResource PrimaryButton}" Width="140" Height="36"
-                    HorizontalAlignment="Center" Click="SaveButton_Click"/>
-            <Button x:Name="CancelButton" Grid.Column="1" Content="Отмена"
-                    Style="{StaticResource BaseButton}" Width="120" Height="36"
-                    HorizontalAlignment="Center" Click="CancelButton_Click"/>
+
+            <Button x:Name="SaveButton"
+                    Content="Сохранить"
+                    Style="{StaticResource PrimaryButton}"
+                    Width="160"
+                    Height="40"
+                    HorizontalAlignment="Center"
+                    Click="SaveButton_Click"/>
+
+            <Button x:Name="CancelButton"
+                    Grid.Column="1"
+                    Content="Отмена"
+                    Style="{StaticResource BaseButton}"
+                    Width="140"
+                    Height="40"
+                    HorizontalAlignment="Center"
+                    Click="CancelButton_Click"/>
         </Grid>
     </Grid>
-    <!--#endregion-->
 </Window>

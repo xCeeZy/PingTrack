@@ -47,7 +47,7 @@
                      Grid.Row="1"
                      FontSize="14"
                      VerticalContentAlignment="Center"
-                     Height="32"/>
+                     Height="34"/>
         </Grid>
 
         <Grid Grid.Row="2" Grid.Column="1">
@@ -76,7 +76,7 @@
                      Grid.Row="1"
                      FontSize="14"
                      VerticalContentAlignment="Center"
-                     Height="32"/>
+                     Height="34"/>
         </Grid>
 
         <Grid Grid.Row="4" Grid.Column="1">

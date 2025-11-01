@@ -18,15 +18,20 @@ namespace PingTrack.View.Windows
 {
     public partial class LoginWindow : Window
     {
+        private bool isPasswordVisible = false;
+
+        #region Конструктор
         public LoginWindow()
         {
             InitializeComponent();
         }
+        #endregion
 
+        #region Кнопка входа
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             string login = LoginTextBox.Text.Trim();
-            string password = PasswordBox.Password.Trim();
+            string password = isPasswordVisible ? VisiblePasswordBox.Text.Trim() : PasswordBox.Password.Trim();
 
             if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
             {
@@ -51,5 +56,28 @@ namespace PingTrack.View.Windows
             main.Show();
             Close();
         }
+        #endregion
+
+        #region Показ/скрытие пароля
+        private void TogglePasswordButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (isPasswordVisible)
+            {
+                PasswordBox.Password = VisiblePasswordBox.Text;
+                VisiblePasswordBox.Visibility = Visibility.Collapsed;
+                PasswordBox.Visibility = Visibility.Visible;
+                EyeIcon.Source = new BitmapImage(new System.Uri("pack://application:,,,/Resources/Images/eye_closed.png"));
+            }
+            else
+            {
+                VisiblePasswordBox.Text = PasswordBox.Password;
+                PasswordBox.Visibility = Visibility.Collapsed;
+                VisiblePasswordBox.Visibility = Visibility.Visible;
+                EyeIcon.Source = new BitmapImage(new System.Uri("pack://application:,,,/Resources/Images/eye_open.png"));
+            }
+
+            isPasswordVisible = !isPasswordVisible;
+        }
+        #endregion
     }
 }

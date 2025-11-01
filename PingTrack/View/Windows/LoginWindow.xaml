@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PingTrack.View.Windows"
         mc:Ignorable="d"
-         Title="Авторизация — PingTrack"
+        Title="Авторизация — PingTrack"
         WindowStartupLocation="CenterScreen"
         Width="420" Height="480"
         Background="{StaticResource WindowBrush}"
@@ -29,15 +29,12 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Логотип -->
         <Image Grid.Column="1"
-               Source="C:\Users\rusak\source\repos\PingTrack\PingTrack\Resources\Images\logo.png"
+               Source="/Resources/Images/logo.png"
                Width="212"
                Height="180"
                VerticalAlignment="Center"
                HorizontalAlignment="Center"/>
-
-
 
         <TextBlock Grid.Row="2" Grid.Column="1"
                    Text="Логин"
@@ -52,7 +49,8 @@
                  BorderThickness="1"
                  Background="White"
                  FontSize="14"
-                 VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+                 VerticalContentAlignment="Center"
+                 VerticalAlignment="Center"/>
 
         <TextBlock Grid.Row="4" Grid.Column="1"
                    Text="Пароль"
@@ -60,19 +58,49 @@
                    VerticalAlignment="Center"
                    Foreground="{StaticResource TextBrush}"/>
 
-        <PasswordBox x:Name="PasswordBox"
-                     Grid.Row="5" Grid.Column="1"
-                     Height="30"
+        <Grid Grid.Row="5" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="40"/>
+            </Grid.ColumnDefinitions>
+
+            <PasswordBox x:Name="PasswordBox"
+                         Height="34"
+                         BorderBrush="#33000000"
+                         BorderThickness="1"
+                         Background="White"
+                         FontSize="14"
+                         VerticalContentAlignment="Center"/>
+
+            <TextBox x:Name="VisiblePasswordBox"
+                     Height="34"
                      BorderBrush="#33000000"
                      BorderThickness="1"
                      Background="White"
                      FontSize="14"
-                     VerticalContentAlignment="Center"/>
+                     VerticalContentAlignment="Center"
+                     Visibility="Collapsed"/>
+
+            <Button x:Name="TogglePasswordButton"
+                    Grid.Column="1"
+                    Width="34"
+                    Height="34"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Click="TogglePasswordButton_Click">
+                <Image x:Name="EyeIcon"
+                       Width="28"
+                       Height="28"
+                       Source="/Resources/Images/eye_closed.png"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"/>
+            </Button>
+        </Grid>
 
         <Button x:Name="LoginButton"
                 Grid.Row="6" Grid.Column="1"
                 Content="Войти"
-                Height="34"
+                Height="36"
                 Background="{StaticResource PrimaryBrush}"
                 Foreground="White"
                 FontWeight="SemiBold"

@@ -259,6 +259,8 @@
       <DependentUpon>Model1.edmx</DependentUpon>
       <LastGenOutput>Model1.cs</LastGenOutput>
     </Content>
+    <Resource Include="Resources\Images\eye_closed.png" />
+    <Resource Include="Resources\Images\eye_open.png" />
     <Resource Include="Resources\Images\logo.png" />
   </ItemGroup>
   <ItemGroup>

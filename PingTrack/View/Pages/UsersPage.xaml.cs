@@ -21,6 +21,7 @@ namespace PingTrack.View.Pages
     public partial class UsersPage : Page
     {
         private List<Users> allUsers;
+        private bool isInitialized = false;
 
         public UsersPage()
         {
@@ -28,10 +29,10 @@ namespace PingTrack.View.Pages
             LoadRoles();
             LoadUsers();
 
-            UsersDataGrid.MouseDoubleClick += UsersDataGrid_MouseDoubleClick;
-            AddUserButton.Click += AddUserButton_Click;
-            EditUserButton.Click += EditUserButton_Click;
-            DeleteUserButton.Click += DeleteUserButton_Click;
+            RoleFilter.SelectionChanged += RoleFilter_SelectionChanged;
+            SearchBox.TextChanged += SearchBox_TextChanged;
+
+            isInitialized = true;
         }
 
         private void LoadRoles()
@@ -52,7 +53,10 @@ namespace PingTrack.View.Pages
 
         private void ApplyFilters()
         {
-            string searchText = SearchBox.Text.Trim();
+            if (!isInitialized) return;
+            if (allUsers == null || RoleFilter == null) return;
+
+            string searchText = SearchBox.Text?.Trim().ToLower() ?? string.Empty;
             Roles selectedRole = RoleFilter.SelectedItem as Roles;
 
             IEnumerable<Users> filtered = allUsers;
@@ -60,23 +64,40 @@ namespace PingTrack.View.Pages
             if (selectedRole != null && selectedRole.ID_Role != 0)
                 filtered = filtered.Where(u => u.ID_Role == selectedRole.ID_Role);
 
-            if (!string.IsNullOrWhiteSpace(searchText) && searchText != "Поиск по логину или ФИО")
+            if (!string.IsNullOrWhiteSpace(searchText) && searchText != "поиск по логину или фио")
                 filtered = filtered.Where(u =>
-                    (!string.IsNullOrEmpty(u.Login) && u.Login.IndexOf(searchText, System.StringComparison.OrdinalIgnoreCase) >= 0) ||
-                    (!string.IsNullOrEmpty(u.Full_Name) && u.Full_Name.IndexOf(searchText, System.StringComparison.OrdinalIgnoreCase) >= 0));
+                    (!string.IsNullOrEmpty(u.Login) && u.Login.ToLower().Contains(searchText)) ||
+                    (!string.IsNullOrEmpty(u.Full_Name) && u.Full_Name.ToLower().Contains(searchText)));
 
             UsersDataGrid.ItemsSource = filtered.ToList();
+        }
+
+        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            ApplyFilters();
+        }
+
+        private void SearchBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (SearchBox.Text == "Поиск по логину или ФИО")
+            {
+                SearchBox.Text = "";
+                SearchBox.Foreground = Brushes.Black;
+            }
+        }
+
+        private void SearchBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(SearchBox.Text))
+            {
+                SearchBox.Text = "Поиск по логину или ФИО";
+                SearchBox.Foreground = Brushes.Gray;
+            }
         }
 
         private void RoleFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ApplyFilters();
-        }
-
-        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (SearchBox.IsFocused)
-                ApplyFilters();
         }
 
         private void AddUserButton_Click(object sender, RoutedEventArgs e)
@@ -125,24 +146,6 @@ namespace PingTrack.View.Pages
             AddEditUserWindow window = new AddEditUserWindow(selectedUser);
             if (window.ShowDialog() == true)
                 LoadUsers();
-        }
-
-        private void SearchBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (SearchBox.Text == "Поиск по логину или ФИО")
-            {
-                SearchBox.Text = string.Empty;
-                SearchBox.Foreground = Brushes.Black;
-            }
-        }
-
-        private void SearchBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(SearchBox.Text))
-            {
-                SearchBox.Text = "Поиск по логину или ФИО";
-                SearchBox.Foreground = Brushes.Gray;
-            }
         }
     }
 }

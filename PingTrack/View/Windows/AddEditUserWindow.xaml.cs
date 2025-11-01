@@ -18,11 +18,8 @@ namespace PingTrack.View.Windows
 {
     public partial class AddEditUserWindow : Window
     {
-        #region Поля
         private Users currentUser;
-        #endregion
 
-        #region Конструкторы
         public AddEditUserWindow()
         {
             InitializeComponent();
@@ -36,30 +33,30 @@ namespace PingTrack.View.Windows
             LoadRoles();
             currentUser = user;
             Title = "Редактирование пользователя";
+
             LoginBox.Text = currentUser.Login;
             PasswordBox.Password = currentUser.Password;
+            FullNameBox.Text = currentUser.Full_Name;
             RoleComboBox.SelectedValue = currentUser.ID_Role;
             IsActiveCheckBox.IsChecked = currentUser.IsActive;
         }
-        #endregion
 
-        #region Загрузка ролей
         private void LoadRoles()
         {
             List<Roles> roles = App.db.Roles.ToList();
             RoleComboBox.ItemsSource = roles;
         }
-        #endregion
 
-        #region Кнопки
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             string login = LoginBox.Text.Trim();
             string password = PasswordBox.Password.Trim();
+            string fullName = FullNameBox.Text.Trim();
             object roleValue = RoleComboBox.SelectedValue;
             bool? isActive = IsActiveCheckBox.IsChecked;
 
-            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password) || roleValue == null || !isActive.HasValue)
+            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password) ||
+                string.IsNullOrWhiteSpace(fullName) || roleValue == null || !isActive.HasValue)
             {
                 Feedback.ShowWarning("Ошибка", "Заполните все поля.");
                 return;
@@ -78,8 +75,11 @@ namespace PingTrack.View.Windows
 
                 currentUser.Login = login;
                 currentUser.Password = password;
+                currentUser.Full_Name = fullName;
                 currentUser.ID_Role = (int)roleValue;
                 currentUser.IsActive = isActive.Value;
+                currentUser.Created_At = DateTime.Now;
+
                 App.db.Users.Add(currentUser);
             }
             else
@@ -92,6 +92,7 @@ namespace PingTrack.View.Windows
 
                 currentUser.Login = login;
                 currentUser.Password = password;
+                currentUser.Full_Name = fullName;
                 currentUser.ID_Role = (int)roleValue;
                 currentUser.IsActive = isActive.Value;
             }
@@ -104,6 +105,5 @@ namespace PingTrack.View.Windows
         {
             DialogResult = false;
         }
-        #endregion
     }
 }
