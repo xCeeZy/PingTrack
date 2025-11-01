@@ -27,6 +27,7 @@ namespace PingTrack.Model
         public int ID_Role { get; set; }
         public bool IsActive { get; set; }
         public System.DateTime Created_At { get; set; }
+        public string Full_Name { get; set; }
     
         public virtual ICollection<Groups> Groups { get; set; }
         public virtual ICollection<Players> Players { get; set; }
