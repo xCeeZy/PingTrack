@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PingTrack.View.Windows"
         mc:Ignorable="d"
-        Title="Авторизация — PingTrack"
+         Title="Авторизация — PingTrack"
         WindowStartupLocation="CenterScreen"
         Width="420" Height="480"
         Background="{StaticResource WindowBrush}"
@@ -13,8 +13,8 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="120"/>
+            <RowDefinition Height="40"/>
             <RowDefinition Height="40"/>
             <RowDefinition Height="40"/>
             <RowDefinition Height="40"/>
@@ -29,13 +29,15 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="1"
-                   Text="PingTrack"
-                   FontSize="28"
-                   FontWeight="Bold"
-                   Foreground="{StaticResource PrimaryBrush}"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
+        <!-- Логотип -->
+        <Image Grid.Column="1"
+               Source="C:\Users\rusak\source\repos\PingTrack\PingTrack\Resources\Images\logo.png"
+               Width="212"
+               Height="180"
+               VerticalAlignment="Center"
+               HorizontalAlignment="Center"/>
+
+
 
         <TextBlock Grid.Row="2" Grid.Column="1"
                    Text="Логин"
@@ -50,8 +52,7 @@
                  BorderThickness="1"
                  Background="White"
                  FontSize="14"
-                 VerticalContentAlignment="Center"
-                 TextAlignment="Left"/>
+                 VerticalContentAlignment="Center"/>
 
         <TextBlock Grid.Row="4" Grid.Column="1"
                    Text="Пароль"
