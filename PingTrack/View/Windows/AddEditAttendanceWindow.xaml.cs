@@ -1,4 +1,5 @@
-﻿using PingTrack.Model;
+﻿using PingTrack.AppData;
+using PingTrack.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +18,12 @@ namespace PingTrack.View.Windows
 {
     public partial class AddEditAttendanceWindow : Window
     {
+        #region Поля
         private Attendance currentAttendance;
         private readonly string userRole;
+        #endregion
 
+        #region Конструкторы
         public AddEditAttendanceWindow(string role) : this(role, null) { }
 
         public AddEditAttendanceWindow(string role, Attendance attendance)
@@ -29,16 +33,17 @@ namespace PingTrack.View.Windows
             currentAttendance = attendance;
 
             PlayerComboBox.ItemsSource = App.db.Players.ToList();
+
             TrainingComboBox.ItemsSource = App.db.Trainings
-                .ToList()
-                .Select(t => new
-                {
-                    t.ID_Training,
-                    TrainingDisplay = t.Date.ToString("dd.MM.yyyy") + " " +
-                                      t.Time.ToString(@"hh\\:mm") + " (" +
-                                      (t.Groups != null ? t.Groups.Group_Name : "-") + ")"
-                })
-                .ToList();
+    .ToList()
+    .Select(t => new
+    {
+        t.ID_Training,
+        TrainingDisplay = t.Date.ToString("dd.MM.yyyy") + " " +
+                          t.Time.ToString(@"hh\:mm") + " (" +
+                          (t.Groups != null ? t.Groups.Group_Name : "-") + ")"
+    })
+    .ToList();
 
             if (attendance != null)
             {
@@ -49,22 +54,26 @@ namespace PingTrack.View.Windows
                 ScoreBox.Text = attendance.Score.HasValue ? attendance.Score.Value.ToString() : string.Empty;
             }
         }
+        #endregion
 
+        #region Проверка роли
         public bool CanOpenForRole()
         {
             if (userRole == "Студент")
             {
-                MessageBox.Show("У студентов нет прав для изменения посещаемости.", "Доступ запрещён", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Feedback.ShowWarning("Доступ запрещён", "У студентов нет прав для изменения посещаемости.");
                 return false;
             }
             return true;
         }
+        #endregion
 
+        #region Сохранение данных
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (PlayerComboBox.SelectedValue == null || TrainingComboBox.SelectedValue == null)
             {
-                MessageBox.Show("Заполните все обязательные поля.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Feedback.ShowWarning("Ошибка", "Заполните все обязательные поля.");
                 return;
             }
 
@@ -74,7 +83,7 @@ namespace PingTrack.View.Windows
             Attendance existing = App.db.Attendance.FirstOrDefault(a => a.ID_Player == playerId && a.ID_Training == trainingId);
             if (existing != null && currentAttendance == null)
             {
-                MessageBox.Show("Этот игрок уже отмечен на выбранной тренировке.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Feedback.ShowError("Ошибка", "Этот игрок уже отмечен на выбранной тренировке.");
                 return;
             }
 
@@ -105,17 +114,21 @@ namespace PingTrack.View.Windows
             try
             {
                 App.db.SaveChanges();
+                Feedback.ShowSuccess("Успешно", "Изменения успешно сохранены.");
                 DialogResult = true;
             }
             catch (Exception)
             {
-                MessageBox.Show("Не удалось сохранить изменения. Проверьте данные.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Feedback.ShowError("Ошибка", "Не удалось сохранить изменения. Проверьте данные.");
             }
         }
+        #endregion
 
+        #region Отмена
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
         }
+        #endregion
     }
 }

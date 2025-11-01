@@ -7,11 +7,12 @@
         mc:Ignorable="d"
        Title="PingTrack"
         WindowStartupLocation="CenterScreen"
-        Width="1100" Height="680"
+        Width="1100" Height="700"
         Background="{StaticResource WindowBrush}"
         ResizeMode="NoResize">
 
-    <Grid>
+    <Grid Margin="8">
+        <!--#region Основная сетка-->
         <Grid.RowDefinitions>
             <RowDefinition Height="90"/>
             <RowDefinition Height="1"/>
@@ -19,13 +20,15 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="230"/>
             <ColumnDefinition Width="1"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+        <!--#endregion-->
 
+        <!--#region Верхняя панель-->
         <Border Grid.Row="0" Grid.ColumnSpan="3" Background="{StaticResource PanelBrush}">
-            <Grid>
+            <Grid Margin="20,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -33,17 +36,17 @@
                 </Grid.ColumnDefinitions>
 
                 <Image Grid.Column="0"
-                       Source="C:\Users\rusak\source\repos\PingTrack\PingTrack\Resources\Images\logo.png"
-                       Width="440"
-                       Height="108"
+                       Source="/Resources/Images/logo.png"
+                       Width="300"
+                       Height="125"
                        Stretch="Uniform"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Center"/>
+                       VerticalAlignment="Center"
+                       Margin="-69,0,69,0"/>
 
                 <StackPanel Grid.Column="2"
                             Orientation="Horizontal"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center">
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Right">
                     <TextBlock x:Name="UserText"
                                Text="Пользователь: —"
                                FontSize="13"
@@ -58,73 +61,105 @@
                 </StackPanel>
             </Grid>
         </Border>
+        <!--#endregion-->
 
-        <Border Grid.Row="1" Grid.ColumnSpan="3" Background="#22000000"/>
+        <!--#region Разделительная линия под шапкой-->
+        <Border Grid.Row="1" Grid.ColumnSpan="3" Background="#33000000"/>
+        <!--#endregion-->
 
+        <!--#region Левая панель меню-->
         <Border Grid.Row="2" Grid.Column="0" Background="{StaticResource PanelBrush}">
-            <Grid>
+            <Grid Margin="14">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="10"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0"
                            Text="Меню"
+                           FontSize="16"
                            FontWeight="SemiBold"
-                           FontSize="15"
                            Foreground="{StaticResource TextBrush}"
                            HorizontalAlignment="Center"
-                           VerticalAlignment="Center"/>
+                           Margin="0,0,0,6"/>
+
+                <Separator Grid.Row="1" Margin="0,4"/>
 
                 <Button x:Name="DashboardBtn"
-                        Grid.Row="1"
+                        Grid.Row="2"
                         Style="{StaticResource NavButton}"
                         Content="Панель"
                         Click="DashboardBtn_Click"/>
 
                 <Button x:Name="PlayersBtn"
-                        Grid.Row="2"
+                        Grid.Row="3"
                         Style="{StaticResource NavButton}"
                         Content="Игроки"
                         Click="PlayersBtn_Click"/>
 
                 <Button x:Name="GroupsBtn"
-                        Grid.Row="3"
+                        Grid.Row="4"
                         Style="{StaticResource NavButton}"
                         Content="Группы"
                         Click="GroupsBtn_Click"/>
 
                 <Button x:Name="TrainingsBtn"
-                        Grid.Row="4"
+                        Grid.Row="5"
                         Style="{StaticResource NavButton}"
                         Content="Занятия"
                         Click="TrainingsBtn_Click"/>
 
                 <Button x:Name="JournalBtn"
-                        Grid.Row="5"
+                        Grid.Row="6"
                         Style="{StaticResource NavButton}"
                         Content="Журнал"
                         Click="JournalBtn_Click"/>
 
                 <Button x:Name="ReportsBtn"
-                        Grid.Row="6"
+                        Grid.Row="7"
                         Style="{StaticResource NavButton}"
                         Content="Отчёты"
                         Click="ReportsBtn_Click"/>
+
+                <Button x:Name="UsersBtn"
+                        Grid.Row="8"
+                        Style="{StaticResource NavButton}"
+                        Content="Пользователи"
+                        Click="UsersBtn_Click"/>
+
+                <Button x:Name="LogoutBtn"
+                        Grid.Row="10"
+                        Style="{StaticResource BaseButton}"
+                        Content="Выйти"
+                        Width="140"
+                        Height="38"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Margin="0,8,0,0"
+                        Click="LogoutBtn_Click"/>
             </Grid>
         </Border>
+        <!--#endregion-->
 
-        <Border Grid.Row="2" Grid.Column="1" Background="#22000000"/>
+        <!--#region Разделительная линия между меню и контентом-->
+        <Border Grid.Row="2" Grid.Column="1" Background="#33000000"/>
+        <!--#endregion-->
 
+        <!--#region Основной контент-->
         <Border Grid.Row="2" Grid.Column="2" Background="{StaticResource WindowBrush}">
             <Frame x:Name="MainFrame"
                    NavigationUIVisibility="Hidden"
                    Background="{StaticResource WindowBrush}"/>
         </Border>
+        <!--#endregion-->
     </Grid>
 </Window>

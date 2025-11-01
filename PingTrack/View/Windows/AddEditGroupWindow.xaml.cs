@@ -1,4 +1,5 @@
-﻿using PingTrack.Model;
+﻿using PingTrack.AppData;
+using PingTrack.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,11 @@ namespace PingTrack.View.Windows
 {
     public partial class AddEditGroupWindow : Window
     {
+        #region Поля
         private Groups currentGroup;
+        #endregion
 
+        #region Конструктор
         public AddEditGroupWindow(Groups selectedGroup = null)
         {
             InitializeComponent();
@@ -39,15 +43,16 @@ namespace PingTrack.View.Windows
                 LevelComboBox.SelectedValue = currentGroup.ID_Level;
             }
         }
+        #endregion
 
+        #region Сохранение данных
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(GroupNameBox.Text) ||
                 CoachComboBox.SelectedValue == null ||
                 LevelComboBox.SelectedValue == null)
             {
-                MessageBox.Show("Заполните все поля.", "Ошибка",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                Feedback.ShowWarning("Ошибка", "Заполните все обязательные поля.");
                 return;
             }
 
@@ -58,13 +63,24 @@ namespace PingTrack.View.Windows
             if (currentGroup.ID_Group == 0)
                 App.db.Groups.Add(currentGroup);
 
-            App.db.SaveChanges();
-            DialogResult = true;
+            try
+            {
+                App.db.SaveChanges();
+                Feedback.ShowSuccess("Успешно", "Информация о группе сохранена.");
+                DialogResult = true;
+            }
+            catch (Exception)
+            {
+                Feedback.ShowError("Ошибка", "Не удалось сохранить данные. Проверьте корректность введённой информации.");
+            }
         }
+        #endregion
 
+        #region Отмена
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            DialogResult = false;
         }
+        #endregion
     }
 }

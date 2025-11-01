@@ -1,4 +1,5 @@
-﻿using PingTrack.Model;
+﻿using PingTrack.AppData;
+using PingTrack.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,11 @@ namespace PingTrack.View.Windows
 {
     public partial class AddEditTrainingWindow : Window
     {
+        #region Поля
         private Trainings currentTraining;
+        #endregion
 
+        #region Конструктор
         public AddEditTrainingWindow(Trainings training = null)
         {
             InitializeComponent();
@@ -26,32 +30,41 @@ namespace PingTrack.View.Windows
 
             GroupComboBox.ItemsSource = App.db.Groups.ToList();
             TypeComboBox.ItemsSource = App.db.Training_Types.ToList();
-            CoachComboBox.ItemsSource = App.db.Users.Where(u => u.Roles.Role_Name == "Тренер").ToList();
+            CoachComboBox.ItemsSource = App.db.Users
+                .Where(u => u.Roles.Role_Name == "Тренер")
+                .ToList();
 
             if (training != null)
             {
                 Title = "Редактирование занятия";
                 DatePickerField.SelectedDate = training.Date;
-                TimeBox.Text = training.Time.ToString(@"hh\:mm");
+                TimeBox.Text = training.Time.ToString(@"hh\\:mm");
                 GroupComboBox.SelectedValue = training.ID_Group;
                 TypeComboBox.SelectedValue = training.ID_Type;
                 CoachComboBox.SelectedValue = training.ID_Coach;
                 NoteBox.Text = training.Note;
             }
         }
+        #endregion
 
+        #region Сохранение данных
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (DatePickerField.SelectedDate == null || string.IsNullOrWhiteSpace(TimeBox.Text) ||
-                GroupComboBox.SelectedValue == null || TypeComboBox.SelectedValue == null || CoachComboBox.SelectedValue == null)
+            if (DatePickerField.SelectedDate == null ||
+                string.IsNullOrWhiteSpace(TimeBox.Text) ||
+                GroupComboBox.SelectedValue == null ||
+                TypeComboBox.SelectedValue == null ||
+                CoachComboBox.SelectedValue == null)
             {
-                MessageBox.Show("Заполните все обязательные поля.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Feedback.ShowWarning("Ошибка", "Заполните все обязательные поля.");
                 return;
             }
 
-            if (!TimeSpan.TryParse(TimeBox.Text, out TimeSpan parsedTime))
+            TimeSpan parsedTime;
+            bool isValidTime = TimeSpan.TryParse(TimeBox.Text, out parsedTime);
+            if (!isValidTime)
             {
-                MessageBox.Show("Некорректный формат времени. Используйте ЧЧ:ММ.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Feedback.ShowError("Ошибка", "Некорректный формат времени. Используйте ЧЧ:ММ.");
                 return;
             }
 
@@ -78,13 +91,24 @@ namespace PingTrack.View.Windows
                 currentTraining.Note = NoteBox.Text.Trim();
             }
 
-            App.db.SaveChanges();
-            DialogResult = true;
+            try
+            {
+                App.db.SaveChanges();
+                Feedback.ShowSuccess("Успешно", "Информация о занятии сохранена.");
+                DialogResult = true;
+            }
+            catch (Exception)
+            {
+                Feedback.ShowError("Ошибка", "Не удалось сохранить данные. Проверьте введённую информацию.");
+            }
         }
+        #endregion
 
+        #region Отмена
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
         }
+        #endregion
     }
 }

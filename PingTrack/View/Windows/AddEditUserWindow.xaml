@@ -1,0 +1,67 @@
+﻿<Window x:Class="PingTrack.View.Windows.AddEditUserWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PingTrack.View.Windows"
+        mc:Ignorable="d"
+        Title="Пользователь"
+        WindowStartupLocation="CenterScreen"
+        Width="420" Height="360"
+        Background="{StaticResource WindowBrush}"
+        ResizeMode="NoResize">
+    <!--#region Контент окна-->
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
+                   Text="Данные пользователя"
+                   FontSize="18" FontWeight="SemiBold"
+                   Foreground="{StaticResource PrimaryBrush}"
+                   VerticalAlignment="Center" HorizontalAlignment="Center"/>
+
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
+            <TextBlock Text="Логин" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+            <TextBox x:Name="LoginBox" Height="34" FontSize="14" VerticalContentAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="2">
+            <TextBlock Text="Пароль" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+            <PasswordBox x:Name="PasswordBox" Height="34" FontSize="14"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal" VerticalAlignment="Center">
+            <StackPanel Width="220">
+                <TextBlock Text="Роль" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+                <ComboBox x:Name="RoleComboBox" Height="34" FontSize="14"
+                          DisplayMemberPath="Role_Name" SelectedValuePath="ID_Role"/>
+            </StackPanel>
+            <CheckBox x:Name="IsActiveCheckBox" Content="Активен" FontSize="14"
+                      VerticalAlignment="Bottom" Margin="20,0,0,6"/>
+        </StackPanel>
+
+        <Grid Grid.Row="4" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="SaveButton" Content="Сохранить"
+                    Style="{StaticResource PrimaryButton}" Width="140" Height="36"
+                    HorizontalAlignment="Center" Click="SaveButton_Click"/>
+            <Button x:Name="CancelButton" Grid.Column="1" Content="Отмена"
+                    Style="{StaticResource BaseButton}" Width="120" Height="36"
+                    HorizontalAlignment="Center" Click="CancelButton_Click"/>
+        </Grid>
+    </Grid>
+    <!--#endregion-->
+</Window>

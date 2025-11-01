@@ -1,4 +1,5 @@
-﻿using PingTrack.Model;
+﻿using PingTrack.AppData;
+using PingTrack.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,11 @@ namespace PingTrack.View.Windows
 {
     public partial class AddEditPlayerWindow : Window
     {
+        #region Поля
         private Players currentPlayer;
+        #endregion
 
+        #region Конструктор
         public AddEditPlayerWindow(Players selectedPlayer = null)
         {
             InitializeComponent();
@@ -34,15 +38,16 @@ namespace PingTrack.View.Windows
                 GroupComboBox.SelectedValue = currentPlayer.ID_Group;
             }
         }
+        #endregion
 
+        #region Сохранение данных
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(FullNameBox.Text) ||
                 BirthDatePicker.SelectedDate == null ||
                 GroupComboBox.SelectedValue == null)
             {
-                MessageBox.Show("Заполните все обязательные поля.", "Ошибка",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                Feedback.ShowWarning("Ошибка", "Заполните все обязательные поля.");
                 return;
             }
 
@@ -54,14 +59,24 @@ namespace PingTrack.View.Windows
             if (currentPlayer.ID_Player == 0)
                 App.db.Players.Add(currentPlayer);
 
-            App.db.SaveChanges();
-            DialogResult = true;
+            try
+            {
+                App.db.SaveChanges();
+                Feedback.ShowSuccess("Успешно", "Информация об игроке сохранена.");
+                DialogResult = true;
+            }
+            catch (Exception)
+            {
+                Feedback.ShowError("Ошибка", "Не удалось сохранить данные. Проверьте корректность введённой информации.");
+            }
         }
+        #endregion
 
+        #region Отмена
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            DialogResult = false;
         }
+        #endregion
     }
 }
-

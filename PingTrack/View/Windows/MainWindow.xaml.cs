@@ -1,4 +1,5 @@
-﻿using PingTrack.View.Pages;
+﻿using PingTrack.AppData;
+using PingTrack.View.Pages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,48 +40,64 @@ namespace PingTrack.View.Windows
                 GroupsBtn.Visibility = Visibility.Collapsed;
                 TrainingsBtn.Visibility = Visibility.Collapsed;
                 ReportsBtn.Visibility = Visibility.Collapsed;
+                UsersBtn.Visibility = Visibility.Collapsed;
             }
 
             if (userRole == "Тренер")
             {
                 ReportsBtn.Visibility = Visibility.Collapsed;
+                UsersBtn.Visibility = Visibility.Collapsed;
+            }
+
+            if (userRole == "Администратор")
+            {
+                UsersBtn.Visibility = Visibility.Visible;
             }
         }
 
         private void DashboardBtn_Click(object sender, RoutedEventArgs e)
         {
-            DashboardPage page = new DashboardPage();
-            MainFrame.Navigate(page);
+            MainFrame.Navigate(new DashboardPage());
         }
 
         private void PlayersBtn_Click(object sender, RoutedEventArgs e)
         {
-            PlayersPage page = new PlayersPage();
-            MainFrame.Navigate(page);
+            MainFrame.Navigate(new PlayersPage());
         }
 
         private void GroupsBtn_Click(object sender, RoutedEventArgs e)
         {
-            GroupsPage page = new GroupsPage();
-            MainFrame.Navigate(page);
+            MainFrame.Navigate(new GroupsPage());
         }
 
         private void TrainingsBtn_Click(object sender, RoutedEventArgs e)
         {
-            TrainingsPage page = new TrainingsPage();
-            MainFrame.Navigate(page);
+            MainFrame.Navigate(new TrainingsPage());
         }
 
         private void JournalBtn_Click(object sender, RoutedEventArgs e)
         {
-            JournalPage page = new JournalPage(userRole);
-            MainFrame.Navigate(page);
+            MainFrame.Navigate(new JournalPage(userRole));
         }
 
         private void ReportsBtn_Click(object sender, RoutedEventArgs e)
         {
-            ReportsPage page = new ReportsPage();
-            MainFrame.Navigate(page);
+            MainFrame.Navigate(new ReportsPage());
+        }
+
+        private void UsersBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (userRole == "Администратор")
+                MainFrame.Navigate(new UsersPage());
+            else
+                Feedback.ShowWarning("Доступ запрещён", "Раздел доступен только администраторам.");
+        }
+
+        private void LogoutBtn_Click(object sender, RoutedEventArgs e)
+        {
+            AuthenticationService.Logout();
+            new LoginWindow().Show();
+            Close();
         }
     }
 }

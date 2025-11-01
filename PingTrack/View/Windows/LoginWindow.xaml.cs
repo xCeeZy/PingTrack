@@ -1,4 +1,5 @@
-﻿using PingTrack.Model;
+﻿using PingTrack.AppData;
+using PingTrack.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,21 +30,24 @@ namespace PingTrack.View.Windows
 
             if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
             {
-                MessageBox.Show("Введите логин и пароль.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Feedback.ShowWarning("Ошибка", "Введите логин и пароль.");
                 return;
             }
 
-            Users user = App.db.Users.FirstOrDefault(u => u.Login == login && u.Password == password && u.IsActive == true);
+            bool isAuthenticated = AuthenticationService.Login(login, password);
 
-            if (user == null)
+            if (!isAuthenticated)
             {
-                MessageBox.Show("Неверный логин или пароль.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Feedback.ShowError("Ошибка", "Неверный логин или пароль.");
                 return;
             }
 
-            string roleName = user.Roles.Role_Name;
+            string role = AuthenticationService.GetUserRole();
+            string username = AuthenticationService.GetUserLogin();
 
-            MainWindow main = new MainWindow(roleName, login);
+            Feedback.ShowInfo("Добро пожаловать", "Вы вошли как " + role + ".");
+
+            MainWindow main = new MainWindow(role, username);
             main.Show();
             Close();
         }

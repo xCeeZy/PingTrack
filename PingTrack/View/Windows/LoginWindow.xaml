@@ -47,12 +47,12 @@
 
         <TextBox x:Name="LoginTextBox"
                  Grid.Row="3" Grid.Column="1"
-                 Height="30"
+                 Height="34"
                  BorderBrush="#33000000"
                  BorderThickness="1"
                  Background="White"
                  FontSize="14"
-                 VerticalContentAlignment="Center"/>
+                 VerticalContentAlignment="Center" VerticalAlignment="Center"/>
 
         <TextBlock Grid.Row="4" Grid.Column="1"
                    Text="Пароль"
