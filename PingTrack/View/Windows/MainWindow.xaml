@@ -5,161 +5,512 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PingTrack"
         mc:Ignorable="d"
-       Title="PingTrack"
+        Title="PingTrack — Система управления секцией"
         WindowStartupLocation="CenterScreen"
-        Width="1100" Height="700"
+        Width="1200" Height="750"
         Background="{StaticResource WindowBrush}"
         ResizeMode="NoResize">
 
-    <Grid Margin="8">
-        <!--#region Основная сетка-->
+    <Grid>
+        <!--#region Основная структура-->
         <Grid.RowDefinitions>
-            <RowDefinition Height="90"/>
-            <RowDefinition Height="1"/>
+            <RowDefinition Height="70"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="230"/>
-            <ColumnDefinition Width="1"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
         <!--#endregion-->
 
         <!--#region Верхняя панель-->
-        <Border Grid.Row="0" Grid.ColumnSpan="3" Background="{StaticResource PanelBrush}">
-            <Grid Margin="20,0">
+        <Border Grid.Row="0" 
+                Background="White"
+                BorderBrush="{StaticResource StrokeBrush}"
+                BorderThickness="0,0,0,1">
+            <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="200"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="20"/>
                 </Grid.ColumnDefinitions>
 
-                <Image Grid.Column="0"
+                <!-- Логотип -->
+                <Image Grid.Column="1"
                        Source="/Resources/Images/logo.png"
-                       Width="300"
-                       Height="125"
-                       Stretch="Uniform"
+                       Height="70"
+                       HorizontalAlignment="Left"
                        VerticalAlignment="Center"
-                       Margin="-69,0,69,0"/>
+                       RenderOptions.BitmapScalingMode="HighQuality" Width="171"/>
 
-                <StackPanel Grid.Column="2"
-                            Orientation="Horizontal"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Right">
-                    <TextBlock x:Name="UserText"
-                               Text="Пользователь: —"
-                               FontSize="13"
-                               Foreground="{StaticResource TextBrush}"
-                               VerticalAlignment="Center"/>
-                    <Rectangle Width="12"/>
-                    <TextBlock x:Name="RoleText"
-                               Text="Роль: —"
-                               FontSize="13"
-                               Foreground="{StaticResource TextBrush}"
-                               VerticalAlignment="Center"/>
-                </StackPanel>
+                <!-- Информация о пользователе -->
+                <Border Grid.Column="3" 
+                        Background="{StaticResource HoverBrush}"
+                        CornerRadius="20"
+                        VerticalAlignment="Center">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="15"/>
+                            <ColumnDefinition Width="36"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="1"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="15"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="36"/>
+                            <RowDefinition Height="8"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Иконка пользователя -->
+                        <Border Grid.Column="1"
+                                Grid.Row="1"
+                                Width="36"
+                                Height="36"
+                                CornerRadius="18"
+                                Background="{StaticResource PrimaryBrush}">
+                            <TextBlock x:Name="UserInitial"
+                                       Text="U"
+                                       FontSize="16"
+                                       FontWeight="Bold"
+                                       Foreground="White"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <StackPanel Grid.Column="3"
+                                    Grid.Row="1"
+                                    VerticalAlignment="Center">
+                            <TextBlock x:Name="UserNameText"
+                                       Text="Пользователь"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextBrush}"/>
+                            <TextBlock x:Name="RoleNameText"
+                                       Text="Роль"
+                                       FontSize="11"
+                                       Foreground="{StaticResource TextMutedBrush}"/>
+                        </StackPanel>
+
+                        <Rectangle Grid.Column="5"
+                                   Grid.Row="1"
+                                   Width="1"
+                                   Height="24"
+                                   Fill="{StaticResource StrokeBrush}"
+                                   VerticalAlignment="Center"/>
+
+                        <Button Grid.Column="7"
+                                Grid.Row="1"
+                                x:Name="LogoutButton"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Cursor="Hand"
+                                Width="30"
+                                Height="30"
+                                ToolTip="Выйти"
+                                Click="LogoutBtn_Click">
+                            <TextBlock Text="⎋"
+                                       FontSize="20"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Button>
+                    </Grid>
+                </Border>
             </Grid>
         </Border>
         <!--#endregion-->
 
-        <!--#region Разделительная линия под шапкой-->
-        <Border Grid.Row="1" Grid.ColumnSpan="3" Background="#33000000"/>
-        <!--#endregion-->
+        <!--#region Основной контент с меню-->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="240"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <!--#region Левая панель меню-->
-        <Border Grid.Row="2" Grid.Column="0" Background="{StaticResource PanelBrush}">
-            <Grid Margin="14">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="10"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+            <!--#region Боковое меню-->
+            <Border Grid.Column="0"
+                    Background="White"
+                    BorderBrush="{StaticResource StrokeBrush}"
+                    BorderThickness="0,0,1,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="50"/>
+                    </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0"
-                           Text="Меню"
-                           FontSize="16"
-                           FontWeight="SemiBold"
-                           Foreground="{StaticResource TextBrush}"
-                           HorizontalAlignment="Center"
-                           Margin="0,0,0,6"/>
+                    <!-- Навигационные кнопки -->
+                    <ScrollViewer Grid.Row="0" 
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="12"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="8"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="12"/>
+                                <RowDefinition Height="1"/>
+                                <RowDefinition Height="12"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="8"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="12"/>
+                                <RowDefinition Height="1"/>
+                                <RowDefinition Height="12"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="8"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="12"/>
+                            </Grid.RowDefinitions>
 
-                <Separator Grid.Row="1" Margin="0,4"/>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                            </Grid.ColumnDefinitions>
 
-                <Button x:Name="DashboardBtn"
-                        Grid.Row="2"
-                        Style="{StaticResource NavButton}"
-                        Content="Панель"
-                        Click="DashboardBtn_Click"/>
+                            <!-- Основное меню -->
+                            <TextBlock Grid.Row="1" Grid.Column="1"
+                                       Text="ОСНОВНОЕ"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextMutedBrush}"/>
 
-                <Button x:Name="PlayersBtn"
-                        Grid.Row="3"
-                        Style="{StaticResource NavButton}"
-                        Content="Игроки"
-                        Click="PlayersBtn_Click"/>
+                            <Button Grid.Row="3" Grid.Column="1"
+                                    x:Name="DashboardBtn"
+                                    Height="42"
+                                    Click="DashboardBtn_Click">
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <Border x:Name="border"
+                                                Background="Transparent"
+                                                CornerRadius="8"
+                                                Cursor="Hand">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="12"/>
+                                                    <ColumnDefinition Width="24"/>
+                                                    <ColumnDefinition Width="8"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="12"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="📊"
+                                                           FontSize="16"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="3"
+                                                           Text="Панель"
+                                                           FontSize="14"
+                                                           Foreground="{StaticResource TextBrush}"
+                                                           VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="{StaticResource HoverBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
 
-                <Button x:Name="GroupsBtn"
-                        Grid.Row="4"
-                        Style="{StaticResource NavButton}"
-                        Content="Группы"
-                        Click="GroupsBtn_Click"/>
+                            <Button Grid.Row="4" Grid.Column="1"
+                                    x:Name="JournalBtn"
+                                    Height="42"
+                                    Click="JournalBtn_Click">
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <Border x:Name="border"
+                                                Background="Transparent"
+                                                CornerRadius="8"
+                                                Cursor="Hand">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="12"/>
+                                                    <ColumnDefinition Width="24"/>
+                                                    <ColumnDefinition Width="8"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="12"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="📝"
+                                                           FontSize="16"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="3"
+                                                           Text="Журнал"
+                                                           FontSize="14"
+                                                           Foreground="{StaticResource TextBrush}"
+                                                           VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="{StaticResource HoverBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
 
-                <Button x:Name="TrainingsBtn"
-                        Grid.Row="5"
-                        Style="{StaticResource NavButton}"
-                        Content="Занятия"
-                        Click="TrainingsBtn_Click"/>
+                            <!-- Разделитель -->
+                            <Border Grid.Row="6" Grid.Column="1"
+                                    Height="1" 
+                                    Background="{StaticResource StrokeBrush}"/>
 
-                <Button x:Name="JournalBtn"
-                        Grid.Row="6"
-                        Style="{StaticResource NavButton}"
-                        Content="Журнал"
-                        Click="JournalBtn_Click"/>
+                            <!-- Управление -->
+                            <TextBlock Grid.Row="8" Grid.Column="1"
+                                       Text="УПРАВЛЕНИЕ"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextMutedBrush}"/>
 
-                <Button x:Name="ReportsBtn"
-                        Grid.Row="7"
-                        Style="{StaticResource NavButton}"
-                        Content="Отчёты"
-                        Click="ReportsBtn_Click"/>
+                            <Button Grid.Row="10" Grid.Column="1"
+                                    x:Name="PlayersBtn"
+                                    Height="42"
+                                    Click="PlayersBtn_Click">
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <Border x:Name="border"
+                                                Background="Transparent"
+                                                CornerRadius="8"
+                                                Cursor="Hand">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="12"/>
+                                                    <ColumnDefinition Width="24"/>
+                                                    <ColumnDefinition Width="8"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="12"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="👥"
+                                                           FontSize="16"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="3"
+                                                           Text="Игроки"
+                                                           FontSize="14"
+                                                           Foreground="{StaticResource TextBrush}"
+                                                           VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="{StaticResource HoverBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
 
-                <Button x:Name="UsersBtn"
-                        Grid.Row="8"
-                        Style="{StaticResource NavButton}"
-                        Content="Пользователи"
-                        Click="UsersBtn_Click"/>
+                            <Button Grid.Row="11" Grid.Column="1"
+                                    x:Name="GroupsBtn"
+                                    Height="42"
+                                    Click="GroupsBtn_Click">
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <Border x:Name="border"
+                                                Background="Transparent"
+                                                CornerRadius="8"
+                                                Cursor="Hand">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="12"/>
+                                                    <ColumnDefinition Width="24"/>
+                                                    <ColumnDefinition Width="8"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="12"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="📚"
+                                                           FontSize="16"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="3"
+                                                           Text="Группы"
+                                                           FontSize="14"
+                                                           Foreground="{StaticResource TextBrush}"
+                                                           VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="{StaticResource HoverBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
 
-                <Button x:Name="LogoutBtn"
-                        Grid.Row="10"
-                        Style="{StaticResource BaseButton}"
-                        Content="Выйти"
-                        Width="140"
-                        Height="38"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Bottom"
-                        Margin="0,8,0,0"
-                        Click="LogoutBtn_Click"/>
-            </Grid>
-        </Border>
-        <!--#endregion-->
+                            <Button Grid.Row="12" Grid.Column="1"
+                                    x:Name="TrainingsBtn"
+                                    Height="42"
+                                    Click="TrainingsBtn_Click">
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <Border x:Name="border"
+                                                Background="Transparent"
+                                                CornerRadius="8"
+                                                Cursor="Hand">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="12"/>
+                                                    <ColumnDefinition Width="24"/>
+                                                    <ColumnDefinition Width="8"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="12"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="🏓"
+                                                           FontSize="16"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="3"
+                                                           Text="Занятия"
+                                                           FontSize="14"
+                                                           Foreground="{StaticResource TextBrush}"
+                                                           VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="{StaticResource HoverBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
 
-        <!--#region Разделительная линия между меню и контентом-->
-        <Border Grid.Row="2" Grid.Column="1" Background="#33000000"/>
-        <!--#endregion-->
+                            <!-- Разделитель -->
+                            <Border Grid.Row="14" Grid.Column="1"
+                                    Height="1" 
+                                    Background="{StaticResource StrokeBrush}"/>
 
-        <!--#region Основной контент-->
-        <Border Grid.Row="2" Grid.Column="2" Background="{StaticResource WindowBrush}">
-            <Frame x:Name="MainFrame"
+                            <!-- Администрирование -->
+                            <TextBlock Grid.Row="16" Grid.Column="1"
+                                       Text="АДМИНИСТРИРОВАНИЕ"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextMutedBrush}"/>
+
+                            <Button Grid.Row="18" Grid.Column="1"
+                                    x:Name="ReportsBtn"
+                                    Height="42"
+                                    Click="ReportsBtn_Click">
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <Border x:Name="border"
+                                                Background="Transparent"
+                                                CornerRadius="8"
+                                                Cursor="Hand">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="12"/>
+                                                    <ColumnDefinition Width="24"/>
+                                                    <ColumnDefinition Width="8"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="12"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="📈"
+                                                           FontSize="16"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="3"
+                                                           Text="Отчёты"
+                                                           FontSize="14"
+                                                           Foreground="{StaticResource TextBrush}"
+                                                           VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="{StaticResource HoverBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+
+                            <Button Grid.Row="19" Grid.Column="1"
+                                    x:Name="UsersBtn"
+                                    Height="42"
+                                    Click="UsersBtn_Click">
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <Border x:Name="border"
+                                                Background="Transparent"
+                                                CornerRadius="8"
+                                                Cursor="Hand">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="12"/>
+                                                    <ColumnDefinition Width="24"/>
+                                                    <ColumnDefinition Width="8"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="12"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="🔐"
+                                                           FontSize="16"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="3"
+                                                           Text="Пользователи"
+                                                           FontSize="14"
+                                                           Foreground="{StaticResource TextBrush}"
+                                                           VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="{StaticResource HoverBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </Grid>
+                    </ScrollViewer>
+
+                    <!-- Версия программы -->
+                    <Border Grid.Row="1"
+                            BorderBrush="{StaticResource StrokeBrush}"
+                            BorderThickness="0,1,0,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="1"
+                                       Text="PingTrack v1.0"
+                                       FontSize="11"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Row="2"
+                                       Text="© 2024 Rusakov"
+                                       FontSize="10"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       HorizontalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+            <!--#endregion-->
+
+            <!--#region Область контента-->
+            <Frame Grid.Column="1"
+                   x:Name="MainFrame"
                    NavigationUIVisibility="Hidden"
                    Background="{StaticResource WindowBrush}"/>
-        </Border>
+            <!--#endregion-->
+        </Grid>
         <!--#endregion-->
     </Grid>
 </Window>

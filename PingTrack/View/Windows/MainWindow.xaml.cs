@@ -19,19 +19,30 @@ namespace PingTrack.View.Windows
 {
     public partial class MainWindow : Window
     {
+        #region Поля
         private readonly string userRole;
         private readonly string userName;
+        #endregion
 
+        #region Конструктор
         public MainWindow(string role, string login)
         {
             InitializeComponent();
             userRole = role;
             userName = login;
-            RoleText.Text = "Роль: " + role;
-            UserText.Text = "Пользователь: " + login;
-            ApplyRolePermissions();
-        }
 
+            UserNameText.Text = login;
+            RoleNameText.Text = role;
+
+            if (!string.IsNullOrEmpty(login))
+                UserInitial.Text = login.Substring(0, 1).ToUpper();
+
+            ApplyRolePermissions();
+            MainFrame.Navigate(new DashboardPage());
+        }
+        #endregion
+
+        #region Применение прав доступа
         private void ApplyRolePermissions()
         {
             if (userRole == "Студент")
@@ -54,7 +65,9 @@ namespace PingTrack.View.Windows
                 UsersBtn.Visibility = Visibility.Visible;
             }
         }
+        #endregion
 
+        #region Навигация
         private void DashboardBtn_Click(object sender, RoutedEventArgs e)
         {
             MainFrame.Navigate(new DashboardPage());
@@ -92,12 +105,20 @@ namespace PingTrack.View.Windows
             else
                 Feedback.ShowWarning("Доступ запрещён", "Раздел доступен только администраторам.");
         }
+        #endregion
 
+        #region Выход
         private void LogoutBtn_Click(object sender, RoutedEventArgs e)
         {
-            AuthenticationService.Logout();
-            new LoginWindow().Show();
-            Close();
+            bool confirm = Feedback.AskQuestion("Подтверждение", "Вы действительно хотите выйти?");
+            if (confirm)
+            {
+                AuthenticationService.Logout();
+                LoginWindow loginWindow = new LoginWindow();
+                loginWindow.Show();
+                Close();
+            }
         }
+        #endregion
     }
 }
