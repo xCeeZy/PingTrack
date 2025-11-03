@@ -6,160 +6,230 @@
       xmlns:local="clr-namespace:PingTrack.View.Pages"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="Отчёты"
+      Title="Отчёты и статистика"
       Background="{StaticResource WindowBrush}">
 
-    <Grid Margin="20">
-        <!--#region Структура сетки-->
+    <Grid>
+        <!--#region Основная структура-->
         <Grid.RowDefinitions>
-            <RowDefinition Height="70"/>
-            <RowDefinition Height="130"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="80"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="30"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="30"/>
         </Grid.ColumnDefinitions>
         <!--#endregion-->
 
-        <!--#region Заголовок-->
-        <TextBlock Grid.Row="0"
-                   Text="Отчёты и статистика"
-                   FontSize="24"
-                   FontWeight="Bold"
-                   Foreground="{StaticResource PrimaryBrush}"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
-        <!--#endregion-->
-
-        <!--#region Параметры фильтрации-->
-        <Border Grid.Row="1"
-                Background="White"
-                CornerRadius="6"
-                Padding="16"
-                BorderBrush="#22000000"
-                BorderThickness="1">
+        <!--#region Заголовок страницы-->
+        <Border Grid.Row="0" Grid.Column="1"
+                Style="{StaticResource Card}">
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="24"/>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="24"/>
-                    <ColumnDefinition Width="1.5*"/>
-                    <ColumnDefinition Width="24"/>
-                    <ColumnDefinition Width="1.5*"/>
-                </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="28"/>
-                    <RowDefinition Height="44"/>
+                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="15"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" 
-                           Text="Тип отчёта:" 
-                           FontSize="14" 
-                           Foreground="{StaticResource TextBrush}" 
-                           VerticalAlignment="Center"/>
-                <ComboBox x:Name="ReportTypeComboBox" 
-                          Grid.Row="1" Grid.Column="0" 
-                          Height="34" 
-                          FontSize="14" 
-                          SelectedIndex="0">
-                    <ComboBoxItem Content="Посещаемость по игрокам"/>
-                    <ComboBoxItem Content="Посещаемость по группам"/>
-                    <ComboBoxItem Content="Рейтинг активности"/>
-                    <ComboBoxItem Content="Общая статистика тренировок"/>
-                </ComboBox>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="20"/>
+                </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="2" 
-                           Text="Группа:" 
-                           FontSize="14" 
-                           Foreground="{StaticResource TextBrush}" 
+                <TextBlock Grid.Row="1" Grid.Column="1"
+                           Text="📊"
+                           FontSize="28"
                            VerticalAlignment="Center"/>
-                <ComboBox x:Name="GroupComboBox" 
-                          Grid.Row="1" Grid.Column="2" 
-                          Height="32" 
-                          FontSize="14" 
-                          DisplayMemberPath="Group_Name" 
+
+                <StackPanel Grid.Row="1" Grid.Column="3"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="Отчёты и статистика"
+                               Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Text="Анализ посещаемости и активности игроков"
+                               Style="{StaticResource SubTitle}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        <!--#endregion-->
+
+        <!--#region Панель фильтров-->
+        <Border Grid.Row="2" Grid.Column="1"
+                Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="15"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="20"/>
+                </Grid.ColumnDefinitions>
+
+                <!--#region Тип отчёта-->
+                <TextBlock Grid.Row="1" Grid.Column="1"
+                           Text="Тип отчёта"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextBrush}"/>
+
+                <ComboBox x:Name="ReportTypeComboBox"
+                          Grid.Row="3" Grid.Column="1"
+                          Height="34"
+                          FontSize="14"
+                          SelectedIndex="0"
+                          SelectionChanged="ReportTypeComboBox_SelectionChanged"/>
+                <!--#endregion-->
+
+                <!--#region Группа-->
+                <TextBlock Grid.Row="1" Grid.Column="3"
+                           Text="Группа"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextBrush}"/>
+
+                <ComboBox x:Name="GroupComboBox"
+                          Grid.Row="3" Grid.Column="3"
+                          Height="34"
+                          FontSize="14"
+                          DisplayMemberPath="Group_Name"
                           SelectedValuePath="ID_Group"/>
+                <!--#endregion-->
 
-                <TextBlock Grid.Row="0" Grid.Column="4" 
-                           Text="С даты:" 
-                           FontSize="14" 
-                           Foreground="{StaticResource TextBrush}" 
-                           VerticalAlignment="Center"/>
-                <DatePicker x:Name="StartDatePicker" 
-                            Grid.Row="1" Grid.Column="4" 
-                            Height="32" 
-                            FontSize="14"/>
+                <!--#region Период-->
+                <TextBlock Grid.Row="5" Grid.Column="1"
+                           Text="Период"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextBrush}"/>
 
-                <TextBlock Grid.Row="0" Grid.Column="6" 
-                           Text="По дату:" 
-                           FontSize="14" 
-                           Foreground="{StaticResource TextBrush}" 
-                           VerticalAlignment="Center"/>
-                <DatePicker x:Name="EndDatePicker" 
-                            Grid.Row="1" Grid.Column="6" 
-                            Height="32" 
-                            FontSize="14"/>
+                <Grid Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <DatePicker Grid.Column="0"
+                                x:Name="StartDatePicker"
+                                Height="34"
+                                FontSize="14"/>
+
+                    <TextBlock Grid.Column="2"
+                               Text="—"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource TextMutedBrush}"
+                               VerticalAlignment="Center"/>
+
+                    <DatePicker Grid.Column="4"
+                                x:Name="EndDatePicker"
+                                Height="34"
+                                FontSize="14"/>
+                </Grid>
+                <!--#endregion-->
             </Grid>
         </Border>
         <!--#endregion-->
 
         <!--#region Таблица отчётов-->
-        <Border Grid.Row="2"
-                Background="White"
-                CornerRadius="6"
-                Padding="10"
-                BorderBrush="#22000000"
-                BorderThickness="1">
-            <DataGrid x:Name="ReportsDataGrid"
-                      AutoGenerateColumns="False"
-                      CanUserAddRows="False"
-                      IsReadOnly="True"
-                      HeadersVisibility="Column"
-                      ColumnHeaderHeight="36"
-                      RowHeaderWidth="0"
-                      GridLinesVisibility="None"
-                      VerticalAlignment="Stretch"
-                      HorizontalAlignment="Stretch"
-                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                      ScrollViewer.VerticalScrollBarVisibility="Auto">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Группа" Binding="{Binding Group}" Width="200"/>
-                    <DataGridTextColumn Header="Всего занятий" Binding="{Binding TotalTrainings}" Width="160"/>
-                    <DataGridTextColumn Header="Присутствий" Binding="{Binding PresentCount}" Width="140"/>
-                    <DataGridTextColumn Header="Посещаемость (%)" Binding="{Binding AttendancePercent}" Width="180"/>
-                </DataGrid.Columns>
-            </DataGrid>
+        <Border Grid.Row="4" Grid.Column="1"
+                Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!--#region Информация о количестве-->
+                <Border Grid.Row="0"
+                        Background="#FFF8F9FA"
+                        BorderBrush="{StaticResource StrokeBrush}"
+                        BorderThickness="0,0,0,1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="1"
+                                   x:Name="ReportTitleTextBlock"
+                                   Text="Результаты отчёта"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextBrush}"
+                                   VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+                <!--#endregion-->
+
+                <!--#region DataGrid-->
+                <DataGrid Grid.Row="1"
+                          x:Name="ReportsDataGrid"
+                          AutoGenerateColumns="False"/>
+                <!--#endregion-->
+            </Grid>
         </Border>
         <!--#endregion-->
 
-        <!--#region Кнопки действий-->
-        <Grid Grid.Row="3" VerticalAlignment="Center">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="20"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <!--#region Панель действий-->
+        <Border Grid.Row="6" Grid.Column="1"
+                Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="15"/>
+                </Grid.RowDefinitions>
 
-            <Button x:Name="GenerateReportButton"
-                    Grid.Column="1"
-                    Content="Сформировать отчёт"
-                    Style="{StaticResource PrimaryButton}"
-                    Width="200"
-                    Height="38"
-                    HorizontalAlignment="Right"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-            <Button x:Name="ExportButton"
-                    Grid.Column="3"
-                    Content="Экспорт в Excel"
-                    Style="{StaticResource BaseButton}"
-                    Width="160"
-                    Height="38"
-                    HorizontalAlignment="Left"/>
-        </Grid>
+                <Button Grid.Row="1" Grid.Column="1"
+                        x:Name="GenerateReportButton"
+                        Content="📈 Сформировать отчёт"
+                        Style="{StaticResource PrimaryButton}"
+                        Width="210"
+                        Height="38"
+                        Click="GenerateReportButton_Click"/>
+
+                <Button Grid.Row="1" Grid.Column="3"
+                        x:Name="ClearButton"
+                        Content="🔄 Очистить"
+                        Style="{StaticResource BaseButton}"
+                        Width="140"
+                        Height="38"
+                        Click="ClearButton_Click"/>
+            </Grid>
+        </Border>
         <!--#endregion-->
     </Grid>
 </Page>

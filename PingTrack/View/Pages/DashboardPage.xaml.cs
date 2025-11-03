@@ -1,4 +1,5 @@
-﻿using PingTrack.Model;
+﻿using PingTrack.AppData;
+using PingTrack.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,42 +19,98 @@ namespace PingTrack.View.Pages
 {
     public partial class DashboardPage : Page
     {
+        #region Конструктор
         public DashboardPage()
         {
             InitializeComponent();
             LoadDashboard();
         }
+        #endregion
 
+        #region Загрузка данных дашборда
         private void LoadDashboard()
+        {
+            LoadStatistics();
+            LoadRecentTrainings();
+        }
+
+        private void LoadStatistics()
         {
             int playersCount = App.db.Players.Count();
             PlayersCountText.Text = playersCount.ToString();
+
+            int groupsCount = App.db.Groups.Count();
+            GroupsCountText.Text = groupsCount.ToString();
 
             DateTime today = DateTime.Now.Date;
             int upcomingTrainings = App.db.Trainings.Count(t => t.Date >= today);
             UpcomingTrainingsText.Text = upcomingTrainings.ToString();
 
             double averageAttendance = 0.0;
-            if (App.db.Attendance.Any())
-                averageAttendance = App.db.Attendance.Average(a => a.Is_Present ? 1.0 : 0.0) * 100.0;
+            int totalAttendance = App.db.Attendance.Count();
 
-            AverageAttendanceText.Text = string.Format("{0:F1}%", averageAttendance);
+            if (totalAttendance > 0)
+            {
+                int presentCount = App.db.Attendance.Count(a => a.Is_Present);
+                averageAttendance = (double)presentCount / totalAttendance * 100.0;
+            }
 
-            var recent = App.db.Trainings
+            AverageAttendanceText.Text = $"{averageAttendance:F1}%";
+        }
+
+        private void LoadRecentTrainings()
+        {
+            List<TrainingDashboardItem> recentTrainings = App.db.Trainings
+                .Include("Groups")
+                .Include("Users")
+                .Include("Training_Types")
+                .Include("Attendance")
                 .OrderByDescending(t => t.Date)
                 .ThenByDescending(t => t.Time)
                 .Take(10)
                 .ToList()
-                .Select(t => new
+                .Select(t => new TrainingDashboardItem
                 {
-                    Date = t.Date.ToString("dd.MM.yyyy") + " " + t.Time.ToString(@"hh\:mm"),
-                    Group = t.Groups != null ? t.Groups.Group_Name : "-",
-                    Type = t.Training_Types != null ? t.Training_Types.Type_Name : "-",
-                    Coach = t.Users != null ? t.Users.Login : "-"
+                    DateTime = $"{t.Date:dd.MM.yyyy} {t.Time:hh\\:mm}",
+                    Group = t.Groups?.Group_Name ?? "-",
+                    Type = t.Training_Types?.Type_Name ?? "-",
+                    Coach = t.Users?.Full_Name ?? "-",
+                    Attendance = GetAttendanceInfo(t)
                 })
                 .ToList();
 
-            RecentTrainingsGrid.ItemsSource = recent;
+            RecentTrainingsGrid.ItemsSource = recentTrainings;
         }
+
+        private string GetAttendanceInfo(Trainings training)
+        {
+            if (training.Attendance == null || training.Attendance.Count == 0)
+                return "Нет данных";
+
+            int present = training.Attendance.Count(a => a.Is_Present);
+            int total = training.Attendance.Count;
+
+            return $"{present} из {total}";
+        }
+        #endregion
+
+        #region Обработчики событий
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            LoadDashboard();
+            Feedback.ShowInfo("Обновление", "Статистика обновлена.");
+        }
+        #endregion
     }
+
+    #region Вспомогательный класс для отображения
+    public class TrainingDashboardItem
+    {
+        public string DateTime { get; set; }
+        public string Group { get; set; }
+        public string Type { get; set; }
+        public string Coach { get; set; }
+        public string Attendance { get; set; }
+    }
+    #endregion
 }

@@ -34,12 +34,11 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Логотип -->
-                <Image Grid.Column="1"
+                <Image
                        Source="/Resources/Images/logo.png"
-                       Height="70"
-                       HorizontalAlignment="Left"
+                       Height="121"
                        VerticalAlignment="Center"
-                       RenderOptions.BitmapScalingMode="HighQuality" Width="171"/>
+                       RenderOptions.BitmapScalingMode="HighQuality" Width="209" HorizontalAlignment="Left" Grid.ColumnSpan="2"/>
 
                 <!-- Информация о пользователе -->
                 <Border Grid.Column="3" 

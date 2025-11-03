@@ -9,100 +9,271 @@
       Title="Учёт пользователей"
       Background="{StaticResource WindowBrush}">
 
-    <Grid Margin="20">
-
+    <Grid>
+        <!--#region Основная структура-->
         <Grid.RowDefinitions>
-            <RowDefinition Height="80"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0"
-                   Text="Учёт пользователей"
-                   FontSize="22"
-                   FontWeight="Bold"
-                   Foreground="{StaticResource PrimaryBrush}"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="30"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="30"/>
+        </Grid.ColumnDefinitions>
+        <!--#endregion-->
 
-        <Grid Grid.Row="1" Margin="0 10 0 10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
+        <!--#region Заголовок страницы-->
+        <Border Grid.Row="0" Grid.Column="1"
+                Style="{StaticResource Card}"
+                Padding="20,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-            <TextBox x:Name="SearchBox"
-                     Grid.Column="0"
-                     Height="34"
-                     FontSize="14"
-                     VerticalContentAlignment="Center"
-                     Foreground="Gray"
-                     Text="Поиск по логину или ФИО"
-                     GotFocus="SearchBox_GotFocus"
-                     LostFocus="SearchBox_LostFocus"
-                     TextChanged="SearchBox_TextChanged"/>
+                <TextBlock Grid.Column="0"
+                           Text="👥"
+                           FontSize="28"
+                           VerticalAlignment="Center"/>
 
-            <ComboBox x:Name="RoleFilter"
-                      Grid.Column="1"
-                      Height="34"
-                      FontSize="14"
-                      VerticalContentAlignment="Center"
-                      HorizontalAlignment="Right"/>
-        </Grid>
-
-        <Border Grid.Row="2" Style="{StaticResource Card}">
-            <DataGrid x:Name="UsersDataGrid"
-                      AutoGenerateColumns="False"
-                      HeadersVisibility="Column"
-                      CanUserAddRows="False"
-                      IsReadOnly="True"
-                      RowHeaderWidth="0"
-                      GridLinesVisibility="None"
-                      MouseDoubleClick="UsersDataGrid_MouseDoubleClick"
-                      ScrollViewer.HorizontalScrollBarVisibility="Auto">
-
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Логин" Binding="{Binding Login}" Width="150"/>
-                    <DataGridTextColumn Header="Роль" Binding="{Binding Roles.Role_Name}" Width="120"/>
-                    <DataGridTextColumn Header="ФИО" Binding="{Binding Full_Name}" Width="*"/>
-                    <DataGridCheckBoxColumn Header="Активен" Binding="{Binding IsActive}" Width="100"/>
-                </DataGrid.Columns>
-            </DataGrid>
+                <StackPanel Grid.Column="2"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="Управление пользователями"
+                               Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Text="Добавление, редактирование и удаление пользователей системы"
+                               Style="{StaticResource SubTitle}"
+                               Margin="0,3,0,0"/>
+                </StackPanel>
+            </Grid>
         </Border>
+        <!--#endregion-->
 
-        <Grid Grid.Row="3">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
+        <!--#region Панель фильтров и поиска-->
+        <Border Grid.Row="2" Grid.Column="1"
+                Style="{StaticResource Card}"
+                Padding="20,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="250"/>
+                </Grid.ColumnDefinitions>
 
-            <Button x:Name="AddUserButton"
-                    Content="Добавить"
-                    Style="{StaticResource PrimaryButton}"
-                    Width="140"
-                    Height="36"
-                    HorizontalAlignment="Center"
-                    Click="AddUserButton_Click"/>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-            <Button x:Name="EditUserButton"
-                    Grid.Column="1"
-                    Content="Редактировать"
-                    Style="{StaticResource BaseButton}"
-                    Width="140"
-                    Height="36"
-                    HorizontalAlignment="Center"
-                    Click="EditUserButton_Click"/>
+                <!--#region Поле поиска-->
+                <TextBlock Grid.Row="0" Grid.Column="0"
+                           Text="Поиск"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextBrush}"/>
 
-            <Button x:Name="DeleteUserButton"
-                    Grid.Column="2"
-                    Content="Удалить"
-                    Style="{StaticResource BaseButton}"
-                    Width="140"
-                    Height="36"
-                    HorizontalAlignment="Center"
-                    Click="DeleteUserButton_Click"/>
-        </Grid>
+                <Border Grid.Row="2" Grid.Column="0"
+                        BorderBrush="{StaticResource StrokeStrongBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Background="White">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="35"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0"
+                                   Text="🔍"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Foreground="{StaticResource TextMutedBrush}"/>
+
+                        <TextBox x:Name="SearchBox"
+                                 Grid.Column="1"
+                                 Height="34"
+                                 FontSize="14"
+                                 VerticalContentAlignment="Center"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 Foreground="{StaticResource TextMutedBrush}"
+                                 Text="Поиск по логину или ФИО"
+                                 GotFocus="SearchBox_GotFocus"
+                                 LostFocus="SearchBox_LostFocus"
+                                 TextChanged="SearchBox_TextChanged"/>
+                    </Grid>
+                </Border>
+                <!--#endregion-->
+
+                <!--#region Фильтр по роли-->
+                <TextBlock Grid.Row="0" Grid.Column="2"
+                           Text="Роль"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextBrush}"/>
+
+                <ComboBox x:Name="RoleFilter"
+                          Grid.Row="2" Grid.Column="2"
+                          Height="34"
+                          FontSize="14"
+                          VerticalContentAlignment="Center"/>
+                <!--#endregion-->
+            </Grid>
+        </Border>
+        <!--#endregion-->
+
+        <!--#region Таблица пользователей-->
+        <Border Grid.Row="4" Grid.Column="1"
+                Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!--#region Информация о количестве-->
+                <Border Grid.Row="0"
+                        Background="#FFF8F9FA"
+                        BorderBrush="{StaticResource StrokeBrush}"
+                        BorderThickness="0,0,0,1"
+                        Padding="20,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0"
+                                   x:Name="CountTextBlock"
+                                   Text="Всего пользователей: 0"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextBrush}"
+                                   VerticalAlignment="Center"/>
+
+                        <Button Grid.Column="1"
+                                x:Name="RefreshButton"
+                                Content="🔄 Обновить"
+                                Style="{StaticResource BaseButton}"
+                                Width="110"
+                                Height="32"
+                                FontSize="13"
+                                Click="RefreshButton_Click"/>
+                    </Grid>
+                </Border>
+                <!--#endregion-->
+
+                <!--#region DataGrid-->
+                <DataGrid Grid.Row="1"
+                          x:Name="UsersDataGrid"
+                          AutoGenerateColumns="False"
+                          MouseDoubleClick="UsersDataGrid_MouseDoubleClick"
+                          SelectionChanged="UsersDataGrid_SelectionChanged">
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Логин" 
+                                            Binding="{Binding Login}" 
+                                            Width="180"/>
+
+                        <DataGridTextColumn Header="ФИО" 
+                                            Binding="{Binding Full_Name}" 
+                                            Width="*"
+                                            MinWidth="200"/>
+
+                        <DataGridTextColumn Header="Роль" 
+                                            Binding="{Binding Roles.Role_Name}" 
+                                            Width="150"/>
+
+                        <DataGridTextColumn Header="Статус" 
+                                            Binding="{Binding IsActive}" 
+                                            Width="120">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="FontSize" Value="13"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                            <Setter Property="Text" Value="✓ Активен"/>
+                                            <Setter Property="Foreground" Value="#27AE60"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                            <Setter Property="Text" Value="✗ Неактивен"/>
+                                            <Setter Property="Foreground" Value="#E74C3C"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="Дата создания" 
+                                            Binding="{Binding Created_At, StringFormat='dd.MM.yyyy'}" 
+                                            Width="130"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <!--#endregion-->
+            </Grid>
+        </Border>
+        <!--#endregion-->
+
+        <!--#region Панель действий-->
+        <Border Grid.Row="6" Grid.Column="1"
+                Style="{StaticResource Card}"
+                Padding="20,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           x:Name="SelectionInfoTextBlock"
+                           Text="Выберите пользователя для редактирования или удаления"
+                           FontSize="13"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           VerticalAlignment="Center"/>
+
+                <Button Grid.Column="2"
+                        x:Name="AddUserButton"
+                        Content="➕ Добавить"
+                        Style="{StaticResource PrimaryButton}"
+                        Width="140"
+                        Height="36"
+                        Click="AddUserButton_Click"/>
+
+                <Button Grid.Column="4"
+                        x:Name="EditUserButton"
+                        Content="✏️ Редактировать"
+                        Style="{StaticResource BaseButton}"
+                        Width="160"
+                        Height="36"
+                        IsEnabled="False"
+                        Click="EditUserButton_Click"/>
+
+                <Button Grid.Column="6"
+                        x:Name="DeleteUserButton"
+                        Content="🗑️ Удалить"
+                        Style="{StaticResource BaseButton}"
+                        Width="140"
+                        Height="36"
+                        IsEnabled="False"
+                        Click="DeleteUserButton_Click"/>
+            </Grid>
+        </Border>
+        <!--#endregion-->
     </Grid>
 </Page>

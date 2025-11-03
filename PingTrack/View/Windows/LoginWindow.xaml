@@ -5,113 +5,208 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PingTrack.View.Windows"
         mc:Ignorable="d"
-        Title="Авторизация — PingTrack"
+        Title="PingTrack — Авторизация"
         WindowStartupLocation="CenterScreen"
-        Width="420" Height="480"
-        Background="{StaticResource WindowBrush}"
+        Width="440" Height="620"
+        Background="White"
         ResizeMode="NoResize">
 
     <Grid>
+        <!--#region Основная структура-->
         <Grid.RowDefinitions>
-            <RowDefinition Height="120"/>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="45"/>
         </Grid.RowDefinitions>
-
+        
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="260"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="50"/>
         </Grid.ColumnDefinitions>
+        <!--#endregion-->
 
-        <Image Grid.Column="1"
-               Source="/Resources/Images/logo.png"
-               Width="212"
-               Height="180"
-               VerticalAlignment="Center"
-               HorizontalAlignment="Center"/>
+        <!--#region Логотип-->
+        <Viewbox Grid.Row="1" Grid.Column="1"
+                 Height="120"
+                 HorizontalAlignment="Center">
+            <Image Source="/Resources/Images/logo.png"
+                   RenderOptions.BitmapScalingMode="HighQuality"/>
+        </Viewbox>
+        <!--#endregion-->
 
-        <TextBlock Grid.Row="2" Grid.Column="1"
-                   Text="Логин"
-                   FontSize="15"
-                   VerticalAlignment="Center"
-                   Foreground="{StaticResource TextBrush}"/>
+        <!--#region Заголовок-->
+        <TextBlock Grid.Row="3" Grid.Column="1"
+                   Text="Вход в систему"
+                   FontSize="20"
+                   FontWeight="Bold"
+                   Foreground="#1F2937"
+                   HorizontalAlignment="Center"/>
+        <!--#endregion-->
 
-        <TextBox x:Name="LoginTextBox"
-                 Grid.Row="3" Grid.Column="1"
-                 Height="34"
-                 BorderBrush="#33000000"
-                 BorderThickness="1"
-                 Background="White"
-                 FontSize="14"
-                 VerticalContentAlignment="Center"
-                 VerticalAlignment="Center"/>
+        <!--#region Форма входа-->
+        <Border Grid.Row="5" Grid.Column="1"
+                Background="#F9FAFB"
+                CornerRadius="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="22"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="18"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="22"/>
+                </Grid.RowDefinitions>
+                
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="25"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="25"/>
+                </Grid.ColumnDefinitions>
+                
+                <!--#region Логин-->
+                <TextBlock Grid.Row="1" Grid.Column="1"
+                           Text="Логин"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="#374151"/>
+                
+                <Border Grid.Row="3" Grid.Column="1"
+                        BorderBrush="#D1D5DB"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Background="White"
+                        Height="44">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="12"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <TextBox Grid.Column="1"
+                                 x:Name="LoginTextBox"
+                                 FontSize="15"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 VerticalContentAlignment="Center"
+                                 Foreground="#1F2937"/>
+                    </Grid>
+                </Border>
+                <!--#endregion-->
+                
+                <!--#region Пароль-->
+                <TextBlock Grid.Row="5" Grid.Column="1"
+                           Text="Пароль"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="#374151"/>
+                
+                <Border Grid.Row="7" Grid.Column="1"
+                        BorderBrush="#D1D5DB"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Background="White"
+                        Height="44">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="44"/>
+                        </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="4" Grid.Column="1"
-                   Text="Пароль"
-                   FontSize="15"
-                   VerticalAlignment="Center"
-                   Foreground="{StaticResource TextBrush}"/>
+                        <PasswordBox Grid.Column="1"
+                                     x:Name="PasswordBox"
+                                     FontSize="15"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     VerticalContentAlignment="Center"
+                                     Foreground="#1F2937"/>
 
-        <Grid Grid.Row="5" Grid.Column="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="40"/>
-            </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="1"
+                                 x:Name="VisiblePasswordBox"
+                                 FontSize="15"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 VerticalContentAlignment="Center"
+                                 Foreground="#1F2937"
+                                 Visibility="Collapsed"/>
 
-            <PasswordBox x:Name="PasswordBox"
-                         Height="34"
-                         BorderBrush="#33000000"
-                         BorderThickness="1"
-                         Background="White"
-                         FontSize="14"
-                         VerticalContentAlignment="Center"/>
+                        <Button Grid.Column="2"
+                                x:Name="TogglePasswordButton"
+                                Width="44"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Cursor="Hand"
+                                Click="TogglePasswordButton_Click">
+                            <TextBlock x:Name="EyeIcon"
+                                       Text="👁️"
+                                       FontSize="18"
+                                       Foreground="#9CA3AF"/>
+                        </Button>
+                    </Grid>
+                </Border>
+                <!--#endregion-->
+                
+                <!--#region Кнопка входа-->
+                <Button Grid.Row="9" Grid.Column="1"
+                        x:Name="LoginButton"
+                        Content="Войти в систему"
+                        Height="46"
+                        FontSize="15"
+                        FontWeight="Bold"
+                        Foreground="White"
+                        Background="{StaticResource PrimaryBrush}"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Click="LoginButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="border"
+                                                Background="{TemplateBinding Background}"
+                                                CornerRadius="8">
+                                            <ContentPresenter HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Opacity" Value="0.9"/>
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter TargetName="border" Property="Opacity" Value="0.8"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <!--#endregion-->
+            </Grid>
+        </Border>
+        <!--#endregion-->
 
-            <TextBox x:Name="VisiblePasswordBox"
-                     Height="34"
-                     BorderBrush="#33000000"
-                     BorderThickness="1"
-                     Background="White"
-                     FontSize="14"
-                     VerticalContentAlignment="Center"
-                     Visibility="Collapsed"/>
-
-            <Button x:Name="TogglePasswordButton"
-                    Grid.Column="1"
-                    Width="34"
-                    Height="34"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Click="TogglePasswordButton_Click">
-                <Image x:Name="EyeIcon"
-                       Width="28"
-                       Height="28"
-                       Source="/Resources/Images/eye_closed.png"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Center"/>
-            </Button>
-        </Grid>
-
-        <Button x:Name="LoginButton"
-                Grid.Row="6" Grid.Column="1"
-                Content="Войти"
-                Height="36"
-                Background="{StaticResource PrimaryBrush}"
-                Foreground="White"
-                FontWeight="SemiBold"
-                BorderThickness="0"
-                Cursor="Hand"
-                Click="LoginButton_Click">
-            <Button.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="6"/>
-                </Style>
-            </Button.Resources>
-        </Button>
+        <!--#region Футер-->
+        <TextBlock Grid.Row="7" Grid.Column="1"
+                   Text="© 2024 PingTrack. Все права защищены."
+                   FontSize="11"
+                   Foreground="#9CA3AF"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+        <!--#endregion-->
     </Grid>
 </Window>

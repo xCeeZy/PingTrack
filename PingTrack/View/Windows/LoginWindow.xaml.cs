@@ -18,24 +18,63 @@ namespace PingTrack.View.Windows
 {
     public partial class LoginWindow : Window
     {
+        #region Поля
         private bool isPasswordVisible = false;
+        #endregion
 
         #region Конструктор
         public LoginWindow()
         {
             InitializeComponent();
+
+            LoginTextBox.Focus();
+
+            LoginTextBox.KeyDown += InputField_KeyDown;
+            PasswordBox.KeyDown += InputField_KeyDown;
+            VisiblePasswordBox.KeyDown += InputField_KeyDown;
         }
         #endregion
 
-        #region Кнопка входа
+        #region Обработка нажатия Enter
+        private void InputField_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                if (sender == LoginTextBox)
+                {
+                    if (isPasswordVisible)
+                        VisiblePasswordBox.Focus();
+                    else
+                        PasswordBox.Focus();
+                }
+                else
+                {
+                    LoginButton_Click(null, null);
+                }
+            }
+        }
+        #endregion
+
+        #region Вход в систему
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             string login = LoginTextBox.Text.Trim();
             string password = isPasswordVisible ? VisiblePasswordBox.Text.Trim() : PasswordBox.Password.Trim();
 
-            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(login))
             {
-                Feedback.ShowWarning("Ошибка", "Введите логин и пароль.");
+                Feedback.ShowWarning("Внимание", "Введите логин.");
+                LoginTextBox.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                Feedback.ShowWarning("Внимание", "Введите пароль.");
+                if (isPasswordVisible)
+                    VisiblePasswordBox.Focus();
+                else
+                    PasswordBox.Focus();
                 return;
             }
 
@@ -43,17 +82,23 @@ namespace PingTrack.View.Windows
 
             if (!isAuthenticated)
             {
-                Feedback.ShowError("Ошибка", "Неверный логин или пароль.");
+                Feedback.ShowError("Ошибка входа", "Неверный логин или пароль.");
+                PasswordBox.Clear();
+                VisiblePasswordBox.Clear();
+
+                if (isPasswordVisible)
+                    VisiblePasswordBox.Focus();
+                else
+                    PasswordBox.Focus();
+
                 return;
             }
 
             string role = AuthenticationService.GetUserRole();
             string username = AuthenticationService.GetUserLogin();
 
-            Feedback.ShowInfo("Добро пожаловать", "Вы вошли как " + role + ".");
-
-            MainWindow main = new MainWindow(role, username);
-            main.Show();
+            MainWindow mainWindow = new MainWindow(role, username);
+            mainWindow.Show();
             Close();
         }
         #endregion
@@ -66,14 +111,17 @@ namespace PingTrack.View.Windows
                 PasswordBox.Password = VisiblePasswordBox.Text;
                 VisiblePasswordBox.Visibility = Visibility.Collapsed;
                 PasswordBox.Visibility = Visibility.Visible;
-                EyeIcon.Source = new BitmapImage(new System.Uri("pack://application:,,,/Resources/Images/eye_closed.png"));
+                EyeIcon.Text = "👁️";
+                PasswordBox.Focus();
             }
             else
             {
                 VisiblePasswordBox.Text = PasswordBox.Password;
                 PasswordBox.Visibility = Visibility.Collapsed;
                 VisiblePasswordBox.Visibility = Visibility.Visible;
-                EyeIcon.Source = new BitmapImage(new System.Uri("pack://application:,,,/Resources/Images/eye_open.png"));
+                EyeIcon.Text = "👁️‍🗨️";
+                VisiblePasswordBox.Focus();
+                VisiblePasswordBox.SelectionStart = VisiblePasswordBox.Text.Length;
             }
 
             isPasswordVisible = !isPasswordVisible;

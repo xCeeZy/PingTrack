@@ -63,9 +63,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppData\AuthenticationService.cs" />
+    <Compile Include="AppData\DataGridHelper.cs" />
     <Compile Include="AppData\Feedback.cs" />
     <Compile Include="AppData\JournalGridItem.cs" />
     <Compile Include="AppData\PaginationService.cs" />
+    <Compile Include="AppData\ReportService.cs" />
     <Compile Include="Model\Attendance.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>

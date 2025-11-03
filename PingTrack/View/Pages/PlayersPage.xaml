@@ -6,99 +6,305 @@
       xmlns:local="clr-namespace:PingTrack.View.Pages"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="Игроки"
+      Title="Игроки секции"
       Background="{StaticResource WindowBrush}">
 
-    <Grid Margin="20">
-        <!--#region Структура сетки-->
+    <Grid>
+        <!--#region Основная структура-->
         <Grid.RowDefinitions>
-            <RowDefinition Height="70"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="70"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="30"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="30"/>
         </Grid.ColumnDefinitions>
         <!--#endregion-->
 
-        <!--#region Заголовок-->
-        <TextBlock Grid.Row="0"
-                   Text="Игроки секции"
-                   FontSize="24"
-                   FontWeight="Bold"
-                   Foreground="{StaticResource PrimaryBrush}"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
-        <!--#endregion-->
+        <!--#region Заголовок страницы-->
+        <Border Grid.Row="0" Grid.Column="1"
+                Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="15"/>
+                </Grid.RowDefinitions>
 
-        <!--#region Таблица-->
-        <Border Grid.Row="1"
-                Background="White"
-                CornerRadius="6"
-                Padding="10"
-                BorderBrush="#22000000"
-                BorderThickness="1">
-            <DataGrid x:Name="PlayersDataGrid"
-                      AutoGenerateColumns="False"
-                      HeadersVisibility="Column"
-                      ColumnHeaderHeight="36"
-                      CanUserAddRows="False"
-                      IsReadOnly="True"
-                      RowHeaderWidth="0"
-                      GridLinesVisibility="None"
-                      VerticalAlignment="Stretch"
-                      HorizontalAlignment="Stretch"
-                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                      ScrollViewer.VerticalScrollBarVisibility="Auto">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="ФИО" Binding="{Binding Full_Name}" Width="240"/>
-                    <DataGridTextColumn Header="Дата рождения" Binding="{Binding Birth_Date, StringFormat=d}" Width="160"/>
-                    <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="150"/>
-                    <DataGridTextColumn Header="Группа" Binding="{Binding Groups.Group_Name}" Width="180"/>
-                </DataGrid.Columns>
-            </DataGrid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="20"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="1" Grid.Column="1"
+                           Text="🏆"
+                           FontSize="28"
+                           VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Row="1" Grid.Column="3"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="Игроки секции"
+                               Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Text="Учёт и управление игроками настольного тенниса"
+                               Style="{StaticResource SubTitle}"/>
+                </StackPanel>
+            </Grid>
         </Border>
         <!--#endregion-->
 
-        <!--#region Нижняя панель управления-->
-        <Grid Grid.Row="2" VerticalAlignment="Center">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <!--#region Панель фильтров-->
+        <Border Grid.Row="2" Grid.Column="1"
+                Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="15"/>
+                </Grid.RowDefinitions>
 
-            <!-- Левая навигация -->
-            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                <Button x:Name="PrevPageButton"
-                        Content="Назад"
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="20"/>
+                </Grid.ColumnDefinitions>
+
+                <!--#region Поиск-->
+                <TextBlock Grid.Row="1" Grid.Column="1"
+                           Text="Поиск"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextBrush}"/>
+
+                <Border Grid.Row="3" Grid.Column="1"
+                        BorderBrush="{StaticResource StrokeStrongBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Background="White">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="35"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0"
+                                   Text="🔍"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Foreground="{StaticResource TextMutedBrush}"/>
+
+                        <TextBox x:Name="SearchBox"
+                                 Grid.Column="1"
+                                 Height="34"
+                                 FontSize="14"
+                                 VerticalContentAlignment="Center"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 Foreground="{StaticResource TextMutedBrush}"
+                                 Text="Поиск по ФИО или телефону"
+                                 GotFocus="SearchBox_GotFocus"
+                                 LostFocus="SearchBox_LostFocus"
+                                 TextChanged="SearchBox_TextChanged"/>
+                    </Grid>
+                </Border>
+                <!--#endregion-->
+
+                <!--#region Фильтр по группе-->
+                <TextBlock Grid.Row="1" Grid.Column="3"
+                           Text="Группа"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextBrush}"/>
+
+                <ComboBox x:Name="GroupFilter"
+                          Grid.Row="3" Grid.Column="3"
+                          Height="34"
+                          FontSize="14"
+                          VerticalContentAlignment="Center"/>
+                <!--#endregion-->
+            </Grid>
+        </Border>
+        <!--#endregion-->
+
+        <!--#region Таблица игроков-->
+        <Border Grid.Row="4" Grid.Column="1"
+                Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!--#region Информация о количестве-->
+                <Border Grid.Row="0"
+                        Background="#FFF8F9FA"
+                        BorderBrush="{StaticResource StrokeBrush}"
+                        BorderThickness="0,0,0,1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="20"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="1"
+                                   x:Name="CountTextBlock"
+                                   Text="Всего игроков: 0"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextBrush}"
+                                   VerticalAlignment="Center"/>
+
+                        <Button Grid.Column="2"
+                                x:Name="RefreshButton"
+                                Content="🔄 Обновить"
+                                Style="{StaticResource BaseButton}"
+                                Width="110"
+                                Height="32"
+                                FontSize="13"
+                                Click="RefreshButton_Click"/>
+                    </Grid>
+                </Border>
+                <!--#endregion-->
+
+                <!--#region DataGrid-->
+                <DataGrid Grid.Row="1"
+                          x:Name="PlayersDataGrid"
+                          AutoGenerateColumns="False"
+                          MouseDoubleClick="PlayersDataGrid_MouseDoubleClick"
+                          SelectionChanged="PlayersDataGrid_SelectionChanged">
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ФИО" 
+                                            Binding="{Binding Full_Name}" 
+                                            Width="*"
+                                            MinWidth="200"/>
+
+                        <DataGridTextColumn Header="Дата рождения" 
+                                            Binding="{Binding Birth_Date, StringFormat='dd.MM.yyyy'}" 
+                                            Width="140"/>
+
+                        <DataGridTemplateColumn Header="Возраст" Width="90">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Age}"
+                                               HorizontalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTextColumn Header="Телефон" 
+                                            Binding="{Binding Phone}" 
+                                            Width="130"/>
+
+                        <DataGridTextColumn Header="Группа" 
+                                            Binding="{Binding GroupName}" 
+                                            Width="180"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <!--#endregion-->
+            </Grid>
+        </Border>
+        <!--#endregion-->
+
+        <!--#region Панель действий-->
+        <Border Grid.Row="6" Grid.Column="1"
+                Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="15"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="20"/>
+                </Grid.ColumnDefinitions>
+
+                <!--#region Пагинация слева-->
+                <Button Grid.Row="1" Grid.Column="1"
+                        x:Name="PrevPageButton"
+                        Content="◀ Назад"
                         Style="{StaticResource BaseButton}"
-                        Width="100" Height="34"/>
-                <TextBlock x:Name="PageInfoText"
+                        Width="100"
+                        Height="36"
+                        Click="PrevPageButton_Click"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="3"
+                           x:Name="PageInfoText"
                            Text="Страница 1 из 1"
                            FontSize="13"
+                           FontWeight="SemiBold"
                            Foreground="{StaticResource TextBrush}"
                            VerticalAlignment="Center"
-                           Margin="12,0,12,0"/>
-                <Button x:Name="NextPageButton"
-                        Content="Вперёд"
-                        Style="{StaticResource BaseButton}"
-                        Width="100" Height="34"/>
-            </StackPanel>
+                           MinWidth="140"
+                           TextAlignment="Center"/>
 
-            <!-- Правая панель -->
-            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <Button x:Name="AddPlayerButton"
-                        Content="Добавить игрока"
-                        Style="{StaticResource PrimaryButton}"
-                        Width="160" Height="36"
-                        Margin="0,0,12,0"/>
-                <Button x:Name="DeletePlayerButton"
-                        Content="Удалить"
+                <Button Grid.Row="1" Grid.Column="5"
+                        x:Name="NextPageButton"
+                        Content="Вперёд ▶"
                         Style="{StaticResource BaseButton}"
-                        Width="120" Height="36"/>
-            </StackPanel>
-        </Grid>
+                        Width="100"
+                        Height="36"
+                        Click="NextPageButton_Click"/>
+                <!--#endregion-->
+
+                <!--#region Кнопки действий справа-->
+                <Button Grid.Row="1" Grid.Column="7"
+                        x:Name="AddPlayerButton"
+                        Content="➕ Добавить"
+                        Style="{StaticResource PrimaryButton}"
+                        Width="140"
+                        Height="36"
+                        Click="AddPlayerButton_Click"/>
+
+                <Button Grid.Row="1" Grid.Column="9"
+                        x:Name="EditPlayerButton"
+                        Content="✏️ Редактировать"
+                        Style="{StaticResource BaseButton}"
+                        Width="160"
+                        Height="36"
+                        IsEnabled="False"
+                        Click="EditPlayerButton_Click"/>
+
+                <Button Grid.Row="1" Grid.Column="11"
+                        x:Name="DeletePlayerButton"
+                        Content="🗑️ Удалить"
+                        Style="{StaticResource BaseButton}"
+                        Width="120"
+                        Height="36"
+                        IsEnabled="False"
+                        Click="DeletePlayerButton_Click"/>
+                <!--#endregion-->
+            </Grid>
+        </Border>
         <!--#endregion-->
     </Grid>
 </Page>

@@ -6,64 +6,305 @@
       xmlns:local="clr-namespace:PingTrack.View.Pages"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="Занятия"
+      Title="Расписание тренировок"
       Background="{StaticResource WindowBrush}">
 
     <Grid>
+        <!--#region Основная структура-->
         <Grid.RowDefinitions>
-            <RowDefinition Height="80"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="80"/>
+            <ColumnDefinition Width="30"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="200"/>
-            <ColumnDefinition Width="200"/>
-            <ColumnDefinition Width="80"/>
+            <ColumnDefinition Width="30"/>
         </Grid.ColumnDefinitions>
+        <!--#endregion-->
 
-        <TextBlock Grid.Row="0" Grid.ColumnSpan="5"
-                   Text="Занятия секции"
-                   FontSize="22" FontWeight="Bold"
-                   Foreground="{StaticResource PrimaryBrush}"
-                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <!--#region Заголовок страницы-->
+        <Border Grid.Row="0" Grid.Column="1"
+                Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="15"/>
+                </Grid.RowDefinitions>
 
-        <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Style="{StaticResource Card}">
-            <DataGrid x:Name="TrainingsDataGrid"
-                      AutoGenerateColumns="False"
-                      HeadersVisibility="Column"
-                      ColumnHeaderHeight="32"
-                      CanUserAddRows="False"
-                      IsReadOnly="True"
-                      RowHeaderWidth="0"
-                      GridLinesVisibility="None">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Дата" Binding="{Binding Date}" Width="150"/>
-                    <DataGridTextColumn Header="Время" Binding="{Binding Time}" Width="120"/>
-                    <DataGridTextColumn Header="Группа" Binding="{Binding Group}" Width="auto"/>
-                    <DataGridTextColumn Header="Тренер" Binding="{Binding Coach}" Width="200"/>
-                    <DataGridTextColumn Header="Тип занятия" Binding="{Binding Type}" Width="200"/>
-                </DataGrid.Columns>
-            </DataGrid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="20"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="1" Grid.Column="1"
+                           Text="📅"
+                           FontSize="28"
+                           VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Row="1" Grid.Column="3"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="Расписание тренировок"
+                               Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Text="Планирование и учёт проведённых занятий"
+                               Style="{StaticResource SubTitle}"/>
+                </StackPanel>
+            </Grid>
         </Border>
+        <!--#endregion-->
 
-        <Grid Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
-            <Button x:Name="AddTrainingButton"
-                    Content="Добавить занятие"
-                    Style="{StaticResource PrimaryButton}"
-                    Width="160" Height="36"
-                    HorizontalAlignment="Center"/>
-            <Button x:Name="DeleteTrainingButton"
-                    Grid.Column="1"
-                    Content="Удалить"
-                    Style="{StaticResource BaseButton}"
-                    Width="120" Height="36"
-                    HorizontalAlignment="Center"/>
-        </Grid>
+        <!--#region Панель фильтров-->
+        <Border Grid.Row="2" Grid.Column="1"
+        Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="15"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="20"/>
+                </Grid.ColumnDefinitions>
+
+                <!--#region Период (две даты)-->
+                <TextBlock Grid.Row="1" Grid.Column="1"
+                   Text="Период"
+                   FontSize="13"
+                   FontWeight="SemiBold"
+                   Foreground="{StaticResource TextBrush}"/>
+
+                <Grid Grid.Row="3" Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="140"/>
+                    </Grid.ColumnDefinitions>
+
+                    <DatePicker Grid.Column="0"
+                        x:Name="StartDatePicker"
+                        Height="34"
+                        FontSize="14"
+                        SelectedDateChanged="DateFilter_Changed"/>
+
+                    <TextBlock Grid.Column="2"
+                       Text="—"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource TextMutedBrush}"
+                       VerticalAlignment="Center"/>
+
+                    <DatePicker Grid.Column="4"
+                        x:Name="EndDatePicker"
+                        Height="34"
+                        FontSize="14"
+                        SelectedDateChanged="DateFilter_Changed"/>
+                </Grid>
+                <!--#endregion-->
+
+                <!--#region Фильтр по группе-->
+                <TextBlock Grid.Row="1" Grid.Column="3"
+                   Text="Группа"
+                   FontSize="13"
+                   FontWeight="SemiBold"
+                   Foreground="{StaticResource TextBrush}"/>
+
+                <ComboBox Grid.Row="3" Grid.Column="3"
+                  x:Name="GroupFilter"
+                  Height="34"
+                  FontSize="14"
+                  VerticalContentAlignment="Center"/>
+                <!--#endregion-->
+
+                <!--#region Фильтр по тренеру-->
+                <TextBlock Grid.Row="1" Grid.Column="5"
+                   Text="Тренер"
+                   FontSize="13"
+                   FontWeight="SemiBold"
+                   Foreground="{StaticResource TextBrush}"/>
+
+                <ComboBox Grid.Row="3" Grid.Column="5"
+                  x:Name="CoachFilter"
+                  Height="34"
+                  FontSize="14"
+                  VerticalContentAlignment="Center"/>
+                <!--#endregion-->
+
+                <!--#region Фильтр по типу-->
+                <TextBlock Grid.Row="1" Grid.Column="7"
+                   Text="Тип занятия"
+                   FontSize="13"
+                   FontWeight="SemiBold"
+                   Foreground="{StaticResource TextBrush}"/>
+
+                <ComboBox Grid.Row="3" Grid.Column="7"
+                  x:Name="TypeFilter"
+                  Height="34"
+                  FontSize="14"
+                  VerticalContentAlignment="Center"/>
+                <!--#endregion-->
+            </Grid>
+        </Border>
+        <!--#endregion-->
+
+        <!--#region Таблица тренировок-->
+        <Border Grid.Row="4" Grid.Column="1"
+                Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!--#region Информация о количестве-->
+                <Border Grid.Row="0"
+                        Background="#FFF8F9FA"
+                        BorderBrush="{StaticResource StrokeBrush}"
+                        BorderThickness="0,0,0,1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="20"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="1"
+                                   x:Name="CountTextBlock"
+                                   Text="Всего тренировок: 0"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextBrush}"
+                                   VerticalAlignment="Center"/>
+
+                        <Button Grid.Column="2"
+                                x:Name="RefreshButton"
+                                Content="🔄 Обновить"
+                                Style="{StaticResource BaseButton}"
+                                Width="110"
+                                Height="32"
+                                FontSize="13"
+                                Click="RefreshButton_Click"/>
+                    </Grid>
+                </Border>
+                <!--#endregion-->
+
+                <!--#region DataGrid-->
+                <DataGrid Grid.Row="1"
+                          x:Name="TrainingsDataGrid"
+                          AutoGenerateColumns="False"
+                          MouseDoubleClick="TrainingsDataGrid_MouseDoubleClick"
+                          SelectionChanged="TrainingsDataGrid_SelectionChanged">
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Дата" 
+                                            Binding="{Binding Date}" 
+                                            Width="110"/>
+
+                        <DataGridTextColumn Header="Время" 
+                                            Binding="{Binding Time}" 
+                                            Width="90"/>
+
+                        <DataGridTextColumn Header="Группа" 
+                                            Binding="{Binding Group}" 
+                                            Width="*"
+                                            MinWidth="150"/>
+
+                        <DataGridTextColumn Header="Тренер" 
+                                            Binding="{Binding Coach}" 
+                                            Width="200"/>
+
+                        <DataGridTextColumn Header="Тип занятия" 
+                                            Binding="{Binding Type}" 
+                                            Width="180"/>
+
+                        <DataGridTextColumn Header="Примечание" 
+                                            Binding="{Binding Note}" 
+                                            Width="200"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <!--#endregion-->
+            </Grid>
+        </Border>
+        <!--#endregion-->
+
+        <!--#region Панель действий-->
+        <Border Grid.Row="6" Grid.Column="1"
+                Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="15"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="20"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="1" Grid.Column="1"
+                           x:Name="SelectionInfoTextBlock"
+                           Text="Выберите тренировку для редактирования или удаления"
+                           FontSize="13"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           VerticalAlignment="Center"/>
+
+                <Button Grid.Row="1" Grid.Column="3"
+                        x:Name="AddTrainingButton"
+                        Content="➕ Добавить"
+                        Style="{StaticResource PrimaryButton}"
+                        Width="140"
+                        Height="36"
+                        Click="AddTrainingButton_Click"/>
+
+                <Button Grid.Row="1" Grid.Column="5"
+                        x:Name="EditTrainingButton"
+                        Content="✏️ Редактировать"
+                        Style="{StaticResource BaseButton}"
+                        Width="160"
+                        Height="36"
+                        IsEnabled="False"
+                        Click="EditTrainingButton_Click"/>
+
+                <Button Grid.Row="1" Grid.Column="7"
+                        x:Name="DeleteTrainingButton"
+                        Content="🗑️ Удалить"
+                        Style="{StaticResource BaseButton}"
+                        Width="120"
+                        Height="36"
+                        IsEnabled="False"
+                        Click="DeleteTrainingButton_Click"/>
+            </Grid>
+        </Border>
+        <!--#endregion-->
     </Grid>
 </Page>
