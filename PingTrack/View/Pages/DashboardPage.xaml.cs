@@ -32,6 +32,8 @@ namespace PingTrack.View.Pages
         {
             LoadStatistics();
             LoadRecentTrainings();
+            LoadRiskPlayers();
+            LoadAttendanceChart();
         }
 
         private void LoadStatistics()
@@ -55,7 +57,7 @@ namespace PingTrack.View.Pages
                 averageAttendance = (double)presentCount / totalAttendance * 100.0;
             }
 
-            AverageAttendanceText.Text = $"{averageAttendance:F1}%";
+            AverageAttendanceText.Text = string.Format("{0:F1}%", averageAttendance);
         }
 
         private void LoadRecentTrainings()
@@ -71,7 +73,7 @@ namespace PingTrack.View.Pages
                 .ToList()
                 .Select(t => new TrainingDashboardItem
                 {
-                    DateTime = $"{t.Date:dd.MM.yyyy} {t.Time:hh\\:mm}",
+                    DateTime = string.Format("{0:dd.MM.yyyy} {1:hh\\:mm}", t.Date, t.Time),
                     Group = t.Groups?.Group_Name ?? "-",
                     Type = t.Training_Types?.Type_Name ?? "-",
                     Coach = t.Users?.Full_Name ?? "-",
@@ -90,7 +92,51 @@ namespace PingTrack.View.Pages
             int present = training.Attendance.Count(a => a.Is_Present);
             int total = training.Attendance.Count;
 
-            return $"{present} из {total}";
+            return string.Format("{0} из {1}", present, total);
+        }
+
+        private void LoadRiskPlayers()
+        {
+            List<PlayerRiskInfo> riskPlayers = PlayerStatisticsService.GetAtRiskPlayers();
+            RiskPlayersGrid.ItemsSource = riskPlayers;
+        }
+
+        private void LoadAttendanceChart()
+        {
+            List<AttendanceChartItem> chartData = new List<AttendanceChartItem>();
+            DateTime now = DateTime.Now;
+
+            for (int i = 5; i >= 0; i--)
+            {
+                DateTime monthDate = now.AddMonths(-i);
+                DateTime startOfMonth = new DateTime(monthDate.Year, monthDate.Month, 1);
+                DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+
+                List<Attendance> monthAttendances = App.db.Attendance
+                    .Include("Trainings")
+                    .Where(a => a.Trainings.Date >= startOfMonth && a.Trainings.Date <= endOfMonth)
+                    .ToList();
+
+                int totalCount = monthAttendances.Count;
+                int presentCount = monthAttendances.Count(a => a.Is_Present);
+                double percent = totalCount > 0 ? (double)presentCount / totalCount * 100.0 : 0;
+
+                string monthName = monthDate.ToString("MMMM yyyy", new System.Globalization.CultureInfo("ru-RU"));
+                monthName = char.ToUpper(monthName[0]) + monthName.Substring(1);
+
+                double maxWidth = 600.0;
+                double barWidth = percent > 0 ? (percent / 100.0) * maxWidth : 1;
+
+                chartData.Add(new AttendanceChartItem
+                {
+                    MonthName = monthName,
+                    PercentText = string.Format("{0:F1}%", percent),
+                    DetailText = string.Format("Присутствовали: {0} из {1} занятий", presentCount, totalCount),
+                    BarWidth = barWidth
+                });
+            }
+
+            AttendanceChartItems.ItemsSource = chartData;
         }
         #endregion
 
@@ -103,7 +149,7 @@ namespace PingTrack.View.Pages
         #endregion
     }
 
-    #region Вспомогательный класс для отображения
+    #region Вспомогательные классы для отображения
     public class TrainingDashboardItem
     {
         public string DateTime { get; set; }
@@ -111,6 +157,14 @@ namespace PingTrack.View.Pages
         public string Type { get; set; }
         public string Coach { get; set; }
         public string Attendance { get; set; }
+    }
+
+    public class AttendanceChartItem
+    {
+        public string MonthName { get; set; }
+        public string PercentText { get; set; }
+        public string DetailText { get; set; }
+        public double BarWidth { get; set; }
     }
     #endregion
 }

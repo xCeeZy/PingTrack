@@ -210,6 +210,25 @@ namespace PingTrack.View.Pages
             if (window.ShowDialog() == true)
                 LoadTrainings();
         }
+        private void ExportButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (allTrainings == null || allTrainings.Count == 0)
+            {
+                Feedback.ShowWarning("Экспорт невозможен", "Нет данных для экспорта.");
+                return;
+            }
+
+            List<int> trainingIds = allTrainings.Select(t => t.ID_Training).ToList();
+
+            List<Trainings> trainingsToExport = App.db.Trainings
+                .Include("Groups")
+                .Include("Users")
+                .Include("Training_Types")
+                .Where(t => trainingIds.Contains(t.ID_Training))
+                .ToList();
+
+            ExportService.ExportTrainingsToText(trainingsToExport);
+        }
 
         private void EditTrainingButton_Click(object sender, RoutedEventArgs e)
         {

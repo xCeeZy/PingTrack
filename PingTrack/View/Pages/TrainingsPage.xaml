@@ -251,7 +251,7 @@
 
         <!--#region Панель действий-->
         <Border Grid.Row="6" Grid.Column="1"
-                Style="{StaticResource Card}">
+        Style="{StaticResource Card}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="15"/>
@@ -268,41 +268,51 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="10"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="20"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Row="1" Grid.Column="1"
-                           x:Name="SelectionInfoTextBlock"
-                           Text="Выберите тренировку для редактирования или удаления"
-                           FontSize="13"
-                           Foreground="{StaticResource TextMutedBrush}"
-                           VerticalAlignment="Center"/>
+                   x:Name="SelectionInfoTextBlock"
+                   Text="Выберите тренировку для редактирования или удаления"
+                   FontSize="13"
+                   Foreground="{StaticResource TextMutedBrush}"
+                   VerticalAlignment="Center"/>
 
                 <Button Grid.Row="1" Grid.Column="3"
-                        x:Name="AddTrainingButton"
-                        Content="➕ Добавить"
-                        Style="{StaticResource PrimaryButton}"
-                        Width="140"
-                        Height="36"
-                        Click="AddTrainingButton_Click"/>
+                x:Name="ExportButton"
+                Content="📄 Экспорт"
+                Style="{StaticResource BaseButton}"
+                Width="120"
+                Height="36"
+                Click="ExportButton_Click"/>
 
                 <Button Grid.Row="1" Grid.Column="5"
-                        x:Name="EditTrainingButton"
-                        Content="✏️ Редактировать"
-                        Style="{StaticResource BaseButton}"
-                        Width="160"
-                        Height="36"
-                        IsEnabled="False"
-                        Click="EditTrainingButton_Click"/>
+                x:Name="AddTrainingButton"
+                Content="➕ Добавить"
+                Style="{StaticResource PrimaryButton}"
+                Width="140"
+                Height="36"
+                Click="AddTrainingButton_Click"/>
 
                 <Button Grid.Row="1" Grid.Column="7"
-                        x:Name="DeleteTrainingButton"
-                        Content="🗑️ Удалить"
-                        Style="{StaticResource BaseButton}"
-                        Width="120"
-                        Height="36"
-                        IsEnabled="False"
-                        Click="DeleteTrainingButton_Click"/>
+                x:Name="EditTrainingButton"
+                Content="✏️ Редактировать"
+                Style="{StaticResource BaseButton}"
+                Width="160"
+                Height="36"
+                IsEnabled="False"
+                Click="EditTrainingButton_Click"/>
+
+                <Button Grid.Row="1" Grid.Column="9"
+                x:Name="DeleteTrainingButton"
+                Content="🗑️ Удалить"
+                Style="{StaticResource BaseButton}"
+                Width="120"
+                Height="36"
+                IsEnabled="False"
+                Click="DeleteTrainingButton_Click"/>
             </Grid>
         </Border>
         <!--#endregion-->
