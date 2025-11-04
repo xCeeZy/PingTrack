@@ -50,18 +50,22 @@ namespace PingTrack.View.Windows
                 PlayersBtn.Visibility = Visibility.Collapsed;
                 GroupsBtn.Visibility = Visibility.Collapsed;
                 TrainingsBtn.Visibility = Visibility.Collapsed;
+                PlayerStatsBtn.Visibility = Visibility.Collapsed;
                 ReportsBtn.Visibility = Visibility.Collapsed;
                 UsersBtn.Visibility = Visibility.Collapsed;
             }
 
             if (userRole == "Тренер")
             {
+                PlayerStatsBtn.Visibility = Visibility.Visible;
                 ReportsBtn.Visibility = Visibility.Collapsed;
                 UsersBtn.Visibility = Visibility.Collapsed;
             }
 
             if (userRole == "Администратор")
             {
+                PlayerStatsBtn.Visibility = Visibility.Visible;
+                ReportsBtn.Visibility = Visibility.Visible;
                 UsersBtn.Visibility = Visibility.Visible;
             }
         }
@@ -96,6 +100,11 @@ namespace PingTrack.View.Windows
         private void ReportsBtn_Click(object sender, RoutedEventArgs e)
         {
             MainFrame.Navigate(new ReportsPage());
+        }
+
+        private void PlayerStatsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new PlayerStatsPage());
         }
 
         private void UsersBtn_Click(object sender, RoutedEventArgs e)

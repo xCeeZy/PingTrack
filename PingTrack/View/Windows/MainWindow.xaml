@@ -167,6 +167,7 @@
                                 <RowDefinition Height="8"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="12"/>
                             </Grid.RowDefinitions>
 
@@ -398,6 +399,44 @@
                                        Foreground="{StaticResource TextMutedBrush}"/>
 
                             <Button Grid.Row="18" Grid.Column="1"
+                                    x:Name="PlayerStatsBtn"
+                                    Height="42"
+                                    Click="PlayerStatsBtn_Click">
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <Border x:Name="border"
+                                                Background="Transparent"
+                                                CornerRadius="8"
+                                                Cursor="Hand">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="12"/>
+                                                    <ColumnDefinition Width="24"/>
+                                                    <ColumnDefinition Width="8"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="12"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="📊"
+                                                           FontSize="16"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="3"
+                                                           Text="Статистика игрока"
+                                                           FontSize="14"
+                                                           Foreground="{StaticResource TextBrush}"
+                                                           VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="{StaticResource HoverBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+
+                            <Button Grid.Row="19" Grid.Column="1"
                                     x:Name="ReportsBtn"
                                     Height="42"
                                     Click="ReportsBtn_Click">
@@ -435,7 +474,7 @@
                                 </Button.Template>
                             </Button>
 
-                            <Button Grid.Row="19" Grid.Column="1"
+                            <Button Grid.Row="20" Grid.Column="1"
                                     x:Name="UsersBtn"
                                     Height="42"
                                     Click="UsersBtn_Click">
