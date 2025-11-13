@@ -33,5 +33,6 @@ namespace PingTrack.Model
         public DbSet<Training_Types> Training_Types { get; set; }
         public DbSet<Trainings> Trainings { get; set; }
         public DbSet<Users> Users { get; set; }
+        public DbSet<sysdiagrams> sysdiagrams { get; set; }
     }
 }

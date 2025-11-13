@@ -23,6 +23,7 @@
         <AssociationConnector Association="RusakovPingTrackModel.FK__Users__ID_Role__398D8EEE" ManuallyRouted="false" />
         <AssociationConnector Association="RusakovPingTrackModel.FK__Trainings__ID_Ty__49C3F6B7" ManuallyRouted="false" />
         <AssociationConnector Association="RusakovPingTrackModel.FK__Trainings__ID_Co__48CFD27E" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="RusakovPingTrackModel.sysdiagrams" Width="1.5" PointX="5.375" PointY="0.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
