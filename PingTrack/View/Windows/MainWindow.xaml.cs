@@ -45,7 +45,7 @@ namespace PingTrack.View.Windows
         #region Применение прав доступа
         private void ApplyRolePermissions()
         {
-            if (userRole == "Студент")
+            if (userRole == "Игрок")
             {
                 PlayersBtn.Visibility = Visibility.Collapsed;
                 GroupsBtn.Visibility = Visibility.Collapsed;

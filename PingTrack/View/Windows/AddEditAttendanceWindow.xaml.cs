@@ -59,9 +59,9 @@ namespace PingTrack.View.Windows
         #region Проверка роли
         public bool CanOpenForRole()
         {
-            if (userRole == "Студент")
+            if (userRole == "Игрок")
             {
-                Feedback.ShowWarning("Доступ запрещён", "У студентов нет прав для изменения посещаемости.");
+                Feedback.ShowWarning("Доступ запрещён", "У игроков нет прав для изменения посещаемости.");
                 return false;
             }
             return true;
