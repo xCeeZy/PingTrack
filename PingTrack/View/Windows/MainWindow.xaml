@@ -131,7 +131,8 @@
             </Grid.ColumnDefinitions>
 
             <!--#region Боковое меню-->
-            <Border Grid.Column="0"
+            <Border x:Name="SidebarBorder"
+                    Grid.Column="0"
                     Background="White"
                     BorderBrush="{StaticResource StrokeBrush}"
                     BorderThickness="0,0,1,0">

@@ -38,7 +38,16 @@ namespace PingTrack.View.Windows
                 UserInitial.Text = login.Substring(0, 1).ToUpper();
 
             ApplyRolePermissions();
-            MainFrame.Navigate(new DashboardPage());
+
+            // Для игроков открываем PlayerDashboardPage, для остальных - обычный Dashboard
+            if (userRole == "Игрок")
+            {
+                MainFrame.Navigate(new PlayerDashboardPage(login));
+            }
+            else
+            {
+                MainFrame.Navigate(new DashboardPage());
+            }
         }
         #endregion
 
@@ -47,12 +56,18 @@ namespace PingTrack.View.Windows
         {
             if (userRole == "Игрок")
             {
+                // Скрыть боковое меню полностью для игроков
+                SidebarBorder.Visibility = Visibility.Collapsed;
+
+                // Скрыть все кнопки навигации
                 PlayersBtn.Visibility = Visibility.Collapsed;
                 GroupsBtn.Visibility = Visibility.Collapsed;
                 TrainingsBtn.Visibility = Visibility.Collapsed;
                 PlayerStatsBtn.Visibility = Visibility.Collapsed;
                 ReportsBtn.Visibility = Visibility.Collapsed;
                 UsersBtn.Visibility = Visibility.Collapsed;
+                JournalBtn.Visibility = Visibility.Collapsed;
+                DashboardBtn.Visibility = Visibility.Collapsed;
             }
 
             if (userRole == "Тренер")
