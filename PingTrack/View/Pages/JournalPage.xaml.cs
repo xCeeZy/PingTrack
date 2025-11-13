@@ -69,7 +69,7 @@ namespace PingTrack.View.Pages
         #region Настройка UI для роли
         private void ConfigureUIForRole()
         {
-            if (userRole == "Студент")
+            if (userRole == "Игрок")
             {
                 AddButton.Visibility = Visibility.Collapsed;
                 DeleteButton.Visibility = Visibility.Collapsed;
@@ -200,7 +200,7 @@ namespace PingTrack.View.Pages
             JournalGridItem selectedRecord = JournalDataGrid.SelectedItem as JournalGridItem;
             bool hasSelection = selectedRecord != null;
 
-            DeleteButton.IsEnabled = hasSelection && userRole != "Студент";
+            DeleteButton.IsEnabled = hasSelection && userRole != "Игрок";
         }
 
         private void JournalDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)

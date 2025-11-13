@@ -81,6 +81,33 @@ namespace PingTrack.View.Windows
                 currentUser.Created_At = DateTime.Now;
 
                 App.db.Users.Add(currentUser);
+                App.db.SaveChanges();
+
+                // Если создается пользователь с ролью "Игрок", создать запись в таблице Players
+                Roles playerRole = App.db.Roles.FirstOrDefault(r => r.Role_Name == "Игрок");
+                if (playerRole != null && currentUser.ID_Role == playerRole.ID_Role)
+                {
+                    // Получить первую доступную группу (ID_Group обязателен для Players)
+                    Groups firstGroup = App.db.Groups.OrderBy(g => g.ID_Group).FirstOrDefault();
+                    if (firstGroup != null)
+                    {
+                        Players newPlayer = new Players
+                        {
+                            Full_Name = fullName,
+                            ID_User = currentUser.ID_User,
+                            ID_Group = firstGroup.ID_Group,
+                            Birth_Date = DateTime.Now, // Значение по умолчанию, можно изменить позже
+                            Phone = "" // Пустое значение по умолчанию
+                        };
+
+                        App.db.Players.Add(newPlayer);
+                        App.db.SaveChanges();
+                    }
+                    else
+                    {
+                        Feedback.ShowWarning("Предупреждение", "Игрок создан, но не добавлен в таблицу Players: не найдено ни одной группы.");
+                    }
+                }
             }
             else
             {
@@ -95,9 +122,10 @@ namespace PingTrack.View.Windows
                 currentUser.Full_Name = fullName;
                 currentUser.ID_Role = (int)roleValue;
                 currentUser.IsActive = isActive.Value;
+
+                App.db.SaveChanges();
             }
 
-            App.db.SaveChanges();
             DialogResult = true;
         }
 
