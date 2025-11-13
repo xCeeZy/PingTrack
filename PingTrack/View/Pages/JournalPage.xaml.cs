@@ -86,15 +86,15 @@ namespace PingTrack.View.Pages
                 .Include("Trainings.Training_Types")
                 .Include("Players.Groups")
                 .ToList()
-                .OrderByDescending(a => a.Trainings.Date)
-                .ThenBy(a => a.Players.Full_Name)
+                .OrderByDescending(a => a.Trainings != null ? a.Trainings.Date : DateTime.MinValue)
+                .ThenBy(a => a.Players != null ? a.Players.Full_Name : "")
                 .Select(a => new JournalGridItem
                 {
                     ID_Record = a.ID_Record,
-                    Date = a.Trainings.Date.ToString("dd.MM.yyyy"),
-                    Player = a.Players.Full_Name,
-                    Group = a.Players.Groups.Group_Name,
-                    Training = a.Trainings.Training_Types.Type_Name,
+                    Date = a.Trainings != null ? a.Trainings.Date.ToString("dd.MM.yyyy") : "-",
+                    Player = a.Players != null ? a.Players.Full_Name : "-",
+                    Group = a.Players != null && a.Players.Groups != null ? a.Players.Groups.Group_Name : "-",
+                    Training = a.Trainings != null && a.Trainings.Training_Types != null ? a.Trainings.Training_Types.Type_Name : "-",
                     IsPresent = a.Is_Present
                 })
                 .ToList();

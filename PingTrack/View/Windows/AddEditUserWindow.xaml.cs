@@ -25,6 +25,7 @@ namespace PingTrack.View.Windows
             InitializeComponent();
             LoadRoles();
             currentUser = new Users();
+            RoleComboBox.SelectionChanged += RoleComboBox_SelectionChanged;
         }
 
         public AddEditUserWindow(Users user)
@@ -39,12 +40,49 @@ namespace PingTrack.View.Windows
             FullNameBox.Text = currentUser.Full_Name;
             RoleComboBox.SelectedValue = currentUser.ID_Role;
             IsActiveCheckBox.IsChecked = currentUser.IsActive;
+
+            RoleComboBox.SelectionChanged += RoleComboBox_SelectionChanged;
+
+            // Загрузить телефон если пользователь - игрок
+            Players player = App.db.Players.FirstOrDefault(p => p.ID_User == currentUser.ID_User);
+            if (player != null)
+            {
+                PhoneBox.Text = player.Phone ?? "";
+            }
+
+            UpdatePhoneFieldVisibility();
         }
 
         private void LoadRoles()
         {
             List<Roles> roles = App.db.Roles.ToList();
             RoleComboBox.ItemsSource = roles;
+        }
+
+        private void RoleComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            UpdatePhoneFieldVisibility();
+        }
+
+        private void UpdatePhoneFieldVisibility()
+        {
+            if (RoleComboBox.SelectedValue == null)
+            {
+                PhonePanel.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            int selectedRoleId = (int)RoleComboBox.SelectedValue;
+            Roles playerRole = App.db.Roles.FirstOrDefault(r => r.Role_Name == "Игрок");
+
+            if (playerRole != null && selectedRoleId == playerRole.ID_Role)
+            {
+                PhonePanel.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                PhonePanel.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -91,13 +129,15 @@ namespace PingTrack.View.Windows
                     Groups firstGroup = App.db.Groups.OrderBy(g => g.ID_Group).FirstOrDefault();
                     if (firstGroup != null)
                     {
+                        string phone = PhoneBox.Text.Trim();
+
                         Players newPlayer = new Players
                         {
                             Full_Name = fullName,
                             ID_User = currentUser.ID_User,
                             ID_Group = firstGroup.ID_Group,
                             Birth_Date = DateTime.Now, // Значение по умолчанию, можно изменить позже
-                            Phone = "" // Пустое значение по умолчанию
+                            Phone = phone
                         };
 
                         App.db.Players.Add(newPlayer);
@@ -122,6 +162,19 @@ namespace PingTrack.View.Windows
                 currentUser.Full_Name = fullName;
                 currentUser.ID_Role = (int)roleValue;
                 currentUser.IsActive = isActive.Value;
+
+                // Обновить телефон в таблице Players если пользователь - игрок
+                Roles playerRole = App.db.Roles.FirstOrDefault(r => r.Role_Name == "Игрок");
+                if (playerRole != null && currentUser.ID_Role == playerRole.ID_Role)
+                {
+                    Players player = App.db.Players.FirstOrDefault(p => p.ID_User == currentUser.ID_User);
+                    if (player != null)
+                    {
+                        string phone = PhoneBox.Text.Trim();
+                        player.Phone = phone;
+                        player.Full_Name = fullName; // Обновить также ФИО в Players
+                    }
+                }
 
                 App.db.SaveChanges();
             }

@@ -76,7 +76,16 @@
                       Margin="24,0,0,8"/>
         </StackPanel>
 
-        <Grid Grid.Row="5" Grid.ColumnSpan="2">
+        <StackPanel x:Name="PhonePanel" Grid.Row="5" Grid.ColumnSpan="2" Visibility="Collapsed">
+            <TextBlock Text="Номер телефона (только для игроков)" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+            <TextBox x:Name="PhoneBox"
+                     Height="34"
+                     FontSize="14"
+                     VerticalContentAlignment="Center"
+                     Margin="0,0,0,10"/>
+        </StackPanel>
+
+        <Grid Grid.Row="5" Grid.ColumnSpan="2" VerticalAlignment="Bottom">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
