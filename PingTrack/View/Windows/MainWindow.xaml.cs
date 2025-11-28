@@ -59,6 +59,9 @@ namespace PingTrack.View.Windows
                 // Скрыть боковое меню полностью для игроков
                 SidebarBorder.Visibility = Visibility.Collapsed;
 
+                // Убрать пространство, занимаемое колонкой меню
+                SidebarColumn.Width = new GridLength(0);
+
                 // Скрыть все кнопки навигации
                 PlayersBtn.Visibility = Visibility.Collapsed;
                 GroupsBtn.Visibility = Visibility.Collapsed;

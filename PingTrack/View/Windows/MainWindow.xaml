@@ -124,9 +124,9 @@
         <!--#endregion-->
 
         <!--#region Основной контент с меню-->
-        <Grid Grid.Row="1">
+        <Grid x:Name="ContentGrid" Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="240"/>
+                <ColumnDefinition x:Name="SidebarColumn" Width="240"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
