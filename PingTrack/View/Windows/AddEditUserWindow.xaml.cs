@@ -111,41 +111,66 @@ namespace PingTrack.View.Windows
                     return;
                 }
 
-                currentUser.Login = login;
-                currentUser.Password = password;
-                currentUser.Full_Name = fullName;
-                currentUser.ID_Role = (int)roleValue;
-                currentUser.IsActive = isActive.Value;
-                currentUser.Created_At = DateTime.Now;
-
-                App.db.Users.Add(currentUser);
-                App.db.SaveChanges();
-
-                // Если создается пользователь с ролью "Игрок", создать запись в таблице Players
+                // Проверить роль ПЕРЕД созданием User
                 Roles playerRole = App.db.Roles.FirstOrDefault(r => r.Role_Name == "Игрок");
-                if (playerRole != null && currentUser.ID_Role == playerRole.ID_Role)
+                bool isPlayerRole = playerRole != null && (int)roleValue == playerRole.ID_Role;
+
+                // Если игрок, проверить наличие группы ДО создания пользователя
+                if (isPlayerRole)
                 {
-                    // Получить первую доступную группу (ID_Group обязателен для Players)
                     Groups firstGroup = App.db.Groups.OrderBy(g => g.ID_Group).FirstOrDefault();
-                    if (firstGroup != null)
+                    if (firstGroup == null)
                     {
-                        string phone = PhoneBox.Text.Trim();
-
-                        Players newPlayer = new Players
-                        {
-                            Full_Name = fullName,
-                            ID_User = currentUser.ID_User,
-                            ID_Group = firstGroup.ID_Group,
-                            Birth_Date = DateTime.Now, // Значение по умолчанию, можно изменить позже
-                            Phone = phone
-                        };
-
-                        App.db.Players.Add(newPlayer);
-                        App.db.SaveChanges();
+                        Feedback.ShowWarning("Ошибка", "Невозможно создать игрока: не найдено ни одной группы. Сначала создайте группу.");
+                        return;
                     }
-                    else
+                }
+
+                // Использовать транзакцию для атомарности операций
+                using (System.Data.Entity.DbContextTransaction transaction = App.db.Database.BeginTransaction())
+                {
+                    try
                     {
-                        Feedback.ShowWarning("Предупреждение", "Игрок создан, но не добавлен в таблицу Players: не найдено ни одной группы.");
+                        // 1. Создать пользователя
+                        currentUser.Login = login;
+                        currentUser.Password = password;
+                        currentUser.Full_Name = fullName;
+                        currentUser.ID_Role = (int)roleValue;
+                        currentUser.IsActive = isActive.Value;
+                        currentUser.Created_At = DateTime.Now;
+
+                        App.db.Users.Add(currentUser);
+                        App.db.SaveChanges(); // Сохранить User чтобы получить ID_User
+
+                        // 2. Если игрок, создать запись в Players
+                        if (isPlayerRole)
+                        {
+                            Groups firstGroup = App.db.Groups.OrderBy(g => g.ID_Group).FirstOrDefault();
+                            string phone = PhoneBox.Text.Trim();
+
+                            Players newPlayer = new Players
+                            {
+                                Full_Name = fullName,
+                                ID_User = currentUser.ID_User, // Используем полученный ID
+                                ID_Group = firstGroup.ID_Group,
+                                Birth_Date = DateTime.Now,
+                                Phone = phone
+                            };
+
+                            App.db.Players.Add(newPlayer);
+                            App.db.SaveChanges(); // Сохранить Player
+                        }
+
+                        // 3. Все успешно - подтвердить транзакцию
+                        transaction.Commit();
+                        Feedback.ShowSuccess("Успешно", "Пользователь успешно создан.");
+                    }
+                    catch (Exception ex)
+                    {
+                        // 4. Ошибка - откатить все изменения
+                        transaction.Rollback();
+                        Feedback.ShowError("Ошибка", $"Не удалось создать пользователя: {ex.Message}");
+                        return;
                     }
                 }
             }
