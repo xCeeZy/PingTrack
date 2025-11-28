@@ -63,6 +63,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppData\AuthenticationService.cs" />
+    <Compile Include="AppData\ChartModels.cs" />
     <Compile Include="AppData\DataGridHelper.cs" />
     <Compile Include="AppData\ExportService.cs" />
     <Compile Include="AppData\Feedback.cs" />

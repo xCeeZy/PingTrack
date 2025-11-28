@@ -201,13 +201,5 @@ namespace PingTrack.View.Pages
         public string PresenceBg { get; set; }
         public string Score { get; set; }
     }
-
-    public class AttendanceChartItem
-    {
-        public string MonthName { get; set; }
-        public string PercentText { get; set; }
-        public string DetailText { get; set; }
-        public double BarWidth { get; set; }
-    }
     #endregion
 }

@@ -158,13 +158,5 @@ namespace PingTrack.View.Pages
         public string Coach { get; set; }
         public string Attendance { get; set; }
     }
-
-    public class AttendanceChartItem
-    {
-        public string MonthName { get; set; }
-        public string PercentText { get; set; }
-        public string DetailText { get; set; }
-        public double BarWidth { get; set; }
-    }
     #endregion
 }
