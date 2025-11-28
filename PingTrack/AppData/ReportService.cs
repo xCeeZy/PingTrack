@@ -31,13 +31,19 @@ namespace PingTrack.AppData
                 .Include("Trainings");
 
             if (groupId.HasValue && groupId.Value != 0)
-                query = query.Where(a => a.Players.ID_Group == groupId.Value);
+                query = query.Where(a => a.Players != null && a.Players.ID_Group == groupId.Value);
 
-            query = query.Where(a => a.Trainings.Date >= startDate && a.Trainings.Date <= endDate);
+            query = query.Where(a => a.Trainings != null && a.Trainings.Date >= startDate && a.Trainings.Date <= endDate);
 
             List<PlayerAttendanceReport> report = query
                 .ToList()
-                .GroupBy(a => new { a.ID_Player, PlayerName = a.Players.Full_Name, GroupName = a.Players.Groups.Group_Name })
+                .Where(a => a.Players != null) // Фильтруем записи без игроков
+                .GroupBy(a => new
+                {
+                    a.ID_Player,
+                    PlayerName = a.Players.Full_Name ?? "-",
+                    GroupName = a.Players.Groups != null ? a.Players.Groups.Group_Name : "-"
+                })
                 .Select(g => new PlayerAttendanceReport
                 {
                     Player = g.Key.PlayerName,
@@ -64,16 +70,17 @@ namespace PingTrack.AppData
                 .Include("Trainings");
 
             if (groupId.HasValue && groupId.Value != 0)
-                query = query.Where(a => a.Players.ID_Group == groupId.Value);
+                query = query.Where(a => a.Players != null && a.Players.ID_Group == groupId.Value);
 
-            query = query.Where(a => a.Trainings.Date >= startDate && a.Trainings.Date <= endDate);
+            query = query.Where(a => a.Trainings != null && a.Trainings.Date >= startDate && a.Trainings.Date <= endDate);
 
             List<GroupAttendanceReport> report = query
                 .ToList()
+                .Where(a => a.Players != null && a.Players.Groups != null) // Фильтруем записи без групп
                 .GroupBy(a => a.Players.Groups.Group_Name)
                 .Select(g => new GroupAttendanceReport
                 {
-                    Group = g.Key,
+                    Group = g.Key ?? "-",
                     TotalTrainings = g.Count(),
                     PresentCount = g.Count(x => x.Is_Present),
                     AttendancePercent = $"{(g.Count() == 0 ? 0 : Math.Round(g.Count(x => x.Is_Present) * 100.0 / g.Count(), 1))}%"
@@ -94,14 +101,19 @@ namespace PingTrack.AppData
                 .Include("Trainings");
 
             if (groupId.HasValue && groupId.Value != 0)
-                query = query.Where(a => a.Players.ID_Group == groupId.Value);
+                query = query.Where(a => a.Players != null && a.Players.ID_Group == groupId.Value);
 
-            query = query.Where(a => a.Trainings.Date >= startDate && a.Trainings.Date <= endDate);
+            query = query.Where(a => a.Trainings != null && a.Trainings.Date >= startDate && a.Trainings.Date <= endDate);
 
             List<ActivityRatingReport> report = query
                 .ToList()
-                .Where(a => a.Is_Present)
-                .GroupBy(a => new { a.ID_Player, PlayerName = a.Players.Full_Name, GroupName = a.Players.Groups.Group_Name })
+                .Where(a => a.Is_Present && a.Players != null) // Фильтруем только присутствовавших с валидными игроками
+                .GroupBy(a => new
+                {
+                    a.ID_Player,
+                    PlayerName = a.Players.Full_Name ?? "-",
+                    GroupName = a.Players.Groups != null ? a.Players.Groups.Group_Name : "-"
+                })
                 .Select(g => new ActivityRatingReport
                 {
                     Place = 0,
@@ -131,13 +143,14 @@ namespace PingTrack.AppData
                 .ToList();
 
             List<GeneralStatisticsReport> report = trainings
+                .Where(t => t.Training_Types != null) // Фильтруем тренировки без типа
                 .GroupBy(t => t.Training_Types.Type_Name)
                 .Select(g => new GeneralStatisticsReport
                 {
-                    TrainingType = g.Key,
+                    TrainingType = g.Key ?? "-",
                     TotalTrainings = g.Count(),
-                    TotalAttendance = g.Sum(t => t.Attendance.Count),
-                    AverageAttendance = g.Average(t => t.Attendance.Count(a => a.Is_Present))
+                    TotalAttendance = g.Sum(t => t.Attendance != null ? t.Attendance.Count : 0),
+                    AverageAttendance = g.Average(t => t.Attendance != null ? t.Attendance.Count(a => a.Is_Present) : 0)
                 })
                 .OrderByDescending(x => x.TotalTrainings)
                 .ToList();
