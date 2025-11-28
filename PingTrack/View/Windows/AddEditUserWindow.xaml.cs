@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -127,7 +128,7 @@ namespace PingTrack.View.Windows
                 }
 
                 // Использовать транзакцию для атомарности операций
-                using (System.Data.Entity.DbContextTransaction transaction = App.db.Database.BeginTransaction())
+                using (TransactionScope transaction = new TransactionScope())
                 {
                     try
                     {
@@ -162,13 +163,12 @@ namespace PingTrack.View.Windows
                         }
 
                         // 3. Все успешно - подтвердить транзакцию
-                        transaction.Commit();
+                        transaction.Complete();
                         Feedback.ShowSuccess("Успешно", "Пользователь успешно создан.");
                     }
                     catch (Exception ex)
                     {
-                        // 4. Ошибка - откатить все изменения
-                        transaction.Rollback();
+                        // 4. Ошибка - транзакция автоматически откатится (Complete не вызван)
                         Feedback.ShowError("Ошибка", $"Не удалось создать пользователя: {ex.Message}");
                         return;
                     }
