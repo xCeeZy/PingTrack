@@ -2,12 +2,14 @@
 using PingTrack.Model;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Data.Entity;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -44,11 +46,13 @@ namespace PingTrack.View.Windows
 
             RoleComboBox.SelectionChanged += RoleComboBox_SelectionChanged;
 
-            // Загрузить телефон если пользователь - игрок
-            Players player = App.db.Players.FirstOrDefault(p => p.ID_User == currentUser.ID_User);
-            if (player != null)
+            if (currentUser.ID_User != 0)
             {
-                PhoneBox.Text = player.Phone ?? "";
+                Players player = App.db.Players.FirstOrDefault(p => p.ID_User == currentUser.ID_User);
+                if (player != null)
+                {
+                    PhoneBox.Text = player.Phone ?? "";
+                }
             }
 
             UpdatePhoneFieldVisibility();
@@ -60,7 +64,7 @@ namespace PingTrack.View.Windows
             RoleComboBox.ItemsSource = roles;
         }
 
-        private void RoleComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void RoleComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             UpdatePhoneFieldVisibility();
         }
@@ -104,107 +108,87 @@ namespace PingTrack.View.Windows
             Users sameLogin = App.db.Users.FirstOrDefault(u => u.Login == login);
             bool isNew = currentUser.ID_User == 0;
 
-            if (isNew)
+            if (isNew && sameLogin != null)
             {
-                if (sameLogin != null)
-                {
-                    Feedback.ShowWarning("Ошибка", "Такой логин уже существует.");
-                    return;
-                }
+                Feedback.ShowWarning("Ошибка", "Такой логин уже существует.");
+                return;
+            }
+            if (!isNew && sameLogin != null && sameLogin.ID_User != currentUser.ID_User)
+            {
+                Feedback.ShowWarning("Ошибка", "Такой логин уже существует.");
+                return;
+            }
 
-                // Проверить роль ПЕРЕД созданием User
-                Roles playerRole = App.db.Roles.FirstOrDefault(r => r.Role_Name == "Игрок");
-                bool isPlayerRole = playerRole != null && (int)roleValue == playerRole.ID_Role;
+            Roles playerRole = App.db.Roles.FirstOrDefault(r => r.Role_Name == "Игрок");
+            bool isPlayerRole = playerRole != null && (int)roleValue == playerRole.ID_Role;
 
-                // Если игрок, проверить наличие группы ДО создания пользователя
-                if (isPlayerRole)
+            if (isPlayerRole && !App.db.Groups.Any())
+            {
+                Feedback.ShowWarning("Ошибка", "Невозможно создать игрока: нет ни одной группы.");
+                return;
+            }
+
+            using (TransactionScope transaction = new TransactionScope())
+            {
+                try
                 {
-                    Groups firstGroup = App.db.Groups.OrderBy(g => g.ID_Group).FirstOrDefault();
-                    if (firstGroup == null)
+                    currentUser.Login = login;
+                    currentUser.Password = password;
+                    currentUser.Full_Name = fullName;
+                    currentUser.ID_Role = (int)roleValue;
+                    currentUser.IsActive = isActive.Value;
+
+                    if (isNew)
                     {
-                        Feedback.ShowWarning("Ошибка", "Невозможно создать игрока: не найдено ни одной группы. Сначала создайте группу.");
-                        return;
-                    }
-                }
-
-                // Использовать транзакцию для атомарности операций
-                using (TransactionScope transaction = new TransactionScope())
-                {
-                    try
-                    {
-                        // 1. Создать пользователя
-                        currentUser.Login = login;
-                        currentUser.Password = password;
-                        currentUser.Full_Name = fullName;
-                        currentUser.ID_Role = (int)roleValue;
-                        currentUser.IsActive = isActive.Value;
                         currentUser.Created_At = DateTime.Now;
-
                         App.db.Users.Add(currentUser);
-                        App.db.SaveChanges(); // Сохранить User чтобы получить ID_User
+                    }
 
-                        // 2. Если игрок, создать запись в Players
-                        if (isPlayerRole)
+                    App.db.SaveChanges(); // Сохраняем User, чтобы получить ID_User
+
+                    if (isPlayerRole)
+                    {
+                        Players player = App.db.Players.FirstOrDefault(p => p.ID_User == currentUser.ID_User);
+                        Groups defaultGroup = App.db.Groups.OrderBy(g => g.ID_Group).FirstOrDefault();
+
+                        if (player == null)
                         {
-                            Groups firstGroup = App.db.Groups.OrderBy(g => g.ID_Group).FirstOrDefault();
-                            string phone = PhoneBox.Text.Trim();
-
-                            Players newPlayer = new Players
+                            // Если записи игрока не было (например, поменяли роль на Игрок), создаем ее
+                            player = new Players
                             {
+                                ID_User = currentUser.ID_User,
                                 Full_Name = fullName,
-                                ID_User = currentUser.ID_User, // Используем полученный ID
-                                ID_Group = firstGroup.ID_Group,
-                                Birth_Date = DateTime.Now,
-                                Phone = phone
+                                Phone = PhoneBox.Text.Trim(),
+                                ID_Group = defaultGroup.ID_Group,
+                                Birth_Date = DateTime.Now
                             };
-
-                            App.db.Players.Add(newPlayer);
-                            App.db.SaveChanges(); // Сохранить Player
+                            App.db.Players.Add(player);
+                        }
+                        else
+                        {
+                            // Если запись есть, просто обновляем
+                            player.Full_Name = fullName;
+                            player.Phone = PhoneBox.Text.Trim();
                         }
 
-                        // 3. Все успешно - подтвердить транзакцию
-                        transaction.Complete();
-                        Feedback.ShowSuccess("Успешно", "Пользователь успешно создан.");
+                        App.db.SaveChanges(); // Сохраняем Player
                     }
-                    catch (Exception ex)
+
+                    transaction.Complete();
+                    Feedback.ShowSuccess("Успешно", "Данные сохранены.");
+                    DialogResult = true;
+                }
+                catch (Exception ex)
+                {
+                    // Выбрасываем сломанный объект из памяти, чтобы он не сохранился при следующем нажатии
+                    if (isNew)
                     {
-                        // 4. Ошибка - транзакция автоматически откатится (Complete не вызван)
-                        Feedback.ShowError("Ошибка", $"Не удалось создать пользователя: {ex.Message}");
-                        return;
+                        App.db.Users.Remove(currentUser);
                     }
+
+                    Feedback.ShowError("Ошибка", $"Не удалось сохранить: {ex.Message}");
                 }
             }
-            else
-            {
-                if (sameLogin != null && sameLogin.ID_User != currentUser.ID_User)
-                {
-                    Feedback.ShowWarning("Ошибка", "Такой логин уже существует.");
-                    return;
-                }
-
-                currentUser.Login = login;
-                currentUser.Password = password;
-                currentUser.Full_Name = fullName;
-                currentUser.ID_Role = (int)roleValue;
-                currentUser.IsActive = isActive.Value;
-
-                // Обновить телефон в таблице Players если пользователь - игрок
-                Roles playerRole = App.db.Roles.FirstOrDefault(r => r.Role_Name == "Игрок");
-                if (playerRole != null && currentUser.ID_Role == playerRole.ID_Role)
-                {
-                    Players player = App.db.Players.FirstOrDefault(p => p.ID_User == currentUser.ID_User);
-                    if (player != null)
-                    {
-                        string phone = PhoneBox.Text.Trim();
-                        player.Phone = phone;
-                        player.Full_Name = fullName; // Обновить также ФИО в Players
-                    }
-                }
-
-                App.db.SaveChanges();
-            }
-
-            DialogResult = true;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
