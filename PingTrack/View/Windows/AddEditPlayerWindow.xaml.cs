@@ -56,7 +56,9 @@ namespace PingTrack.View.Windows
             currentPlayer.Phone = PhoneBox.Text.Trim();
             currentPlayer.ID_Group = (int)GroupComboBox.SelectedValue;
 
-            if (currentPlayer.ID_Player == 0)
+            bool isNew = currentPlayer.ID_Player == 0;
+
+            if (isNew)
                 App.db.Players.Add(currentPlayer);
 
             try
@@ -65,9 +67,21 @@ namespace PingTrack.View.Windows
                 Feedback.ShowSuccess("Успешно", "Информация об игроке сохранена.");
                 DialogResult = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Feedback.ShowError("Ошибка", "Не удалось сохранить данные. Проверьте корректность введённой информации.");
+                // ИСПРАВЛЕНИЕ: Очищаем "фантомный" объект из памяти старым надежным способом
+                if (isNew)
+                {
+                    // Выкидываем несохраненного игрока из контекста
+                    App.db.Players.Remove(currentPlayer);
+                }
+                else
+                {
+                    // Для существующих игроков откатываем изменения в памяти
+                    App.db.Entry(currentPlayer).Reload();
+                }
+
+                Feedback.ShowError("Ошибка", $"Не удалось сохранить данные.\n{ex.Message}");
             }
         }
         #endregion

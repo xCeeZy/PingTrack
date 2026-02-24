@@ -256,8 +256,20 @@ namespace PingTrack.View.Pages
 
             try
             {
+                // ИСПРАВЛЕНИЕ: Удаляем оценки через цикл, так как RemoveRange нет в этой версии EF
+                if (attendanceCount > 0)
+                {
+                    var attendanceRecords = App.db.Attendance.Where(a => a.ID_Player == player.ID_Player).ToList();
+                    foreach (var record in attendanceRecords)
+                    {
+                        App.db.Attendance.Remove(record);
+                    }
+                }
+
+                // Теперь безопасно удаляем игрока
                 App.db.Players.Remove(player);
                 App.db.SaveChanges();
+
                 Feedback.ShowSuccess("Успешно", "Игрок успешно удалён.");
                 LoadPlayers();
             }

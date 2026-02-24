@@ -7,61 +7,46 @@
         mc:Ignorable="d"
         Title="Пользователь"
         WindowStartupLocation="CenterScreen"
-        Width="420" Height="440"
+        Width="420" 
+        SizeToContent="Height" 
         Background="{StaticResource WindowBrush}"
         ResizeMode="NoResize">
 
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
-            <RowDefinition Height="60"/>
-            <RowDefinition Height="60"/>
-            <RowDefinition Height="60"/>
-            <RowDefinition Height="70"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <StackPanel Margin="20">
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
-                   Text="Данные пользователя"
+        <TextBlock Text="Данные пользователя"
                    FontSize="18"
                    FontWeight="SemiBold"
                    Foreground="{StaticResource PrimaryBrush}"
                    HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
+                   Margin="0,0,0,20"/>
 
-        <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
-            <TextBlock Text="Логин" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+        <StackPanel Margin="0,0,0,15">
+            <TextBlock Text="Логин" FontSize="14" Foreground="{StaticResource TextBrush}" Margin="0,0,0,5"/>
             <TextBox x:Name="LoginBox"
                      Height="34"
                      FontSize="14"
                      VerticalContentAlignment="Center"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="2" Grid.ColumnSpan="2">
-            <TextBlock Text="Пароль" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+        <StackPanel Margin="0,0,0,15">
+            <TextBlock Text="Пароль" FontSize="14" Foreground="{StaticResource TextBrush}" Margin="0,0,0,5"/>
             <PasswordBox x:Name="PasswordBox"
                          Height="34"
                          FontSize="14"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="3" Grid.ColumnSpan="2">
-            <TextBlock Text="ФИО" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+        <StackPanel Margin="0,0,0,15">
+            <TextBlock Text="ФИО" FontSize="14" Foreground="{StaticResource TextBrush}" Margin="0,0,0,5"/>
             <TextBox x:Name="FullNameBox"
                      Height="34"
                      FontSize="14"
                      VerticalContentAlignment="Center"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="4" Grid.ColumnSpan="2"
-                    Orientation="Horizontal"
-                    VerticalAlignment="Center" Height="64">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,15">
             <StackPanel Width="220">
-                <TextBlock Text="Роль" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+                <TextBlock Text="Роль" FontSize="14" Foreground="{StaticResource TextBrush}" Margin="0,0,0,5"/>
                 <ComboBox x:Name="RoleComboBox"
                           Height="36"
                           FontSize="14"
@@ -76,16 +61,15 @@
                       Margin="24,0,0,8"/>
         </StackPanel>
 
-        <StackPanel x:Name="PhonePanel" Grid.Row="5" Grid.ColumnSpan="2" Visibility="Collapsed">
-            <TextBlock Text="Номер телефона (только для игроков)" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+        <StackPanel x:Name="PhonePanel" Visibility="Collapsed" Margin="0,0,0,20">
+            <TextBlock Text="Номер телефона (только для игроков)" FontSize="14" Foreground="{StaticResource TextBrush}" Margin="0,0,0,5"/>
             <TextBox x:Name="PhoneBox"
                      Height="34"
                      FontSize="14"
-                     VerticalContentAlignment="Center"
-                     Margin="0,0,0,10"/>
+                     VerticalContentAlignment="Center"/>
         </StackPanel>
 
-        <Grid Grid.Row="5" Grid.ColumnSpan="2" VerticalAlignment="Bottom">
+        <Grid Margin="0,10,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -108,5 +92,6 @@
                     HorizontalAlignment="Center"
                     Click="CancelButton_Click"/>
         </Grid>
-    </Grid>
+
+    </StackPanel>
 </Window>

@@ -32,6 +32,21 @@ namespace PingTrack.View.Windows
             LoginTextBox.KeyDown += InputField_KeyDown;
             PasswordBox.KeyDown += InputField_KeyDown;
             VisiblePasswordBox.KeyDown += InputField_KeyDown;
+
+            // Обработчики для проверки состояния Caps Lock
+            this.KeyDown += CheckCapsLock;
+            this.KeyUp += CheckCapsLock;
+            this.Loaded += (s, e) => CheckCapsLock(null, null);
+        }
+        #endregion
+
+        #region Проверка Caps Lock
+        private void CheckCapsLock(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.IsKeyToggled(Key.CapsLock))
+                CapsLockWarning.Visibility = Visibility.Visible;
+            else
+                CapsLockWarning.Visibility = Visibility.Collapsed;
         }
         #endregion
 
@@ -58,8 +73,9 @@ namespace PingTrack.View.Windows
         #region Вход в систему
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
+            // Обрезаем только логин. Пароль берем как есть (пробелы могут быть частью пароля)
             string login = LoginTextBox.Text.Trim();
-            string password = isPasswordVisible ? VisiblePasswordBox.Text.Trim() : PasswordBox.Password.Trim();
+            string password = isPasswordVisible ? VisiblePasswordBox.Text : PasswordBox.Password;
 
             if (string.IsNullOrWhiteSpace(login))
             {
@@ -111,7 +127,10 @@ namespace PingTrack.View.Windows
                 PasswordBox.Password = VisiblePasswordBox.Text;
                 VisiblePasswordBox.Visibility = Visibility.Collapsed;
                 PasswordBox.Visibility = Visibility.Visible;
-                EyeIcon.Text = "👁️";
+
+                // Смена картинки на закрытый глаз
+                EyeIcon.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/eye_closed.png"));
+
                 PasswordBox.Focus();
             }
             else
@@ -119,7 +138,10 @@ namespace PingTrack.View.Windows
                 VisiblePasswordBox.Text = PasswordBox.Password;
                 PasswordBox.Visibility = Visibility.Collapsed;
                 VisiblePasswordBox.Visibility = Visibility.Visible;
-                EyeIcon.Text = "👁️‍🗨️";
+
+                // Смена картинки на открытый глаз
+                EyeIcon.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/eye_open.png"));
+
                 VisiblePasswordBox.Focus();
                 VisiblePasswordBox.SelectionStart = VisiblePasswordBox.Text.Length;
             }

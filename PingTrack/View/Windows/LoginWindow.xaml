@@ -12,7 +12,6 @@
         ResizeMode="NoResize">
 
     <Grid>
-        <!--#region Основная структура-->
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition Height="Auto"/>
@@ -23,33 +22,24 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="45"/>
         </Grid.RowDefinitions>
-        
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="50"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="50"/>
         </Grid.ColumnDefinitions>
-        <!--#endregion-->
-
-        <!--#region Логотип-->
         <Viewbox Grid.Row="1" Grid.Column="1"
                  Height="120"
                  HorizontalAlignment="Center">
             <Image Source="/Resources/Images/logo.png"
                    RenderOptions.BitmapScalingMode="HighQuality"/>
         </Viewbox>
-        <!--#endregion-->
-
-        <!--#region Заголовок-->
         <TextBlock Grid.Row="3" Grid.Column="1"
                    Text="Вход в систему"
                    FontSize="20"
                    FontWeight="Bold"
                    Foreground="#1F2937"
                    HorizontalAlignment="Center"/>
-        <!--#endregion-->
-
-        <!--#region Форма входа-->
         <Border Grid.Row="5" Grid.Column="1"
                 Background="#F9FAFB"
                 CornerRadius="12">
@@ -67,20 +57,19 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="22"/>
                 </Grid.RowDefinitions>
-                
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="25"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="25"/>
                 </Grid.ColumnDefinitions>
-                
-                <!--#region Логин-->
+
                 <TextBlock Grid.Row="1" Grid.Column="1"
                            Text="Логин"
                            FontSize="13"
                            FontWeight="SemiBold"
                            Foreground="#374151"/>
-                
+
                 <Border Grid.Row="3" Grid.Column="1"
                         BorderBrush="#D1D5DB"
                         BorderThickness="1"
@@ -93,7 +82,7 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="12"/>
                         </Grid.ColumnDefinitions>
-                        
+
                         <TextBox Grid.Column="1"
                                  x:Name="LoginTextBox"
                                  FontSize="15"
@@ -103,15 +92,12 @@
                                  Foreground="#1F2937"/>
                     </Grid>
                 </Border>
-                <!--#endregion-->
-                
-                <!--#region Пароль-->
                 <TextBlock Grid.Row="5" Grid.Column="1"
                            Text="Пароль"
                            FontSize="13"
                            FontWeight="SemiBold"
                            Foreground="#374151"/>
-                
+
                 <Border Grid.Row="7" Grid.Column="1"
                         BorderBrush="#D1D5DB"
                         BorderThickness="1"
@@ -149,16 +135,23 @@
                                 BorderThickness="0"
                                 Cursor="Hand"
                                 Click="TogglePasswordButton_Click">
-                            <TextBlock x:Name="EyeIcon"
-                                       Text="👁️"
-                                       FontSize="18"
-                                       Foreground="#9CA3AF"/>
+                            <Image x:Name="EyeIcon" 
+                                   Source="/Resources/Images/eye_closed.png" 
+                                   Width="20" Height="20" 
+                                   Opacity="0.6"/>
                         </Button>
                     </Grid>
                 </Border>
-                <!--#endregion-->
-                
-                <!--#region Кнопка входа-->
+                <TextBlock x:Name="CapsLockWarning"
+                           Grid.Row="8" Grid.Column="1"
+                           Text="Включен Caps Lock"
+                           Foreground="#EF4444"
+                           FontSize="12"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Top"
+                           Margin="0,2,0,0"
+                           Visibility="Collapsed"/>
+
                 <Button Grid.Row="9" Grid.Column="1"
                         x:Name="LoginButton"
                         Content="Войти в систему"
@@ -195,18 +188,13 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <!--#endregion-->
             </Grid>
         </Border>
-        <!--#endregion-->
-
-        <!--#region Футер-->
         <TextBlock Grid.Row="7" Grid.Column="1"
                    Text="© 2024 PingTrack. Все права защищены."
                    FontSize="11"
                    Foreground="#9CA3AF"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"/>
-        <!--#endregion-->
     </Grid>
 </Window>
