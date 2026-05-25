@@ -19,133 +19,71 @@ namespace PingTrack.View.Windows
 {
     public partial class MainWindow : Window
     {
-        #region Поля
         private readonly string userRole;
         private readonly string userName;
-        #endregion
+        private readonly int currentUserId;
 
-        #region Конструктор
-        public MainWindow(string role, string login)
+        public MainWindow(string role, string login, int userId)
         {
             InitializeComponent();
             userRole = role;
             userName = login;
+            currentUserId = userId;
 
             UserNameText.Text = login;
             RoleNameText.Text = role;
-
-            if (!string.IsNullOrEmpty(login))
-                UserInitial.Text = login.Substring(0, 1).ToUpper();
+            if (!string.IsNullOrEmpty(login)) UserInitial.Text = login.Substring(0, 1).ToUpper();
 
             ApplyRolePermissions();
+            CheckSystemRisksAsync();
 
-            // Для игроков открываем PlayerDashboardPage, для остальных - обычный Dashboard
-            if (userRole == "Игрок")
+            if (userRole == "Игрок") MainFrame.Navigate(new PlayerDashboardPage(login));
+            else MainFrame.Navigate(new DashboardPage());
+        }
+
+        private async void CheckSystemRisksAsync()
+        {
+            if (userRole == "Администратор" || userRole == "Тренер")
             {
-                MainFrame.Navigate(new PlayerDashboardPage(login));
-            }
-            else
-            {
-                MainFrame.Navigate(new DashboardPage());
+                var expiredCount = await Task.Run(() =>
+                    App.db.Players.Count(p => p.IsDeleted == false && p.Medical_Clearance_Date < System.DateTime.Now));
+
+                if (expiredCount > 0)
+                {
+                    Feedback.ShowWarning("Контроль рисков", $"Внимание! У {expiredCount} игроков просрочены медицинские справки.");
+                }
             }
         }
-        #endregion
 
-        #region Применение прав доступа
         private void ApplyRolePermissions()
         {
-            if (userRole == "Игрок")
-            {
-                // Скрыть боковое меню полностью для игроков
-                SidebarBorder.Visibility = Visibility.Collapsed;
+            SidebarBorder.Visibility = userRole == "Игрок" ? Visibility.Collapsed : Visibility.Visible;
+            if (userRole == "Игрок") SidebarColumn.Width = new GridLength(0);
 
-                // Убрать пространство, занимаемое колонкой меню
-                SidebarColumn.Width = new GridLength(0);
-
-                // Скрыть все кнопки навигации
-                PlayersBtn.Visibility = Visibility.Collapsed;
-                GroupsBtn.Visibility = Visibility.Collapsed;
-                TrainingsBtn.Visibility = Visibility.Collapsed;
-                PlayerStatsBtn.Visibility = Visibility.Collapsed;
-                ReportsBtn.Visibility = Visibility.Collapsed;
-                UsersBtn.Visibility = Visibility.Collapsed;
-                JournalBtn.Visibility = Visibility.Collapsed;
-                DashboardBtn.Visibility = Visibility.Collapsed;
-            }
-
-            if (userRole == "Тренер")
-            {
-                PlayerStatsBtn.Visibility = Visibility.Visible;
-                ReportsBtn.Visibility = Visibility.Collapsed;
-                UsersBtn.Visibility = Visibility.Collapsed;
-            }
-
-            if (userRole == "Администратор")
-            {
-                PlayerStatsBtn.Visibility = Visibility.Visible;
-                ReportsBtn.Visibility = Visibility.Visible;
-                UsersBtn.Visibility = Visibility.Visible;
-            }
-        }
-        #endregion
-
-        #region Навигация
-        private void DashboardBtn_Click(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new DashboardPage());
+            bool isAdmin = userRole == "Администратор";
+            LogsBtn.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
+            UsersBtn.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
+            ReportsBtn.Visibility = (isAdmin || userRole == "Тренер") ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        private void PlayersBtn_Click(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new PlayersPage());
-        }
+        private void LogsBtn_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new LogsPage());
+        private void DashboardBtn_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new DashboardPage());
+        private void PlayersBtn_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new PlayersPage());
+        private void GroupsBtn_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new GroupsPage());
+        private void TrainingsBtn_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new TrainingsPage());
+        private void JournalBtn_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new JournalPage(userRole));
+        private void ReportsBtn_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ReportsPage());
+        private void PlayerStatsBtn_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new PlayerStatsPage());
+        private void UsersBtn_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new UsersPage());
 
-        private void GroupsBtn_Click(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new GroupsPage());
-        }
-
-        private void TrainingsBtn_Click(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new TrainingsPage());
-        }
-
-        private void JournalBtn_Click(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new JournalPage(userRole));
-        }
-
-        private void ReportsBtn_Click(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new ReportsPage());
-        }
-
-        private void PlayerStatsBtn_Click(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new PlayerStatsPage());
-        }
-
-        private void UsersBtn_Click(object sender, RoutedEventArgs e)
-        {
-            if (userRole == "Администратор")
-                MainFrame.Navigate(new UsersPage());
-            else
-                Feedback.ShowWarning("Доступ запрещён", "Раздел доступен только администраторам.");
-        }
-        #endregion
-
-        #region Выход
         private void LogoutBtn_Click(object sender, RoutedEventArgs e)
         {
-            bool confirm = Feedback.AskQuestion("Подтверждение", "Вы действительно хотите выйти?");
-            if (confirm)
+            if (Feedback.AskQuestion("Подтверждение", "Выйти из системы?"))
             {
                 AuthenticationService.Logout();
-                LoginWindow loginWindow = new LoginWindow();
-                loginWindow.Show();
+                new LoginWindow().Show();
                 Close();
             }
         }
-        #endregion
     }
 }

@@ -17,6 +17,7 @@ namespace PingTrack.Model
         public Players()
         {
             this.Attendance = new HashSet<Attendance>();
+            this.Subscriptions = new HashSet<Subscriptions>();
         }
     
         public int ID_Player { get; set; }
@@ -25,9 +26,12 @@ namespace PingTrack.Model
         public string Phone { get; set; }
         public int ID_Group { get; set; }
         public Nullable<int> ID_User { get; set; }
+        public Nullable<System.DateTime> Medical_Clearance_Date { get; set; }
+        public bool IsDeleted { get; set; }
     
         public virtual ICollection<Attendance> Attendance { get; set; }
         public virtual Groups Groups { get; set; }
         public virtual Users Users { get; set; }
+        public virtual ICollection<Subscriptions> Subscriptions { get; set; }
     }
 }

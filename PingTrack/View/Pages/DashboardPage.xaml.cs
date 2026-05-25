@@ -38,22 +38,26 @@ namespace PingTrack.View.Pages
 
         private void LoadStatistics()
         {
-            int playersCount = App.db.Players.Count();
+            // Считаем только неудаленных игроков
+            int playersCount = App.db.Players.Count(p => p.IsDeleted == false);
             PlayersCountText.Text = playersCount.ToString();
 
-            int groupsCount = App.db.Groups.Count();
+            // Считаем только неудаленные группы
+            int groupsCount = App.db.Groups.Count(g => g.IsDeleted == false);
             GroupsCountText.Text = groupsCount.ToString();
 
+            // Считаем только неудаленные предстоящие тренировки
             DateTime today = DateTime.Now.Date;
-            int upcomingTrainings = App.db.Trainings.Count(t => t.Date >= today);
+            int upcomingTrainings = App.db.Trainings.Count(t => t.Date >= today && t.IsDeleted == false);
             UpcomingTrainingsText.Text = upcomingTrainings.ToString();
 
+            // Считаем процент посещаемости только по актуальным отметкам
             double averageAttendance = 0.0;
-            int totalAttendance = App.db.Attendance.Count();
+            int totalAttendance = App.db.Attendance.Count(a => a.IsDeleted == false);
 
             if (totalAttendance > 0)
             {
-                int presentCount = App.db.Attendance.Count(a => a.Is_Present);
+                int presentCount = App.db.Attendance.Count(a => a.IsDeleted == false && a.Is_Present);
                 averageAttendance = (double)presentCount / totalAttendance * 100.0;
             }
 
@@ -62,11 +66,13 @@ namespace PingTrack.View.Pages
 
         private void LoadRecentTrainings()
         {
+            // Загружаем только неудаленные тренировки
             List<TrainingDashboardItem> recentTrainings = App.db.Trainings
                 .Include("Groups")
                 .Include("Users")
                 .Include("Training_Types")
                 .Include("Attendance")
+                .Where(t => t.IsDeleted == false)
                 .OrderByDescending(t => t.Date)
                 .ThenByDescending(t => t.Time)
                 .Take(10)
@@ -89,8 +95,12 @@ namespace PingTrack.View.Pages
             if (training.Attendance == null || training.Attendance.Count == 0)
                 return "Нет данных";
 
-            int present = training.Attendance.Count(a => a.Is_Present);
-            int total = training.Attendance.Count;
+            // Считаем только неудаленные отметки посещаемости
+            int present = training.Attendance.Count(a => a.Is_Present && a.IsDeleted == false);
+            int total = training.Attendance.Count(a => a.IsDeleted == false);
+
+            if (total == 0)
+                return "Нет данных";
 
             return string.Format("{0} из {1}", present, total);
         }
@@ -112,9 +122,13 @@ namespace PingTrack.View.Pages
                 DateTime startOfMonth = new DateTime(monthDate.Year, monthDate.Month, 1);
                 DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
+                // Загружаем отметки, отфильтровывая мягко удаленные записи
                 List<Attendance> monthAttendances = App.db.Attendance
                     .Include("Trainings")
-                    .Where(a => a.Trainings.Date >= startOfMonth && a.Trainings.Date <= endOfMonth)
+                    .Where(a => a.Trainings.Date >= startOfMonth
+                             && a.Trainings.Date <= endOfMonth
+                             && a.IsDeleted == false
+                             && a.Trainings.IsDeleted == false)
                     .ToList();
 
                 int totalCount = monthAttendances.Count;

@@ -73,6 +73,9 @@
     <Compile Include="AppData\PlayerStatisticsService.cs" />
     <Compile Include="AppData\ReportService.cs" />
     <Compile Include="AppData\RiskAnalysisService.cs" />
+    <Compile Include="Model\ActionLogs.cs">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="Model\Attendance.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -102,6 +105,9 @@
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Model\Roles.cs">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Model\Subscriptions.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Model\Trainings.cs">

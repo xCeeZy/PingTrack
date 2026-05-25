@@ -12,25 +12,16 @@ namespace PingTrack.Model
     using System;
     using System.Collections.Generic;
     
-    public partial class Trainings
+    public partial class Subscriptions
     {
-        public Trainings()
-        {
-            this.Attendance = new HashSet<Attendance>();
-        }
-    
-        public int ID_Training { get; set; }
-        public System.DateTime Date { get; set; }
-        public System.TimeSpan Time { get; set; }
-        public int ID_Group { get; set; }
-        public int ID_Coach { get; set; }
-        public int ID_Type { get; set; }
-        public string Note { get; set; }
+        public int ID_Subscription { get; set; }
+        public int ID_Player { get; set; }
+        public System.DateTime Start_Date { get; set; }
+        public System.DateTime End_Date { get; set; }
+        public decimal Amount { get; set; }
+        public bool IsPaid { get; set; }
         public bool IsDeleted { get; set; }
     
-        public virtual ICollection<Attendance> Attendance { get; set; }
-        public virtual Groups Groups { get; set; }
-        public virtual Training_Types Training_Types { get; set; }
-        public virtual Users Users { get; set; }
+        public virtual Players Players { get; set; }
     }
 }

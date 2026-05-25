@@ -19,6 +19,7 @@ namespace PingTrack.Model
         public int ID_Player { get; set; }
         public bool Is_Present { get; set; }
         public Nullable<int> Score { get; set; }
+        public bool IsDeleted { get; set; }
     
         public virtual Players Players { get; set; }
         public virtual Trainings Trainings { get; set; }

@@ -38,9 +38,10 @@ namespace PingTrack.View.Pages
         #region Инициализация фильтров
         private void InitializeFilters()
         {
+            // Фильтруем тренеров: берем только тех, кто не удален
             List<Users> coaches = App.db.Users
                 .Include("Roles")
-                .Where(u => u.Roles.Role_Name == "Тренер")
+                .Where(u => u.Roles.Role_Name == "Тренер" && u.IsDeleted == false)
                 .OrderBy(u => u.Full_Name)
                 .ToList();
 
@@ -64,10 +65,12 @@ namespace PingTrack.View.Pages
         #region Загрузка данных
         private void LoadGroups()
         {
+            // Исключаем из загрузки удаленные группы
             allGroups = App.db.Groups
                 .Include("Users")
                 .Include("Levels")
                 .Include("Players")
+                .Where(g => g.IsDeleted == false)
                 .ToList()
                 .OrderBy(g => g.Group_Name)
                 .Select(g => new GroupGridItem
@@ -76,7 +79,8 @@ namespace PingTrack.View.Pages
                     Name = g.Group_Name,
                     Coach = g.Users.Full_Name,
                     Level = g.Levels.Level_Name,
-                    PlayerCount = g.Players.Count
+                    // Считаем только активных (не удаленных) игроков в группе
+                    PlayerCount = g.Players.Count(p => p.IsDeleted == false)
                 })
                 .ToList();
 
@@ -221,23 +225,27 @@ namespace PingTrack.View.Pages
             if (group == null)
                 return;
 
-            if (group.Players.Count > 0)
+            // Проверяем только активных игроков перед удалением
+            int activePlayersCount = group.Players.Count(p => p.IsDeleted == false);
+            if (activePlayersCount > 0)
             {
                 Feedback.ShowError("Ошибка удаления",
-                    $"Невозможно удалить группу \"{group.Group_Name}\".\n\nВ группе есть игроки ({group.Players.Count} чел.). Сначала переместите всех игроков в другие группы.");
+                    $"Невозможно удалить группу \"{group.Group_Name}\".\n\nВ группе есть активные игроки ({activePlayersCount} чел.). Сначала переместите всех игроков в другие группы или удалите их.");
                 return;
             }
 
             bool confirm = Feedback.AskQuestion("Подтверждение удаления",
-                $"Вы уверены, что хотите удалить группу \"{group.Group_Name}\"?\n\nЭто действие нельзя отменить.");
+                $"Вы уверены, что хотите удалить группу \"{group.Group_Name}\"?\n\nЭто действие уберет её из всех списков программы.");
 
             if (!confirm)
                 return;
 
             try
             {
-                App.db.Groups.Remove(group);
+                // Применяем мягкое удаление вместо App.db.Groups.Remove(group);
+                group.IsDeleted = true;
                 App.db.SaveChanges();
+
                 Feedback.ShowSuccess("Успешно", "Группа успешно удалена.");
                 LoadGroups();
             }

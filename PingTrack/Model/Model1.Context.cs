@@ -25,11 +25,13 @@ namespace PingTrack.Model
             throw new UnintentionalCodeFirstException();
         }
     
+        public DbSet<ActionLogs> ActionLogs { get; set; }
         public DbSet<Attendance> Attendance { get; set; }
         public DbSet<Groups> Groups { get; set; }
         public DbSet<Levels> Levels { get; set; }
         public DbSet<Players> Players { get; set; }
         public DbSet<Roles> Roles { get; set; }
+        public DbSet<Subscriptions> Subscriptions { get; set; }
         public DbSet<Training_Types> Training_Types { get; set; }
         public DbSet<Trainings> Trainings { get; set; }
         public DbSet<Users> Users { get; set; }

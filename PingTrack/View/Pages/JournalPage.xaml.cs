@@ -45,7 +45,12 @@ namespace PingTrack.View.Pages
         #region Инициализация фильтров
         private void InitializeFilters()
         {
-            List<Groups> groups = App.db.Groups.OrderBy(g => g.Group_Name).ToList();
+            // Загружаем только не удаленные группы
+            List<Groups> groups = App.db.Groups
+                .Where(g => g.IsDeleted == false)
+                .OrderBy(g => g.Group_Name)
+                .ToList();
+
             Groups allGroupsOption = new Groups { ID_Group = 0, Group_Name = "Все группы" };
             groups.Insert(0, allGroupsOption);
             GroupFilter.ItemsSource = groups;
@@ -80,11 +85,15 @@ namespace PingTrack.View.Pages
         #region Загрузка данных
         private void LoadJournal()
         {
+            // Фильтруем удаленные отметки, отметки удаленных игроков и удаленных тренировок
             allRecords = App.db.Attendance
                 .Include("Trainings")
                 .Include("Players")
                 .Include("Trainings.Training_Types")
                 .Include("Players.Groups")
+                .Where(a => a.IsDeleted == false &&
+                            a.Players.IsDeleted == false &&
+                            a.Trainings.IsDeleted == false)
                 .ToList()
                 .OrderByDescending(a => a.Trainings != null ? a.Trainings.Date : DateTime.MinValue)
                 .ThenBy(a => a.Players != null ? a.Players.Full_Name : "")
@@ -247,15 +256,17 @@ namespace PingTrack.View.Pages
                 return;
 
             bool confirm = Feedback.AskQuestion("Подтверждение удаления",
-                $"Вы уверены, что хотите удалить запись о посещении?\n\nИгрок: {selected.Player}\nДата: {selected.Date}\n\nЭто действие нельзя отменить.");
+                $"Вы уверены, что хотите удалить запись о посещении?\n\nИгрок: {selected.Player}\nДата: {selected.Date}\n\nОна будет скрыта из статистики, но сохранится в логах.");
 
             if (!confirm)
                 return;
 
             try
             {
-                App.db.Attendance.Remove(record);
+                // Применяем мягкое удаление вместо App.db.Attendance.Remove(record);
+                record.IsDeleted = true;
                 App.db.SaveChanges();
+
                 Feedback.ShowSuccess("Успешно", "Запись успешно удалена.");
                 LoadJournal();
             }

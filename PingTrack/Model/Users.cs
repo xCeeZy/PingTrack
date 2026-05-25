@@ -16,19 +16,22 @@ namespace PingTrack.Model
     {
         public Users()
         {
+            this.ActionLogs = new HashSet<ActionLogs>();
             this.Groups = new HashSet<Groups>();
             this.Players = new HashSet<Players>();
             this.Trainings = new HashSet<Trainings>();
         }
     
         public int ID_User { get; set; }
+        public string Full_Name { get; set; }
         public string Login { get; set; }
         public string Password { get; set; }
         public int ID_Role { get; set; }
         public bool IsActive { get; set; }
-        public System.DateTime Created_At { get; set; }
-        public string Full_Name { get; set; }
+        public Nullable<System.DateTime> Created_At { get; set; }
+        public bool IsDeleted { get; set; }
     
+        public virtual ICollection<ActionLogs> ActionLogs { get; set; }
         public virtual ICollection<Groups> Groups { get; set; }
         public virtual ICollection<Players> Players { get; set; }
         public virtual Roles Roles { get; set; }

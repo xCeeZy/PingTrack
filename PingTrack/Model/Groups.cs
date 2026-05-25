@@ -24,6 +24,7 @@ namespace PingTrack.Model
         public string Group_Name { get; set; }
         public int ID_Level { get; set; }
         public int ID_Coach { get; set; }
+        public bool IsDeleted { get; set; }
     
         public virtual Users Users { get; set; }
         public virtual Levels Levels { get; set; }
