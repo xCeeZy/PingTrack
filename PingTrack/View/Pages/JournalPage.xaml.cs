@@ -64,6 +64,7 @@ namespace PingTrack.View.Pages
                 new FilterOption { Value = 1, Display = "Присутствовал" },
                 new FilterOption { Value = 0, Display = "Отсутствовал" }
             };
+
             PresenceFilter.ItemsSource = presenceOptions;
             PresenceFilter.DisplayMemberPath = "Display";
             PresenceFilter.SelectedIndex = 0;
@@ -299,6 +300,14 @@ namespace PingTrack.View.Pages
         public string Group { get; set; }
         public string Training { get; set; }
         public bool IsPresent { get; set; }
+
+        public string PresenceText
+        {
+            get
+            {
+                return IsPresent ? "Присутствовал" : "Отсутствовал";
+            }
+        }
     }
     #endregion
 }

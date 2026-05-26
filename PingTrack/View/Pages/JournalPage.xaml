@@ -241,7 +241,7 @@
 
         <!--#region Панель действий-->
         <Border Grid.Row="6" Grid.Column="1"
-        Style="{StaticResource Card}">
+                Style="{StaticResource Card}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="15"/>
@@ -265,49 +265,49 @@
 
                 <!--#region Пагинация слева-->
                 <Button Grid.Row="1" Grid.Column="1"
-                x:Name="PrevPageButton"
-                Content="◀ Назад"
-                Style="{StaticResource BaseButton}"
-                Width="100"
-                Height="36"
-                Click="PrevPageButton_Click"/>
+                        x:Name="PrevPageButton"
+                        Content="◀ Назад"
+                        Style="{StaticResource BaseButton}"
+                        Width="100"
+                        Height="36"
+                        Click="PrevPageButton_Click"/>
 
                 <TextBlock Grid.Row="1" Grid.Column="3"
-                   x:Name="PageInfoText"
-                   Text="Страница 1 из 1"
-                   FontSize="13"
-                   FontWeight="SemiBold"
-                   Foreground="{StaticResource TextBrush}"
-                   VerticalAlignment="Center"
-                   MinWidth="140"
-                   TextAlignment="Center"/>
+                           x:Name="PageInfoText"
+                           Text="Страница 1 из 1"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextBrush}"
+                           VerticalAlignment="Center"
+                           MinWidth="140"
+                           TextAlignment="Center"/>
 
                 <Button Grid.Row="1" Grid.Column="5"
-                x:Name="NextPageButton"
-                Content="Вперёд ▶"
-                Style="{StaticResource BaseButton}"
-                Width="100"
-                Height="36"
-                Click="NextPageButton_Click"/>
+                        x:Name="NextPageButton"
+                        Content="Вперёд ▶"
+                        Style="{StaticResource BaseButton}"
+                        Width="100"
+                        Height="36"
+                        Click="NextPageButton_Click"/>
                 <!--#endregion-->
 
                 <!--#region Кнопки действий справа-->
                 <Button Grid.Row="1" Grid.Column="7"
-                x:Name="AddButton"
-                Content="➕ Добавить"
-                Style="{StaticResource PrimaryButton}"
-                Width="140"
-                Height="36"
-                Click="AddButton_Click"/>
+                        x:Name="AddButton"
+                        Content="➕ Добавить"
+                        Style="{StaticResource PrimaryButton}"
+                        Width="140"
+                        Height="36"
+                        Click="AddButton_Click"/>
 
                 <Button Grid.Row="1" Grid.Column="9"
-                x:Name="DeleteButton"
-                Content="🗑️ Удалить"
-                Style="{StaticResource BaseButton}"
-                Width="120"
-                Height="36"
-                IsEnabled="False"
-                Click="DeleteButton_Click"/>
+                        x:Name="DeleteButton"
+                        Content="🗑️ Удалить"
+                        Style="{StaticResource BaseButton}"
+                        Width="120"
+                        Height="36"
+                        IsEnabled="False"
+                        Click="DeleteButton_Click"/>
                 <!--#endregion-->
             </Grid>
         </Border>
