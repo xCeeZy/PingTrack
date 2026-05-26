@@ -33,7 +33,6 @@ namespace PingTrack.View.Windows
             PasswordBox.KeyDown += InputField_KeyDown;
             VisiblePasswordBox.KeyDown += InputField_KeyDown;
 
-            // Обработчики для проверки состояния Caps Lock
             this.KeyDown += CheckCapsLock;
             this.KeyUp += CheckCapsLock;
             this.Loaded += (s, e) => CheckCapsLock(null, null);
@@ -73,7 +72,6 @@ namespace PingTrack.View.Windows
         #region Вход в систему
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            // Обрезаем только логин. Пароль берем как есть (пробелы могут быть частью пароля)
             string login = LoginTextBox.Text.Trim();
             string password = isPasswordVisible ? VisiblePasswordBox.Text : PasswordBox.Password;
 
@@ -112,8 +110,9 @@ namespace PingTrack.View.Windows
 
             string role = AuthenticationService.GetUserRole();
             string username = AuthenticationService.GetUserLogin();
+            int userId = AuthenticationService.GetUserId();
 
-            MainWindow mainWindow = new MainWindow(role, username);
+            MainWindow mainWindow = new MainWindow(role, username, userId);
             mainWindow.Show();
             Close();
         }
@@ -128,7 +127,6 @@ namespace PingTrack.View.Windows
                 VisiblePasswordBox.Visibility = Visibility.Collapsed;
                 PasswordBox.Visibility = Visibility.Visible;
 
-                // Смена картинки на закрытый глаз
                 EyeIcon.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/eye_closed.png"));
 
                 PasswordBox.Focus();
@@ -139,7 +137,6 @@ namespace PingTrack.View.Windows
                 PasswordBox.Visibility = Visibility.Collapsed;
                 VisiblePasswordBox.Visibility = Visibility.Visible;
 
-                // Смена картинки на открытый глаз
                 EyeIcon.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/eye_open.png"));
 
                 VisiblePasswordBox.Focus();

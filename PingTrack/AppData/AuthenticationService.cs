@@ -14,9 +14,10 @@ namespace PingTrack.AppData
 
         public static Users CurrentUser => _currentUser;
 
+        #region Авторизация и аутентификация
         public static bool Login(string login, string password)
         {
-            Users user = App.db.Users.FirstOrDefault(u => u.Login == login && u.Password == password);
+            Users user = App.db.Users.FirstOrDefault(u => u.Login == login && u.Password == password && u.IsDeleted == false);
             if (user == null)
                 return false;
 
@@ -33,7 +34,9 @@ namespace PingTrack.AppData
         {
             return _currentUser != null;
         }
+        #endregion
 
+        #region Получение данных пользователя
         public static string GetUserRole()
         {
             if (_currentUser == null || _currentUser.Roles == null)
@@ -46,5 +49,11 @@ namespace PingTrack.AppData
         {
             return _currentUser?.Login ?? string.Empty;
         }
+
+        public static int GetUserId()
+        {
+            return _currentUser?.ID_User ?? 0;
+        }
+        #endregion
     }
 }
