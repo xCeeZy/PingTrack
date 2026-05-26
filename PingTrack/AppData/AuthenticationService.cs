@@ -22,11 +22,14 @@ namespace PingTrack.AppData
                 return false;
 
             _currentUser = user;
+            ActionLogService.LogSystem($"Пользователь {user.Login} вошёл в систему.");
             return true;
         }
 
         public static void Logout()
         {
+            string login = _currentUser?.Login ?? "Неизвестный пользователь";
+            ActionLogService.LogSystem($"Пользователь {login} вышел из системы.");
             _currentUser = null;
         }
 
