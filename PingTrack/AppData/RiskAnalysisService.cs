@@ -2,128 +2,242 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PingTrack.AppData
 {
     public static class RiskAnalysisService
     {
+        private const int DefaultDaysBack = 30;
+
         /// <summary>
-        /// Получить список игроков в зоне риска
+        /// Получить единый список игроков в зоне риска для Dashboard, отчётов и статистики.
         /// </summary>
-        /// <param name="daysBack">За сколько дней анализировать (по умолчанию 30)</param>
-        /// <param name="topCount">Сколько игроков вернуть (по умолчанию 5)</param>
-        public static List<PlayerAtRisk> GetPlayersAtRisk(int daysBack = 30, int topCount = 5)
+        public static List<PlayerRiskInfo> GetAtRiskPlayers(int daysBack = DefaultDaysBack, int? topCount = null)
         {
             try
             {
-                var startDate = DateTime.Now.AddDays(-daysBack);
-                var playersAtRisk = new List<PlayerAtRisk>();
+                DateTime endDate = DateTime.Now;
+                DateTime startDate = endDate.AddDays(-daysBack);
 
-                // Получаем всех игроков
-                var allPlayers = App.db.Players
+                List<PlayerRiskInfo> riskList = new List<PlayerRiskInfo>();
+
+                List<Players> players = App.db.Players
                     .Include("Groups")
+                    .Where(p => p.IsDeleted == false)
                     .ToList();
 
-                foreach (var player in allPlayers)
+                foreach (Players player in players)
                 {
-                    // Получаем все тренировки группы игрока за период
-                    var groupTrainings = App.db.Trainings
-                        .Where(t => t.ID_Group == player.ID_Group &&
-                                   t.Date >= startDate &&
-                                   t.Date <= DateTime.Now)
+                    List<Trainings> groupTrainings = App.db.Trainings
+                        .Where(t => t.ID_Group == player.ID_Group
+                                 && t.Date >= startDate
+                                 && t.Date <= endDate
+                                 && t.IsDeleted == false)
+                        .OrderByDescending(t => t.Date)
                         .ToList();
 
                     if (!groupTrainings.Any())
                         continue;
 
-                    // Получаем посещения игрока
-                    var trainingIds = groupTrainings.Select(t => t.ID_Training).ToList();
-                    var attendances = App.db.Attendance
+                    List<int> trainingIds = groupTrainings.Select(t => t.ID_Training).ToList();
+
+                    List<Attendance> attendances = App.db.Attendance
                         .Include("Trainings")
-                        .Where(a => a.ID_Player == player.ID_Player &&
-                                   trainingIds.Contains(a.ID_Training))
+                        .Where(a => a.ID_Player == player.ID_Player
+                                 && trainingIds.Contains(a.ID_Training)
+                                 && a.IsDeleted == false)
+                        .OrderByDescending(a => a.Trainings.Date)
                         .ToList();
 
-                    // Считаем пропуски
-                    var attendedCount = attendances.Count(a => a.Is_Present);
-                    var totalTrainings = groupTrainings.Count;
-                    var missedCount = totalTrainings - attendedCount;
-                    var attendancePercent = totalTrainings > 0
-                        ? Math.Round((double)attendedCount / totalTrainings * 100, 1)
+                    int totalTrainings = groupTrainings.Count;
+                    int attendedCount = attendances.Count(a => a.Is_Present);
+                    int missedCount = totalTrainings - attendedCount;
+                    int missedInRow = CalculateMissedInRow(groupTrainings, attendances);
+
+                    double attendancePercent = totalTrainings > 0
+                        ? Math.Round(attendedCount * 100.0 / totalTrainings, 1)
                         : 0;
 
-                    // Последнее посещение
-                    var lastAttendance = attendances
+                    Attendance lastAttendance = attendances
                         .Where(a => a.Is_Present)
                         .OrderByDescending(a => a.Trainings.Date)
                         .FirstOrDefault();
 
-                    // Определяем уровень риска
-                    string riskLevel = DetermineRiskLevel(attendancePercent, missedCount, lastAttendance?.Trainings.Date);
+                    DateTime? lastAttendanceDate = lastAttendance?.Trainings.Date;
+                    int daysSinceLastVisit = lastAttendanceDate.HasValue
+                        ? (endDate - lastAttendanceDate.Value).Days
+                        : daysBack;
 
-                    // Добавляем в список, если есть риск
-                    if (riskLevel != null)
+                    RiskDecision riskDecision = DetermineRisk(attendancePercent, missedCount, missedInRow, daysSinceLastVisit, lastAttendanceDate);
+
+                    if (riskDecision.Level == RiskLevel.Low)
+                        continue;
+
+                    riskList.Add(new PlayerRiskInfo
                     {
-                        playersAtRisk.Add(new PlayerAtRisk
-                        {
-                            PlayerId = player.ID_Player,
-                            PlayerName = player.Full_Name,
-                            GroupName = player.Groups?.Group_Name ?? "Без группы",
-                            MissedTrainings = missedCount,
-                            LastAttendance = lastAttendance?.Trainings.Date,
-                            AttendancePercent = attendancePercent,
-                            RiskLevel = riskLevel
-                        });
-                    }
+                        PlayerId = player.ID_Player,
+                        PlayerName = player.Full_Name,
+                        GroupName = player.Groups?.Group_Name ?? "Без группы",
+                        RiskLevel = riskDecision.DisplayName,
+                        DaysSinceLastVisit = daysSinceLastVisit,
+                        RecommendedAction = riskDecision.RecommendedAction,
+                        MissedTrainings = missedCount,
+                        MissedInRow = missedInRow,
+                        LastAttendance = lastAttendanceDate,
+                        AttendancePercent = attendancePercent
+                    });
                 }
 
-                // Сортируем по уровню риска и проценту посещаемости
-                return playersAtRisk
-                    .OrderBy(p => p.RiskLevel == "Высокий" ? 0 : 1)
-                    .ThenBy(p => p.AttendancePercent)
-                    .Take(topCount)
-                    .ToList();
+                IEnumerable<PlayerRiskInfo> orderedRiskList = riskList
+                    .OrderBy(r => GetRiskSortOrder(r.RiskLevel))
+                    .ThenByDescending(r => r.DaysSinceLastVisit)
+                    .ThenBy(r => r.AttendancePercent)
+                    .ThenBy(r => r.PlayerName);
+
+                if (topCount.HasValue)
+                    orderedRiskList = orderedRiskList.Take(topCount.Value);
+
+                return orderedRiskList.ToList();
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Ошибка в GetPlayersAtRisk: {ex.Message}");
-                return new List<PlayerAtRisk>();
+                System.Diagnostics.Debug.WriteLine($"Ошибка в GetAtRiskPlayers: {ex.Message}");
+                return new List<PlayerRiskInfo>();
             }
         }
 
         /// <summary>
-        /// Определить уровень риска игрока
+        /// Совместимость со старым методом, который использовал модель PlayerAtRisk.
         /// </summary>
-        private static string DetermineRiskLevel(double attendancePercent, int missedCount, DateTime? lastAttendance)
+        public static List<PlayerAtRisk> GetPlayersAtRisk(int daysBack = DefaultDaysBack, int topCount = 5)
         {
-            // Высокий риск
-            if (attendancePercent < 40 || missedCount >= 5)
+            return GetAtRiskPlayers(daysBack, topCount)
+                .Select(r => new PlayerAtRisk
+                {
+                    PlayerId = r.PlayerId,
+                    PlayerName = r.PlayerName,
+                    GroupName = r.GroupName,
+                    MissedTrainings = r.MissedTrainings,
+                    LastAttendance = r.LastAttendance,
+                    AttendancePercent = r.AttendancePercent,
+                    RiskLevel = NormalizeRiskLevel(r.RiskLevel)
+                })
+                .ToList();
+        }
+
+        private static int CalculateMissedInRow(List<Trainings> groupTrainings, List<Attendance> attendances)
+        {
+            int missedInRow = 0;
+
+            foreach (Trainings training in groupTrainings.OrderByDescending(t => t.Date))
+            {
+                Attendance attendance = attendances.FirstOrDefault(a => a.ID_Training == training.ID_Training);
+
+                if (attendance == null || !attendance.Is_Present)
+                    missedInRow++;
+                else
+                    break;
+            }
+
+            return missedInRow;
+        }
+
+        private static RiskDecision DetermineRisk(double attendancePercent, int missedCount, int missedInRow, int daysSinceLastVisit, DateTime? lastAttendance)
+        {
+            if (!lastAttendance.HasValue)
+            {
+                return new RiskDecision
+                {
+                    Level = RiskLevel.High,
+                    DisplayName = "🔴 Высокий",
+                    RecommendedAction = "Срочно связаться"
+                };
+            }
+
+            if (attendancePercent < 40 || missedCount >= 5 || missedInRow >= 5 || daysSinceLastVisit > 14)
+            {
+                return new RiskDecision
+                {
+                    Level = RiskLevel.High,
+                    DisplayName = "🔴 Высокий",
+                    RecommendedAction = "Срочная встреча"
+                };
+            }
+
+            if (attendancePercent < 60 || missedCount >= 3 || missedInRow >= 3 || daysSinceLastVisit > 7)
+            {
+                return new RiskDecision
+                {
+                    Level = RiskLevel.Medium,
+                    DisplayName = "🟡 Средний",
+                    RecommendedAction = "Позвонить"
+                };
+            }
+
+            return new RiskDecision
+            {
+                Level = RiskLevel.Low,
+                DisplayName = "🟢 Низкий",
+                RecommendedAction = "Мониторинг"
+            };
+        }
+
+        private static int GetRiskSortOrder(string riskLevel)
+        {
+            string normalizedLevel = NormalizeRiskLevel(riskLevel);
+
+            if (normalizedLevel == "Высокий")
+                return 0;
+
+            if (normalizedLevel == "Средний")
+                return 1;
+
+            return 2;
+        }
+
+        private static string NormalizeRiskLevel(string riskLevel)
+        {
+            if (string.IsNullOrWhiteSpace(riskLevel))
+                return string.Empty;
+
+            if (riskLevel.Contains("Высокий") || riskLevel.Contains("Критический"))
                 return "Высокий";
 
-            // Средний риск
-            if (attendancePercent < 60 || missedCount >= 3)
+            if (riskLevel.Contains("Средний"))
                 return "Средний";
 
-            // Проверяем давность последнего посещения
-            if (lastAttendance.HasValue)
-            {
-                var daysSinceLastVisit = (DateTime.Now - lastAttendance.Value).Days;
+            if (riskLevel.Contains("Низкий"))
+                return "Низкий";
 
-                if (daysSinceLastVisit > 14)
-                    return "Высокий";
-                else if (daysSinceLastVisit > 7)
-                    return "Средний";
-            }
-            else
-            {
-                // Никогда не посещал
-                return "Высокий";
-            }
-
-            // Все хорошо, не в зоне риска
-            return null;
+            return riskLevel;
         }
+
+        private enum RiskLevel
+        {
+            Low,
+            Medium,
+            High
+        }
+
+        private class RiskDecision
+        {
+            public RiskLevel Level { get; set; }
+            public string DisplayName { get; set; }
+            public string RecommendedAction { get; set; }
+        }
+    }
+
+    public class PlayerRiskInfo
+    {
+        public int PlayerId { get; set; }
+        public string PlayerName { get; set; }
+        public string GroupName { get; set; }
+        public string RiskLevel { get; set; }
+        public int DaysSinceLastVisit { get; set; }
+        public string RecommendedAction { get; set; }
+        public int MissedTrainings { get; set; }
+        public int MissedInRow { get; set; }
+        public DateTime? LastAttendance { get; set; }
+        public double AttendancePercent { get; set; }
     }
 }

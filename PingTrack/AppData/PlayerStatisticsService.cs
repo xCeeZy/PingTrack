@@ -116,78 +116,7 @@ namespace PingTrack.AppData
         #region Список игроков в зоне риска
         public static List<PlayerRiskInfo> GetAtRiskPlayers()
         {
-            DateTime oneMonthAgo = DateTime.Now.AddMonths(-1);
-            List<Players> players = App.db.Players.Include("Groups").ToList();
-            List<PlayerRiskInfo> riskList = new List<PlayerRiskInfo>();
-
-            foreach (Players player in players)
-            {
-                List<Attendance> recentAttendances = App.db.Attendance
-                    .Include("Trainings")
-                    .Where(a => a.ID_Player == player.ID_Player
-                           && a.Trainings.Date >= oneMonthAgo)
-                    .OrderByDescending(a => a.Trainings.Date)
-                    .ToList();
-
-                if (!recentAttendances.Any())
-                {
-                    riskList.Add(new PlayerRiskInfo
-                    {
-                        PlayerName = player.Full_Name,
-                        GroupName = player.Groups.Group_Name,
-                        RiskLevel = "🔴 Критический",
-                        DaysSinceLastVisit = 30,
-                        RecommendedAction = "Срочно связаться!"
-                    });
-                    continue;
-                }
-
-                Attendance lastAttendance = recentAttendances.FirstOrDefault(a => a.Is_Present);
-                int daysSinceLast = lastAttendance != null
-                    ? (DateTime.Now - lastAttendance.Trainings.Date).Days
-                    : 30;
-
-                int missedInRow = 0;
-                foreach (Attendance att in recentAttendances)
-                {
-                    if (!att.Is_Present)
-                        missedInRow++;
-                    else
-                        break;
-                }
-
-                double attendancePercent = recentAttendances.Any()
-                    ? recentAttendances.Count(a => a.Is_Present) * 100.0 / recentAttendances.Count
-                    : 0;
-
-                string riskLevel = "🟢 Низкий";
-                string action = "Мониторинг";
-
-                if (attendancePercent < 30 || missedInRow >= 5 || daysSinceLast > 21)
-                {
-                    riskLevel = "🔴 Высокий";
-                    action = "Срочная встреча";
-                }
-                else if (attendancePercent < 60 || missedInRow >= 3 || daysSinceLast > 14)
-                {
-                    riskLevel = "🟡 Средний";
-                    action = "Позвонить";
-                }
-
-                if (riskLevel != "🟢 Низкий")
-                {
-                    riskList.Add(new PlayerRiskInfo
-                    {
-                        PlayerName = player.Full_Name,
-                        GroupName = player.Groups.Group_Name,
-                        RiskLevel = riskLevel,
-                        DaysSinceLastVisit = daysSinceLast,
-                        RecommendedAction = action
-                    });
-                }
-            }
-
-            return riskList.OrderByDescending(r => r.DaysSinceLastVisit).ToList();
+            return RiskAnalysisService.GetAtRiskPlayers();
         }
         #endregion
     }
@@ -205,15 +134,6 @@ namespace PingTrack.AppData
         public int CurrentStreak { get; set; }
         public DateTime LastAttendance { get; set; }
         public List<string> PreferredTrainingTypes { get; set; }
-    }
-
-    public class PlayerRiskInfo
-    {
-        public string PlayerName { get; set; }
-        public string GroupName { get; set; }
-        public string RiskLevel { get; set; }
-        public int DaysSinceLastVisit { get; set; }
-        public string RecommendedAction { get; set; }
     }
     #endregion
 }
