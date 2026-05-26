@@ -167,6 +167,7 @@ namespace PingTrack.View.Pages
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
             ExportService.ExportReportToCsv(currentReportItems, currentReportName);
+            ActionLogService.LogExport("Reports", $"Экспортирован отчёт: {currentReportName}. Количество строк: {currentReportItems.Count}.");
         }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
