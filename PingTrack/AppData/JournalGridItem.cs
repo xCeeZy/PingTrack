@@ -14,5 +14,6 @@ namespace PingTrack.AppData
         public string Group { get; set; }
         public string Training { get; set; }
         public bool IsPresent { get; set; }
+        public string PresenceText => IsPresent ? "Присутствовал" : "Отсутствовал";
     }
 }
