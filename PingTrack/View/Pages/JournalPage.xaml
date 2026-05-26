@@ -64,9 +64,13 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="15"/>
-                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="160"/>
                     <ColumnDefinition Width="15"/>
-                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="160"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="170"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="170"/>
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
@@ -75,7 +79,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!--#region Поиск по игроку-->
+                <!--#region Поиск-->
                 <TextBlock Grid.Row="0" Grid.Column="0"
                            Text="Поиск"
                            FontSize="13"
@@ -142,6 +146,34 @@
                           Height="34"
                           FontSize="14"
                           VerticalContentAlignment="Center"/>
+                <!--#endregion-->
+
+                <!--#region Фильтр даты начала-->
+                <TextBlock Grid.Row="0" Grid.Column="6"
+                           Text="Дата с"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextBrush}"/>
+
+                <DatePicker x:Name="StartDateFilter"
+                            Grid.Row="2" Grid.Column="6"
+                            Height="34"
+                            FontSize="14"
+                            SelectedDateChanged="DateFilter_SelectedDateChanged"/>
+                <!--#endregion-->
+
+                <!--#region Фильтр даты окончания-->
+                <TextBlock Grid.Row="0" Grid.Column="8"
+                           Text="Дата по"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextBrush}"/>
+
+                <DatePicker x:Name="EndDateFilter"
+                            Grid.Row="2" Grid.Column="8"
+                            Height="34"
+                            FontSize="14"
+                            SelectedDateChanged="DateFilter_SelectedDateChanged"/>
                 <!--#endregion-->
             </Grid>
         </Border>
@@ -215,12 +247,13 @@
 
                         <DataGridTextColumn Header="Присутствие" 
                                             Binding="{Binding PresenceText}" 
-                                            Width="140">
+                                            Width="150">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Center"/>
                                     <Setter Property="FontWeight" Value="SemiBold"/>
                                     <Setter Property="FontSize" Value="13"/>
+                                    <Setter Property="Padding" Value="6,2"/>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsPresent}" Value="True">
                                             <Setter Property="Foreground" Value="#27AE60"/>
