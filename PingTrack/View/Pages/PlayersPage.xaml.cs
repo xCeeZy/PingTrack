@@ -55,6 +55,7 @@ namespace PingTrack.View.Pages
         {
             allPlayers = App.db.Players
                 .Include("Groups")
+                .Where(p => p.IsDeleted == false)
                 .ToList()
                 .OrderBy(p => p.Full_Name)
                 .Select(p => new PlayerGridItem
@@ -194,13 +195,8 @@ namespace PingTrack.View.Pages
             if (selectedItem == null)
                 return;
 
-            Players player = App.db.Players.FirstOrDefault(p => p.ID_Player == selectedItem.ID_Player);
-            if (player == null)
-                return;
-
-            AddEditPlayerWindow window = new AddEditPlayerWindow(player);
-            if (window.ShowDialog() == true)
-                LoadPlayers();
+            PlayerCardInfoWindow window = new PlayerCardInfoWindow(selectedItem.ID_Player);
+            window.ShowDialog();
         }
         #endregion
 
@@ -256,7 +252,6 @@ namespace PingTrack.View.Pages
 
             try
             {
-                // ИСПРАВЛЕНИЕ: Удаляем оценки через цикл, так как RemoveRange нет в этой версии EF
                 if (attendanceCount > 0)
                 {
                     var attendanceRecords = App.db.Attendance.Where(a => a.ID_Player == player.ID_Player).ToList();
@@ -266,9 +261,12 @@ namespace PingTrack.View.Pages
                     }
                 }
 
-                // Теперь безопасно удаляем игрока
+                string playerName = player.Full_Name;
                 App.db.Players.Remove(player);
                 App.db.SaveChanges();
+
+                ActionLogService.LogDelete("Players", selectedItem.ID_Player,
+                    $"Удалён игрок: {playerName}. Связанных записей посещаемости удалено: {attendanceCount}.");
 
                 Feedback.ShowSuccess("Успешно", "Игрок успешно удалён.");
                 LoadPlayers();
@@ -286,6 +284,244 @@ namespace PingTrack.View.Pages
         }
         #endregion
     }
+
+    #region Карточка игрока
+    public class PlayerCardInfoWindow : Window
+    {
+        #region Поля
+        private readonly int playerId;
+        #endregion
+
+        #region Конструктор
+        public PlayerCardInfoWindow(int selectedPlayerId)
+        {
+            playerId = selectedPlayerId;
+            Title = "Карточка игрока";
+            Width = 760;
+            Height = 560;
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            ResizeMode = ResizeMode.NoResize;
+            Content = BuildContent();
+            LoadPlayerInfo();
+        }
+        #endregion
+
+        #region Элементы интерфейса
+        private TextBlock nameText;
+        private TextBlock groupText;
+        private TextBlock ageText;
+        private TextBlock phoneText;
+        private TextBlock medicalText;
+        private TextBlock totalText;
+        private TextBlock presentText;
+        private TextBlock absentText;
+        private TextBlock percentText;
+        private DataGrid lastAttendanceGrid;
+        #endregion
+
+        #region Построение интерфейса
+        private UIElement BuildContent()
+        {
+            Grid root = new Grid { Margin = new Thickness(24) };
+            root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(18) });
+            root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(18) });
+            root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+            root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(18) });
+            root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+            root.Children.Add(BuildHeader());
+            Grid.SetRow(root.Children[root.Children.Count - 1], 0);
+
+            root.Children.Add(BuildInfoBlock());
+            Grid.SetRow(root.Children[root.Children.Count - 1], 2);
+
+            root.Children.Add(BuildStatsBlock());
+            Grid.SetRow(root.Children[root.Children.Count - 1], 4);
+
+            Button closeButton = new Button
+            {
+                Content = "Закрыть",
+                Width = 120,
+                Height = 36,
+                HorizontalAlignment = HorizontalAlignment.Right
+            };
+            closeButton.Click += (s, e) => Close();
+            root.Children.Add(closeButton);
+            Grid.SetRow(closeButton, 6);
+
+            return root;
+        }
+
+        private Border BuildHeader()
+        {
+            StackPanel panel = new StackPanel();
+            nameText = new TextBlock { FontSize = 24, FontWeight = FontWeights.Bold };
+            groupText = new TextBlock { FontSize = 14, Margin = new Thickness(0, 6, 0, 0), Foreground = Brushes.Gray };
+            panel.Children.Add(nameText);
+            panel.Children.Add(groupText);
+
+            return new Border
+            {
+                Padding = new Thickness(18),
+                BorderBrush = Brushes.LightGray,
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(10),
+                Child = panel
+            };
+        }
+
+        private Border BuildInfoBlock()
+        {
+            Grid grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition());
+            grid.ColumnDefinitions.Add(new ColumnDefinition());
+            grid.ColumnDefinitions.Add(new ColumnDefinition());
+
+            ageText = CreateValueBlock(grid, "Возраст", 0);
+            phoneText = CreateValueBlock(grid, "Телефон", 1);
+            medicalText = CreateValueBlock(grid, "Мед. справка", 2);
+
+            return new Border
+            {
+                Padding = new Thickness(18),
+                BorderBrush = Brushes.LightGray,
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(10),
+                Child = grid
+            };
+        }
+
+        private Border BuildStatsBlock()
+        {
+            Grid grid = new Grid();
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(12) });
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(12) });
+            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+
+            TextBlock title = new TextBlock { Text = "Статистика посещаемости", FontSize = 18, FontWeight = FontWeights.Bold };
+            grid.Children.Add(title);
+            Grid.SetRow(title, 0);
+
+            UniformGrid statsGrid = new UniformGrid { Columns = 4 };
+            totalText = AddStatBlock(statsGrid, "Всего", Brushes.Black);
+            presentText = AddStatBlock(statsGrid, "Посещено", Brushes.Green);
+            absentText = AddStatBlock(statsGrid, "Пропущено", Brushes.Red);
+            percentText = AddStatBlock(statsGrid, "Посещаемость", Brushes.Black);
+            grid.Children.Add(statsGrid);
+            Grid.SetRow(statsGrid, 2);
+
+            lastAttendanceGrid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                IsReadOnly = true,
+                HeadersVisibility = DataGridHeadersVisibility.Column
+            };
+            lastAttendanceGrid.Columns.Add(new DataGridTextColumn { Header = "Дата", Binding = new Binding("Date"), Width = 120 });
+            lastAttendanceGrid.Columns.Add(new DataGridTextColumn { Header = "Тренировка", Binding = new Binding("TrainingType"), Width = new DataGridLength(1, DataGridLengthUnitType.Star) });
+            lastAttendanceGrid.Columns.Add(new DataGridTextColumn { Header = "Статус", Binding = new Binding("Status"), Width = 140 });
+            grid.Children.Add(lastAttendanceGrid);
+            Grid.SetRow(lastAttendanceGrid, 4);
+
+            return new Border
+            {
+                Padding = new Thickness(18),
+                BorderBrush = Brushes.LightGray,
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(10),
+                Child = grid
+            };
+        }
+        #endregion
+
+        #region Заполнение данных
+        private void LoadPlayerInfo()
+        {
+            Players player = App.db.Players.Include("Groups").FirstOrDefault(p => p.ID_Player == playerId);
+            if (player == null)
+            {
+                Feedback.ShowError("Ошибка", "Игрок не найден.");
+                Close();
+                return;
+            }
+
+            nameText.Text = player.Full_Name;
+            groupText.Text = $"Группа: {player.Groups?.Group_Name ?? "-"}";
+            ageText.Text = $"{CalculateAge(player.Birth_Date)} лет";
+            phoneText.Text = string.IsNullOrWhiteSpace(player.Phone) ? "-" : player.Phone.Trim();
+            medicalText.Text = player.Medical_Clearance_Date.HasValue ? player.Medical_Clearance_Date.Value.ToString("dd.MM.yyyy") : "Не указана";
+
+            List<Attendance> attendances = App.db.Attendance
+                .Include("Trainings")
+                .Include("Trainings.Training_Types")
+                .Where(a => a.ID_Player == player.ID_Player && a.IsDeleted == false && a.Trainings.IsDeleted == false)
+                .OrderByDescending(a => a.Trainings.Date)
+                .ToList();
+
+            int total = attendances.Count;
+            int present = attendances.Count(a => a.Is_Present);
+            int absent = total - present;
+            double percent = total > 0 ? Math.Round(present * 100.0 / total, 1) : 0;
+
+            totalText.Text = total.ToString();
+            presentText.Text = present.ToString();
+            absentText.Text = absent.ToString();
+            percentText.Text = $"{percent}%";
+
+            lastAttendanceGrid.ItemsSource = attendances.Take(10).Select(a => new PlayerCardAttendanceItem
+            {
+                Date = a.Trainings.Date.ToString("dd.MM.yyyy"),
+                TrainingType = a.Trainings.Training_Types?.Type_Name ?? "-",
+                Status = a.Is_Present ? "Присутствовал" : "Отсутствовал"
+            }).ToList();
+
+            ActionLogService.LogView("Players", player.ID_Player, $"Открыта карточка игрока: {player.Full_Name}.");
+        }
+        #endregion
+
+        #region Вспомогательные методы
+        private TextBlock CreateValueBlock(Grid grid, string title, int column)
+        {
+            StackPanel panel = new StackPanel();
+            panel.Children.Add(new TextBlock { Text = title, Foreground = Brushes.Gray, FontWeight = FontWeights.SemiBold });
+            TextBlock valueText = new TextBlock { FontSize = 18, FontWeight = FontWeights.Bold, Margin = new Thickness(0, 4, 0, 0) };
+            panel.Children.Add(valueText);
+            grid.Children.Add(panel);
+            Grid.SetColumn(panel, column);
+            return valueText;
+        }
+
+        private TextBlock AddStatBlock(UniformGrid grid, string title, Brush valueBrush)
+        {
+            StackPanel panel = new StackPanel();
+            panel.Children.Add(new TextBlock { Text = title, Foreground = Brushes.Gray });
+            TextBlock valueText = new TextBlock { FontSize = 22, FontWeight = FontWeights.Bold, Foreground = valueBrush };
+            panel.Children.Add(valueText);
+            grid.Children.Add(panel);
+            return valueText;
+        }
+
+        private int CalculateAge(DateTime birthDate)
+        {
+            DateTime today = DateTime.Today;
+            int age = today.Year - birthDate.Year;
+            if (birthDate.Date > today.AddYears(-age))
+                age--;
+            return age;
+        }
+        #endregion
+    }
+
+    public class PlayerCardAttendanceItem
+    {
+        public string Date { get; set; }
+        public string TrainingType { get; set; }
+        public string Status { get; set; }
+    }
+    #endregion
 
     #region Вспомогательный класс для отображения
     public class PlayerGridItem
