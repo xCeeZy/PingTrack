@@ -39,13 +39,13 @@ namespace PingTrack.View.Pages
             ConfigureUIForRole();
 
             isInitialized = true;
+            ApplyFilters();
         }
         #endregion
 
         #region Инициализация фильтров
         private void InitializeFilters()
         {
-            // Загружаем только не удаленные группы
             List<Groups> groups = App.db.Groups
                 .Where(g => g.IsDeleted == false)
                 .OrderBy(g => g.Group_Name)
@@ -53,6 +53,7 @@ namespace PingTrack.View.Pages
 
             Groups allGroupsOption = new Groups { ID_Group = 0, Group_Name = "Все группы" };
             groups.Insert(0, allGroupsOption);
+
             GroupFilter.ItemsSource = groups;
             GroupFilter.DisplayMemberPath = "Group_Name";
             GroupFilter.SelectedIndex = 0;
@@ -69,6 +70,9 @@ namespace PingTrack.View.Pages
             PresenceFilter.DisplayMemberPath = "Display";
             PresenceFilter.SelectedIndex = 0;
             PresenceFilter.SelectionChanged += Filter_SelectionChanged;
+
+            StartDateFilter.SelectedDate = DateTime.Now.AddMonths(-1);
+            EndDateFilter.SelectedDate = DateTime.Now;
         }
         #endregion
 
@@ -86,7 +90,6 @@ namespace PingTrack.View.Pages
         #region Загрузка данных
         private void LoadJournal()
         {
-            // Фильтруем удаленные отметки, отметки удаленных игроков и удаленных тренировок
             allRecords = App.db.Attendance
                 .Include("Trainings")
                 .Include("Players")
@@ -101,6 +104,7 @@ namespace PingTrack.View.Pages
                 .Select(a => new JournalGridItem
                 {
                     ID_Record = a.ID_Record,
+                    DateValue = a.Trainings != null ? a.Trainings.Date : DateTime.MinValue,
                     Date = a.Trainings != null ? a.Trainings.Date.ToString("dd.MM.yyyy") : "-",
                     Player = a.Players != null ? a.Players.Full_Name : "-",
                     Group = a.Players != null && a.Players.Groups != null ? a.Players.Groups.Group_Name : "-",
@@ -112,10 +116,9 @@ namespace PingTrack.View.Pages
             ApplyFilters();
         }
 
-        private void UpdateCountDisplay()
+        private void UpdateCountDisplay(int filteredCount)
         {
-            int totalCount = allRecords.Count;
-            CountTextBlock.Text = $"Всего записей: {totalCount}";
+            CountTextBlock.Text = $"Найдено записей: {filteredCount}";
         }
         #endregion
 
@@ -128,6 +131,8 @@ namespace PingTrack.View.Pages
             string searchText = SearchBox.Text?.Trim().ToLower() ?? string.Empty;
             Groups selectedGroup = GroupFilter.SelectedItem as Groups;
             FilterOption selectedPresence = PresenceFilter.SelectedItem as FilterOption;
+            DateTime? startDate = StartDateFilter.SelectedDate;
+            DateTime? endDate = EndDateFilter.SelectedDate;
 
             IEnumerable<JournalGridItem> filtered = allRecords;
 
@@ -137,12 +142,20 @@ namespace PingTrack.View.Pages
             if (selectedPresence != null && selectedPresence.Value != -1)
                 filtered = filtered.Where(r => r.IsPresent == (selectedPresence.Value == 1));
 
+            if (startDate.HasValue)
+                filtered = filtered.Where(r => r.DateValue.Date >= startDate.Value.Date);
+
+            if (endDate.HasValue)
+                filtered = filtered.Where(r => r.DateValue.Date <= endDate.Value.Date);
+
             if (!string.IsNullOrWhiteSpace(searchText) && searchText != "поиск по игроку")
                 filtered = filtered.Where(r => r.Player.ToLower().Contains(searchText));
 
-            pagination.SetItems(filtered.ToList());
+            List<JournalGridItem> filteredList = filtered.ToList();
+
+            pagination.SetItems(filteredList);
             UpdatePage();
-            UpdateCountDisplay();
+            UpdateCountDisplay(filteredList.Count);
         }
         #endregion
 
@@ -171,6 +184,11 @@ namespace PingTrack.View.Pages
         }
 
         private void Filter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ApplyFilters();
+        }
+
+        private void DateFilter_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             ApplyFilters();
         }
@@ -264,7 +282,6 @@ namespace PingTrack.View.Pages
 
             try
             {
-                // Применяем мягкое удаление вместо App.db.Attendance.Remove(record);
                 record.IsDeleted = true;
                 App.db.SaveChanges();
 
@@ -295,6 +312,7 @@ namespace PingTrack.View.Pages
     public class JournalGridItem
     {
         public int ID_Record { get; set; }
+        public DateTime DateValue { get; set; }
         public string Date { get; set; }
         public string Player { get; set; }
         public string Group { get; set; }
