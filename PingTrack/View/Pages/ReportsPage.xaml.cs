@@ -19,6 +19,11 @@ namespace PingTrack.View.Pages
 {
     public partial class ReportsPage : Page
     {
+        #region Поля
+        private List<object> currentReportItems = new List<object>();
+        private string currentReportName = "Отчёт";
+        #endregion
+
         #region Конструктор
         public ReportsPage()
         {
@@ -101,6 +106,7 @@ namespace PingTrack.View.Pages
             List<PlayerAttendanceReport> report = ReportService.GeneratePlayerAttendanceReport(startDate, endDate, groupId);
             ReportsDataGrid.ItemsSource = report;
             ReportTitleTextBlock.Text = $"Посещаемость по игрокам: найдено {report.Count} записей";
+            SetCurrentReport(report.Cast<object>().ToList(), "Посещаемость по игрокам");
 
             if (report.Count == 0)
                 Feedback.ShowInfo("Информация", "Нет данных за выбранный период.");
@@ -112,6 +118,7 @@ namespace PingTrack.View.Pages
             List<GroupAttendanceReport> report = ReportService.GenerateGroupAttendanceReport(startDate, endDate, groupId);
             ReportsDataGrid.ItemsSource = report;
             ReportTitleTextBlock.Text = $"Посещаемость по группам: найдено {report.Count} записей";
+            SetCurrentReport(report.Cast<object>().ToList(), "Посещаемость по группам");
 
             if (report.Count == 0)
                 Feedback.ShowInfo("Информация", "Нет данных за выбранный период.");
@@ -123,6 +130,7 @@ namespace PingTrack.View.Pages
             List<ActivityRatingReport> report = ReportService.GenerateActivityRatingReport(startDate, endDate, groupId);
             ReportsDataGrid.ItemsSource = report;
             ReportTitleTextBlock.Text = $"Рейтинг активности: найдено {report.Count} игроков";
+            SetCurrentReport(report.Cast<object>().ToList(), "Рейтинг активности игроков");
 
             if (report.Count == 0)
                 Feedback.ShowInfo("Информация", "Нет данных за выбранный период.");
@@ -134,9 +142,17 @@ namespace PingTrack.View.Pages
             List<GeneralStatisticsReport> report = ReportService.GenerateGeneralStatisticsReport(startDate, endDate);
             ReportsDataGrid.ItemsSource = report;
             ReportTitleTextBlock.Text = $"Общая статистика: найдено {report.Count} типов тренировок";
+            SetCurrentReport(report.Cast<object>().ToList(), "Общая статистика тренировок");
 
             if (report.Count == 0)
                 Feedback.ShowInfo("Информация", "Нет данных за выбранный период.");
+        }
+
+        private void SetCurrentReport(List<object> reportItems, string reportName)
+        {
+            currentReportItems = reportItems ?? new List<object>();
+            currentReportName = reportName;
+            ExportButton.IsEnabled = currentReportItems.Count > 0;
         }
         #endregion
 
@@ -145,6 +161,12 @@ namespace PingTrack.View.Pages
         {
             ReportsDataGrid.ItemsSource = null;
             ReportTitleTextBlock.Text = "Результаты отчёта";
+            SetCurrentReport(new List<object>(), "Отчёт");
+        }
+
+        private void ExportButton_Click(object sender, RoutedEventArgs e)
+        {
+            ExportService.ExportReportToCsv(currentReportItems, currentReportName);
         }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
@@ -155,6 +177,7 @@ namespace PingTrack.View.Pages
             GroupComboBox.SelectedIndex = 0;
             StartDatePicker.SelectedDate = DateTime.Now.AddMonths(-1);
             EndDatePicker.SelectedDate = DateTime.Now;
+            SetCurrentReport(new List<object>(), "Отчёт");
         }
         #endregion
     }
