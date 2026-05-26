@@ -149,7 +149,7 @@ namespace PingTrack.AppData
                 return new RiskDecision
                 {
                     Level = RiskLevel.High,
-                    DisplayName = "🔴 Высокий",
+                    DisplayName = "Высокий",
                     RecommendedAction = "Срочно связаться"
                 };
             }
@@ -159,7 +159,7 @@ namespace PingTrack.AppData
                 return new RiskDecision
                 {
                     Level = RiskLevel.High,
-                    DisplayName = "🔴 Высокий",
+                    DisplayName = "Высокий",
                     RecommendedAction = "Срочная встреча"
                 };
             }
@@ -169,7 +169,7 @@ namespace PingTrack.AppData
                 return new RiskDecision
                 {
                     Level = RiskLevel.Medium,
-                    DisplayName = "🟡 Средний",
+                    DisplayName = "Средний",
                     RecommendedAction = "Позвонить"
                 };
             }
@@ -177,7 +177,7 @@ namespace PingTrack.AppData
             return new RiskDecision
             {
                 Level = RiskLevel.Low,
-                DisplayName = "🟢 Низкий",
+                DisplayName = "Низкий",
                 RecommendedAction = "Мониторинг"
             };
         }
