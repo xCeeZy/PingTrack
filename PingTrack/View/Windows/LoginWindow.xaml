@@ -191,7 +191,7 @@
             </Grid>
         </Border>
         <TextBlock Grid.Row="7" Grid.Column="1"
-                   Text="© 2024 PingTrack. Все права защищены."
+                   Text="© 2026 PingTrack. Все права защищены."
                    FontSize="11"
                    Foreground="#9CA3AF"
                    HorizontalAlignment="Center"
