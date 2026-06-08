@@ -21,44 +21,67 @@ namespace PingTrack.View.Pages
     public partial class JournalPage : Page
     {
         #region Поля
+
         private readonly string userRole;
         private PaginationService<JournalGridItem> pagination;
         private List<JournalGridItem> allRecords;
         private bool isInitialized = false;
+
         #endregion
 
         #region Конструктор
+
         public JournalPage(string role)
         {
             InitializeComponent();
+
             userRole = role;
             pagination = new PaginationService<JournalGridItem>(15);
 
             InitializeFilters();
-            LoadJournal();
             ConfigureUIForRole();
 
             isInitialized = true;
-            ApplyFilters();
+
+            LoadJournal();
         }
+
         #endregion
 
-        #region Инициализация фильтров
+        #region Инициализация
+
         private void InitializeFilters()
+        {
+            InitializeGroupFilter();
+            InitializePresenceFilter();
+            InitializeDateFilters();
+        }
+
+        private void InitializeGroupFilter()
         {
             List<Groups> groups = App.db.Groups
                 .Where(g => g.IsDeleted == false)
                 .OrderBy(g => g.Group_Name)
                 .ToList();
 
-            Groups allGroupsOption = new Groups { ID_Group = 0, Group_Name = "Все группы" };
+            Groups allGroupsOption = new Groups
+            {
+                ID_Group = 0,
+                Group_Name = "Все группы"
+            };
+
             groups.Insert(0, allGroupsOption);
 
             GroupFilter.ItemsSource = groups;
             GroupFilter.DisplayMemberPath = "Group_Name";
             GroupFilter.SelectedIndex = 0;
-            GroupFilter.SelectionChanged += Filter_SelectionChanged;
 
+            GroupFilter.SelectionChanged -= Filter_SelectionChanged;
+            GroupFilter.SelectionChanged += Filter_SelectionChanged;
+        }
+
+        private void InitializePresenceFilter()
+        {
             List<FilterOption> presenceOptions = new List<FilterOption>
             {
                 new FilterOption { Value = -1, Display = "Все" },
@@ -69,14 +92,23 @@ namespace PingTrack.View.Pages
             PresenceFilter.ItemsSource = presenceOptions;
             PresenceFilter.DisplayMemberPath = "Display";
             PresenceFilter.SelectedIndex = 0;
+
+            PresenceFilter.SelectionChanged -= Filter_SelectionChanged;
             PresenceFilter.SelectionChanged += Filter_SelectionChanged;
-
-            StartDateFilter.SelectedDate = DateTime.Now.AddMonths(-1);
-            EndDateFilter.SelectedDate = DateTime.Now;
         }
-        #endregion
 
-        #region Настройка UI для роли
+        private void InitializeDateFilters()
+        {
+            StartDateFilter.SelectedDateChanged -= DateFilter_SelectedDateChanged;
+            EndDateFilter.SelectedDateChanged -= DateFilter_SelectedDateChanged;
+
+            StartDateFilter.SelectedDate = DateTime.Now.AddMonths(-1).Date;
+            EndDateFilter.SelectedDate = DateTime.Now.Date;
+
+            StartDateFilter.SelectedDateChanged += DateFilter_SelectedDateChanged;
+            EndDateFilter.SelectedDateChanged += DateFilter_SelectedDateChanged;
+        }
+
         private void ConfigureUIForRole()
         {
             if (userRole == "Игрок")
@@ -85,9 +117,11 @@ namespace PingTrack.View.Pages
                 DeleteButton.Visibility = Visibility.Collapsed;
             }
         }
+
         #endregion
 
         #region Загрузка данных
+
         private void LoadJournal()
         {
             allRecords = App.db.Attendance
@@ -95,16 +129,16 @@ namespace PingTrack.View.Pages
                 .Include("Players")
                 .Include("Trainings.Training_Types")
                 .Include("Players.Groups")
-                .Where(a => a.IsDeleted == false &&
-                            a.Players.IsDeleted == false &&
-                            a.Trainings.IsDeleted == false)
+                .Where(a => a.IsDeleted == false
+                         && a.Players.IsDeleted == false
+                         && a.Trainings.IsDeleted == false)
                 .ToList()
                 .OrderByDescending(a => a.Trainings != null ? a.Trainings.Date : DateTime.MinValue)
-                .ThenBy(a => a.Players != null ? a.Players.Full_Name : "")
+                .ThenBy(a => a.Players != null ? a.Players.Full_Name : string.Empty)
                 .Select(a => new JournalGridItem
                 {
                     ID_Record = a.ID_Record,
-                    DateValue = a.Trainings != null ? a.Trainings.Date : DateTime.MinValue,
+                    DateValue = a.Trainings != null ? a.Trainings.Date.Date : DateTime.MinValue,
                     Date = a.Trainings != null ? a.Trainings.Date.ToString("dd.MM.yyyy") : "-",
                     Player = a.Players != null ? a.Players.Full_Name : "-",
                     Group = a.Players != null && a.Players.Groups != null ? a.Players.Groups.Group_Name : "-",
@@ -120,9 +154,11 @@ namespace PingTrack.View.Pages
         {
             CountTextBlock.Text = $"Найдено записей: {filteredCount}";
         }
+
         #endregion
 
         #region Фильтрация
+
         private void ApplyFilters()
         {
             if (!isInitialized || allRecords == null)
@@ -131,25 +167,16 @@ namespace PingTrack.View.Pages
             string searchText = SearchBox.Text?.Trim().ToLower() ?? string.Empty;
             Groups selectedGroup = GroupFilter.SelectedItem as Groups;
             FilterOption selectedPresence = PresenceFilter.SelectedItem as FilterOption;
+
             DateTime? startDate = StartDateFilter.SelectedDate;
             DateTime? endDate = EndDateFilter.SelectedDate;
 
             IEnumerable<JournalGridItem> filtered = allRecords;
 
-            if (selectedGroup != null && selectedGroup.ID_Group != 0)
-                filtered = filtered.Where(r => r.Group == selectedGroup.Group_Name);
-
-            if (selectedPresence != null && selectedPresence.Value != -1)
-                filtered = filtered.Where(r => r.IsPresent == (selectedPresence.Value == 1));
-
-            if (startDate.HasValue)
-                filtered = filtered.Where(r => r.DateValue.Date >= startDate.Value.Date);
-
-            if (endDate.HasValue)
-                filtered = filtered.Where(r => r.DateValue.Date <= endDate.Value.Date);
-
-            if (!string.IsNullOrWhiteSpace(searchText) && searchText != "поиск по игроку")
-                filtered = filtered.Where(r => r.Player.ToLower().Contains(searchText));
+            filtered = ApplyGroupFilter(filtered, selectedGroup);
+            filtered = ApplyPresenceFilter(filtered, selectedPresence);
+            filtered = ApplyDateFilter(filtered, startDate, endDate);
+            filtered = ApplySearchFilter(filtered, searchText);
 
             List<JournalGridItem> filteredList = filtered.ToList();
 
@@ -157,9 +184,47 @@ namespace PingTrack.View.Pages
             UpdatePage();
             UpdateCountDisplay(filteredList.Count);
         }
+
+        private IEnumerable<JournalGridItem> ApplyGroupFilter(IEnumerable<JournalGridItem> records, Groups selectedGroup)
+        {
+            if (selectedGroup == null || selectedGroup.ID_Group == 0)
+                return records;
+
+            return records.Where(r => r.Group == selectedGroup.Group_Name);
+        }
+
+        private IEnumerable<JournalGridItem> ApplyPresenceFilter(IEnumerable<JournalGridItem> records, FilterOption selectedPresence)
+        {
+            if (selectedPresence == null || selectedPresence.Value == -1)
+                return records;
+
+            bool isPresent = selectedPresence.Value == 1;
+            return records.Where(r => r.IsPresent == isPresent);
+        }
+
+        private IEnumerable<JournalGridItem> ApplyDateFilter(IEnumerable<JournalGridItem> records, DateTime? startDate, DateTime? endDate)
+        {
+            if (startDate.HasValue)
+                records = records.Where(r => r.DateValue.Date >= startDate.Value.Date);
+
+            if (endDate.HasValue)
+                records = records.Where(r => r.DateValue.Date <= endDate.Value.Date);
+
+            return records;
+        }
+
+        private IEnumerable<JournalGridItem> ApplySearchFilter(IEnumerable<JournalGridItem> records, string searchText)
+        {
+            if (string.IsNullOrWhiteSpace(searchText) || searchText == "поиск по игроку")
+                return records;
+
+            return records.Where(r => r.Player.ToLower().Contains(searchText));
+        }
+
         #endregion
 
-        #region Обработчики событий поиска и фильтров
+        #region Обработчики фильтров
+
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             ApplyFilters();
@@ -169,7 +234,7 @@ namespace PingTrack.View.Pages
         {
             if (SearchBox.Text == "Поиск по игроку")
             {
-                SearchBox.Text = "";
+                SearchBox.Text = string.Empty;
                 SearchBox.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1F2937"));
             }
         }
@@ -192,19 +257,20 @@ namespace PingTrack.View.Pages
         {
             ApplyFilters();
         }
+
         #endregion
 
         #region Навигация страниц
+
         private void UpdatePage()
         {
-            List<JournalGridItem> current = pagination.GetCurrentPage();
-            JournalDataGrid.ItemsSource = current;
+            List<JournalGridItem> currentPage = pagination.GetCurrentPage();
+            JournalDataGrid.ItemsSource = currentPage;
 
-            string pageText = pagination.TotalPages > 0
+            PageInfoText.Text = pagination.TotalPages > 0
                 ? $"Страница {pagination.CurrentPage} из {pagination.TotalPages}"
                 : "Нет записей";
 
-            PageInfoText.Text = pageText;
             PrevPageButton.IsEnabled = pagination.HasPreviousPage;
             NextPageButton.IsEnabled = pagination.HasNextPage;
         }
@@ -220,61 +286,64 @@ namespace PingTrack.View.Pages
             pagination.PreviousPage();
             UpdatePage();
         }
+
         #endregion
 
-        #region Обработчики DataGrid
+        #region Обработчики таблицы
+
         private void JournalDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             JournalGridItem selectedRecord = JournalDataGrid.SelectedItem as JournalGridItem;
-            bool hasSelection = selectedRecord != null;
-
-            DeleteButton.IsEnabled = hasSelection && userRole != "Игрок";
+            DeleteButton.IsEnabled = selectedRecord != null && userRole != "Игрок";
         }
 
         private void JournalDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (JournalDataGrid.SelectedItem == null)
-                return;
-
             JournalGridItem selected = JournalDataGrid.SelectedItem as JournalGridItem;
+
             if (selected == null)
                 return;
 
             Attendance record = App.db.Attendance.FirstOrDefault(x => x.ID_Record == selected.ID_Record);
+
             if (record == null)
                 return;
 
             AddEditAttendanceWindow window = new AddEditAttendanceWindow(userRole, record);
+
             if (window.ShowDialog() == true)
                 LoadJournal();
         }
+
         #endregion
 
         #region Обработчики кнопок
+
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             AddEditAttendanceWindow window = new AddEditAttendanceWindow(userRole);
+
             if (window.ShowDialog() == true)
                 LoadJournal();
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            if (JournalDataGrid.SelectedItem == null)
+            JournalGridItem selected = JournalDataGrid.SelectedItem as JournalGridItem;
+
+            if (selected == null)
             {
                 Feedback.ShowWarning("Предупреждение", "Выберите запись для удаления.");
                 return;
             }
 
-            JournalGridItem selected = JournalDataGrid.SelectedItem as JournalGridItem;
-            if (selected == null)
-                return;
-
             Attendance record = App.db.Attendance.FirstOrDefault(x => x.ID_Record == selected.ID_Record);
+
             if (record == null)
                 return;
 
-            bool confirm = Feedback.AskQuestion("Подтверждение удаления",
+            bool confirm = Feedback.AskQuestion(
+                "Подтверждение удаления",
                 $"Вы уверены, что хотите удалить запись о посещении?\n\nИгрок: {selected.Player}\nДата: {selected.Date}\n\nОна будет скрыта из статистики, но сохранится в логах.");
 
             if (!confirm)
@@ -284,6 +353,11 @@ namespace PingTrack.View.Pages
             {
                 record.IsDeleted = true;
                 App.db.SaveChanges();
+
+                ActionLogService.LogDelete(
+                    "Attendance",
+                    record.ID_Record,
+                    $"Удалена запись посещаемости. Игрок: {selected.Player}, дата: {selected.Date}, статус: {selected.PresenceText}.");
 
                 Feedback.ShowSuccess("Успешно", "Запись успешно удалена.");
                 LoadJournal();
@@ -299,10 +373,12 @@ namespace PingTrack.View.Pages
             LoadJournal();
             Feedback.ShowInfo("Обновление", "Журнал посещаемости обновлён.");
         }
+
         #endregion
     }
 
-    #region Вспомогательные классы
+    #region Модели отображения
+
     public class FilterOption
     {
         public int Value { get; set; }
@@ -327,5 +403,6 @@ namespace PingTrack.View.Pages
             }
         }
     }
+
     #endregion
 }

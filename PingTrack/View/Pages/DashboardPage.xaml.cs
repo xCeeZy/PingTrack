@@ -2,6 +2,7 @@
 using PingTrack.Model;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,14 +21,17 @@ namespace PingTrack.View.Pages
     public partial class DashboardPage : Page
     {
         #region Конструктор
+
         public DashboardPage()
         {
             InitializeComponent();
             LoadDashboard();
         }
+
         #endregion
 
-        #region Загрузка данных дашборда
+        #region Загрузка панели
+
         private void LoadDashboard()
         {
             LoadStatistics();
@@ -36,37 +40,38 @@ namespace PingTrack.View.Pages
             LoadAttendanceChart();
         }
 
+        #endregion
+
+        #region Статистика
+
         private void LoadStatistics()
         {
-            // Считаем только неудаленных игроков
             int playersCount = App.db.Players.Count(p => p.IsDeleted == false);
             PlayersCountText.Text = playersCount.ToString();
 
-            // Считаем только неудаленные группы
             int groupsCount = App.db.Groups.Count(g => g.IsDeleted == false);
             GroupsCountText.Text = groupsCount.ToString();
 
-            // Считаем только неудаленные предстоящие тренировки
             DateTime today = DateTime.Now.Date;
             int upcomingTrainings = App.db.Trainings.Count(t => t.Date >= today && t.IsDeleted == false);
             UpcomingTrainingsText.Text = upcomingTrainings.ToString();
 
-            // Считаем процент посещаемости только по актуальным отметкам
-            double averageAttendance = 0.0;
             int totalAttendance = App.db.Attendance.Count(a => a.IsDeleted == false);
+            int presentAttendance = App.db.Attendance.Count(a => a.IsDeleted == false && a.Is_Present);
 
-            if (totalAttendance > 0)
-            {
-                int presentCount = App.db.Attendance.Count(a => a.IsDeleted == false && a.Is_Present);
-                averageAttendance = (double)presentCount / totalAttendance * 100.0;
-            }
+            double averageAttendance = totalAttendance > 0
+                ? presentAttendance * 100.0 / totalAttendance
+                : 0.0;
 
             AverageAttendanceText.Text = string.Format("{0:F1}%", averageAttendance);
         }
 
+        #endregion
+
+        #region Последние тренировки
+
         private void LoadRecentTrainings()
         {
-            // Загружаем только неудаленные тренировки
             List<TrainingDashboardItem> recentTrainings = App.db.Trainings
                 .Include("Groups")
                 .Include("Users")
@@ -95,7 +100,6 @@ namespace PingTrack.View.Pages
             if (training.Attendance == null || training.Attendance.Count == 0)
                 return "Нет данных";
 
-            // Считаем только неудаленные отметки посещаемости
             int present = training.Attendance.Count(a => a.Is_Present && a.IsDeleted == false);
             int total = training.Attendance.Count(a => a.IsDeleted == false);
 
@@ -105,11 +109,19 @@ namespace PingTrack.View.Pages
             return string.Format("{0} из {1}", present, total);
         }
 
+        #endregion
+
+        #region Игроки в зоне риска
+
         private void LoadRiskPlayers()
         {
             List<PlayerRiskInfo> riskPlayers = PlayerStatisticsService.GetAtRiskPlayers();
             RiskPlayersGrid.ItemsSource = riskPlayers;
         }
+
+        #endregion
+
+        #region Динамика посещаемости
 
         private void LoadAttendanceChart()
         {
@@ -122,7 +134,6 @@ namespace PingTrack.View.Pages
                 DateTime startOfMonth = new DateTime(monthDate.Year, monthDate.Month, 1);
                 DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
-                // Загружаем отметки, отфильтровывая мягко удаленные записи
                 List<Attendance> monthAttendances = App.db.Attendance
                     .Include("Trainings")
                     .Where(a => a.Trainings.Date >= startOfMonth
@@ -131,39 +142,55 @@ namespace PingTrack.View.Pages
                              && a.Trainings.IsDeleted == false)
                     .ToList();
 
-                int totalCount = monthAttendances.Count;
-                int presentCount = monthAttendances.Count(a => a.Is_Present);
-                double percent = totalCount > 0 ? (double)presentCount / totalCount * 100.0 : 0;
+                int totalMarks = monthAttendances.Count;
+                int presentMarks = monthAttendances.Count(a => a.Is_Present);
 
-                string monthName = monthDate.ToString("MMMM yyyy", new System.Globalization.CultureInfo("ru-RU"));
-                monthName = char.ToUpper(monthName[0]) + monthName.Substring(1);
+                double percent = totalMarks > 0
+                    ? presentMarks * 100.0 / totalMarks
+                    : 0.0;
 
-                double maxWidth = 600.0;
-                double barWidth = percent > 0 ? (percent / 100.0) * maxWidth : 1;
+                string monthName = GetMonthName(monthDate);
+                double barWidth = CalculateBarWidth(percent);
 
                 chartData.Add(new AttendanceChartItem
                 {
                     MonthName = monthName,
                     PercentText = string.Format("{0:F1}%", percent),
-                    DetailText = string.Format("Присутствовали: {0} из {1} занятий", presentCount, totalCount),
+                    DetailText = string.Format("Посещаемость: {0} из {1} отметок", presentMarks, totalMarks),
                     BarWidth = barWidth
                 });
             }
 
             AttendanceChartItems.ItemsSource = chartData;
         }
+
+        private string GetMonthName(DateTime date)
+        {
+            string monthName = date.ToString("MMMM yyyy", new CultureInfo("ru-RU"));
+            return char.ToUpper(monthName[0]) + monthName.Substring(1);
+        }
+
+        private double CalculateBarWidth(double percent)
+        {
+            const double maxWidth = 600.0;
+            return percent > 0 ? percent / 100.0 * maxWidth : 1;
+        }
+
         #endregion
 
         #region Обработчики событий
+
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
             LoadDashboard();
             Feedback.ShowInfo("Обновление", "Статистика обновлена.");
         }
+
         #endregion
     }
 
-    #region Вспомогательные классы для отображения
+    #region Модели отображения
+
     public class TrainingDashboardItem
     {
         public string DateTime { get; set; }
@@ -172,5 +199,6 @@ namespace PingTrack.View.Pages
         public string Coach { get; set; }
         public string Attendance { get; set; }
     }
+
     #endregion
 }

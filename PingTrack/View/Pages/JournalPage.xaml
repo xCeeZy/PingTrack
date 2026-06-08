@@ -10,7 +10,6 @@
       Background="{StaticResource WindowBrush}">
 
     <Grid>
-        <!--#region Основная структура-->
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="20"/>
@@ -26,10 +25,9 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="30"/>
         </Grid.ColumnDefinitions>
-        <!--#endregion-->
 
-        <!--#region Заголовок страницы-->
-        <Border Grid.Row="0" Grid.Column="1"
+        <Border Grid.Row="0"
+                Grid.Column="1"
                 Style="{StaticResource Card}"
                 Padding="20,15">
             <Grid>
@@ -48,16 +46,16 @@
                             VerticalAlignment="Center">
                     <TextBlock Text="Журнал посещаемости"
                                Style="{StaticResource SectionTitle}"/>
+
                     <TextBlock Text="Учёт присутствия игроков на тренировках"
                                Style="{StaticResource SubTitle}"
                                Margin="0,3,0,0"/>
                 </StackPanel>
             </Grid>
         </Border>
-        <!--#endregion-->
 
-        <!--#region Панель фильтров-->
-        <Border Grid.Row="2" Grid.Column="1"
+        <Border Grid.Row="2"
+                Grid.Column="1"
                 Style="{StaticResource Card}"
                 Padding="20,15">
             <Grid>
@@ -79,14 +77,16 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!--#region Поиск-->
-                <TextBlock Grid.Row="0" Grid.Column="0"
+                <TextBlock Grid.Row="0"
+                           Grid.Column="0"
                            Text="Поиск"
                            FontSize="13"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource TextBrush}"/>
 
-                <Border Grid.Row="2" Grid.Column="0"
+                <Border Grid.Row="2"
+                        Grid.Column="0"
+                        Height="34"
                         BorderBrush="{StaticResource StrokeStrongBrush}"
                         BorderThickness="1"
                         CornerRadius="8"
@@ -118,69 +118,67 @@
                                  TextChanged="SearchBox_TextChanged"/>
                     </Grid>
                 </Border>
-                <!--#endregion-->
 
-                <!--#region Фильтр по группе-->
-                <TextBlock Grid.Row="0" Grid.Column="2"
+                <TextBlock Grid.Row="0"
+                           Grid.Column="2"
                            Text="Группа"
                            FontSize="13"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource TextBrush}"/>
 
                 <ComboBox x:Name="GroupFilter"
-                          Grid.Row="2" Grid.Column="2"
+                          Grid.Row="2"
+                          Grid.Column="2"
                           Height="34"
                           FontSize="14"
                           VerticalContentAlignment="Center"/>
-                <!--#endregion-->
 
-                <!--#region Фильтр по присутствию-->
-                <TextBlock Grid.Row="0" Grid.Column="4"
+                <TextBlock Grid.Row="0"
+                           Grid.Column="4"
                            Text="Присутствие"
                            FontSize="13"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource TextBrush}"/>
 
                 <ComboBox x:Name="PresenceFilter"
-                          Grid.Row="2" Grid.Column="4"
+                          Grid.Row="2"
+                          Grid.Column="4"
                           Height="34"
                           FontSize="14"
                           VerticalContentAlignment="Center"/>
-                <!--#endregion-->
 
-                <!--#region Фильтр даты начала-->
-                <TextBlock Grid.Row="0" Grid.Column="6"
+                <TextBlock Grid.Row="0"
+                           Grid.Column="6"
                            Text="Дата с"
                            FontSize="13"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource TextBrush}"/>
 
                 <DatePicker x:Name="StartDateFilter"
-                            Grid.Row="2" Grid.Column="6"
+                            Grid.Row="2"
+                            Grid.Column="6"
                             Height="34"
                             FontSize="14"
-                            SelectedDateChanged="DateFilter_SelectedDateChanged"/>
-                <!--#endregion-->
+                            VerticalContentAlignment="Center"/>
 
-                <!--#region Фильтр даты окончания-->
-                <TextBlock Grid.Row="0" Grid.Column="8"
+                <TextBlock Grid.Row="0"
+                           Grid.Column="8"
                            Text="Дата по"
                            FontSize="13"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource TextBrush}"/>
 
                 <DatePicker x:Name="EndDateFilter"
-                            Grid.Row="2" Grid.Column="8"
+                            Grid.Row="2"
+                            Grid.Column="8"
                             Height="34"
                             FontSize="14"
-                            SelectedDateChanged="DateFilter_SelectedDateChanged"/>
-                <!--#endregion-->
+                            VerticalContentAlignment="Center"/>
             </Grid>
         </Border>
-        <!--#endregion-->
 
-        <!--#region Таблица журнала-->
-        <Border Grid.Row="4" Grid.Column="1"
+        <Border Grid.Row="4"
+                Grid.Column="1"
                 Style="{StaticResource Card}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -188,7 +186,6 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!--#region Информация о количестве-->
                 <Border Grid.Row="0"
                         Background="#FFF8F9FA"
                         BorderBrush="{StaticResource StrokeBrush}"
@@ -200,16 +197,16 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Column="0"
-                                   x:Name="CountTextBlock"
+                        <TextBlock x:Name="CountTextBlock"
+                                   Grid.Column="0"
                                    Text="Всего записей: 0"
                                    FontSize="13"
                                    FontWeight="SemiBold"
                                    Foreground="{StaticResource TextBrush}"
                                    VerticalAlignment="Center"/>
 
-                        <Button Grid.Column="1"
-                                x:Name="RefreshButton"
+                        <Button x:Name="RefreshButton"
+                                Grid.Column="1"
                                 Content="🔄 Обновить"
                                 Style="{StaticResource BaseButton}"
                                 Width="110"
@@ -218,46 +215,48 @@
                                 Click="RefreshButton_Click"/>
                     </Grid>
                 </Border>
-                <!--#endregion-->
 
-                <!--#region DataGrid-->
-                <DataGrid Grid.Row="1"
-                          x:Name="JournalDataGrid"
+                <DataGrid x:Name="JournalDataGrid"
+                          Grid.Row="1"
                           AutoGenerateColumns="False"
+                          IsReadOnly="True"
                           MouseDoubleClick="JournalDataGrid_MouseDoubleClick"
                           SelectionChanged="JournalDataGrid_SelectionChanged">
 
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Дата" 
-                                            Binding="{Binding Date}" 
+                        <DataGridTextColumn Header="Дата"
+                                            Binding="{Binding Date}"
                                             Width="120"/>
 
-                        <DataGridTextColumn Header="Игрок" 
-                                            Binding="{Binding Player}" 
+                        <DataGridTextColumn Header="Игрок"
+                                            Binding="{Binding Player}"
                                             Width="*"
                                             MinWidth="180"/>
 
-                        <DataGridTextColumn Header="Группа" 
-                                            Binding="{Binding Group}" 
+                        <DataGridTextColumn Header="Группа"
+                                            Binding="{Binding Group}"
                                             Width="150"/>
 
-                        <DataGridTextColumn Header="Тип тренировки" 
-                                            Binding="{Binding Training}" 
+                        <DataGridTextColumn Header="Тип тренировки"
+                                            Binding="{Binding Training}"
                                             Width="180"/>
 
-                        <DataGridTextColumn Header="Присутствие" 
-                                            Binding="{Binding PresenceText}" 
+                        <DataGridTextColumn Header="Присутствие"
+                                            Binding="{Binding PresenceText}"
                                             Width="150">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Center"/>
                                     <Setter Property="FontWeight" Value="SemiBold"/>
                                     <Setter Property="FontSize" Value="13"/>
                                     <Setter Property="Padding" Value="6,2"/>
+
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsPresent}" Value="True">
                                             <Setter Property="Foreground" Value="#27AE60"/>
                                         </DataTrigger>
+
                                         <DataTrigger Binding="{Binding IsPresent}" Value="False">
                                             <Setter Property="Foreground" Value="#E74C3C"/>
                                         </DataTrigger>
@@ -267,13 +266,11 @@
                         </DataGridTextColumn>
                     </DataGrid.Columns>
                 </DataGrid>
-                <!--#endregion-->
             </Grid>
         </Border>
-        <!--#endregion-->
 
-        <!--#region Панель действий-->
-        <Border Grid.Row="6" Grid.Column="1"
+        <Border Grid.Row="6"
+                Grid.Column="1"
                 Style="{StaticResource Card}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -296,17 +293,18 @@
                     <ColumnDefinition Width="20"/>
                 </Grid.ColumnDefinitions>
 
-                <!--#region Пагинация слева-->
-                <Button Grid.Row="1" Grid.Column="1"
-                        x:Name="PrevPageButton"
+                <Button x:Name="PrevPageButton"
+                        Grid.Row="1"
+                        Grid.Column="1"
                         Content="◀ Назад"
                         Style="{StaticResource BaseButton}"
                         Width="100"
                         Height="36"
                         Click="PrevPageButton_Click"/>
 
-                <TextBlock Grid.Row="1" Grid.Column="3"
-                           x:Name="PageInfoText"
+                <TextBlock x:Name="PageInfoText"
+                           Grid.Row="1"
+                           Grid.Column="3"
                            Text="Страница 1 из 1"
                            FontSize="13"
                            FontWeight="SemiBold"
@@ -315,35 +313,34 @@
                            MinWidth="140"
                            TextAlignment="Center"/>
 
-                <Button Grid.Row="1" Grid.Column="5"
-                        x:Name="NextPageButton"
+                <Button x:Name="NextPageButton"
+                        Grid.Row="1"
+                        Grid.Column="5"
                         Content="Вперёд ▶"
                         Style="{StaticResource BaseButton}"
                         Width="100"
                         Height="36"
                         Click="NextPageButton_Click"/>
-                <!--#endregion-->
 
-                <!--#region Кнопки действий справа-->
-                <Button Grid.Row="1" Grid.Column="7"
-                        x:Name="AddButton"
+                <Button x:Name="AddButton"
+                        Grid.Row="1"
+                        Grid.Column="7"
                         Content="➕ Добавить"
                         Style="{StaticResource PrimaryButton}"
                         Width="140"
                         Height="36"
                         Click="AddButton_Click"/>
 
-                <Button Grid.Row="1" Grid.Column="9"
-                        x:Name="DeleteButton"
+                <Button x:Name="DeleteButton"
+                        Grid.Row="1"
+                        Grid.Column="9"
                         Content="🗑️ Удалить"
                         Style="{StaticResource BaseButton}"
                         Width="120"
                         Height="36"
                         IsEnabled="False"
                         Click="DeleteButton_Click"/>
-                <!--#endregion-->
             </Grid>
         </Border>
-        <!--#endregion-->
     </Grid>
 </Page>
