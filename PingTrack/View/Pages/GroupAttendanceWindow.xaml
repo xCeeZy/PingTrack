@@ -1,0 +1,217 @@
+﻿<Window x:Class="PingTrack.View.Windows.GroupAttendanceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PingTrack.View.Pages"
+        mc:Ignorable="d"
+        Title="Отметка посещаемости группы"
+        WindowStartupLocation="CenterScreen"
+        Width="820"
+        Height="620"
+        MinWidth="760"
+        MinHeight="540"
+        Background="{StaticResource WindowBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="16"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="16"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="24"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="24"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Row="0"
+                Grid.Column="1"
+                Style="{StaticResource Card}"
+                Padding="20,16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0"
+                           Text="Отметка посещаемости группы"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource PrimaryBrush}"/>
+
+                <UniformGrid Grid.Row="2"
+                             Columns="4">
+                    <StackPanel Margin="0,0,12,0">
+                        <TextBlock Text="Дата"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextMutedBrush}"/>
+                        <TextBlock x:Name="DateTextBlock"
+                                   Text="-"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextBrush}"
+                                   Margin="0,4,0,0"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,12,0">
+                        <TextBlock Text="Время"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextMutedBrush}"/>
+                        <TextBlock x:Name="TimeTextBlock"
+                                   Text="-"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextBrush}"
+                                   Margin="0,4,0,0"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,12,0">
+                        <TextBlock Text="Группа"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextMutedBrush}"/>
+                        <TextBlock x:Name="GroupTextBlock"
+                                   Text="-"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextBrush}"
+                                   Margin="0,4,0,0"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Тип"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextMutedBrush}"/>
+                        <TextBlock x:Name="TypeTextBlock"
+                                   Text="-"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextBrush}"
+                                   Margin="0,4,0,0"/>
+                    </StackPanel>
+                </UniformGrid>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2"
+                Grid.Column="1"
+                Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0"
+                        Background="#FFF8F9FA"
+                        BorderBrush="{StaticResource StrokeBrush}"
+                        BorderThickness="0,0,0,1"
+                        Padding="20,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock x:Name="CountTextBlock"
+                                   Grid.Column="0"
+                                   Text="Игроков: 0"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextBrush}"
+                                   VerticalAlignment="Center"/>
+
+                        <Button x:Name="MarkAllPresentButton"
+                                Grid.Column="1"
+                                Content="Все присутствовали"
+                                Style="{StaticResource BaseButton}"
+                                Width="150"
+                                Height="32"
+                                FontSize="13"
+                                Click="MarkAllPresentButton_Click"/>
+
+                        <Button x:Name="ClearAllButton"
+                                Grid.Column="3"
+                                Content="Снять отметки"
+                                Style="{StaticResource BaseButton}"
+                                Width="130"
+                                Height="32"
+                                FontSize="13"
+                                Click="ClearAllButton_Click"/>
+                    </Grid>
+                </Border>
+
+                <DataGrid x:Name="AttendanceDataGrid"
+                          Grid.Row="1"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          HeadersVisibility="Column">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Игрок"
+                                            Binding="{Binding PlayerName}"
+                                            IsReadOnly="True"
+                                            Width="*"
+                                            MinWidth="260"/>
+
+                        <DataGridCheckBoxColumn Header="Присутствовал"
+                                                Binding="{Binding IsPresent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                Width="150"/>
+
+                        <DataGridTextColumn Header="Оценка"
+                                            Binding="{Binding Score, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            Width="120"/>
+
+                        <DataGridTextColumn Header="Статус записи"
+                                            Binding="{Binding RecordStatus}"
+                                            IsReadOnly="True"
+                                            Width="150"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="4"
+                Grid.Column="1"
+                Style="{StaticResource Card}"
+                Padding="20,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="После сохранения журнал посещаемости обновится автоматически."
+                           FontSize="13"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           VerticalAlignment="Center"/>
+
+                <Button x:Name="SaveButton"
+                        Grid.Column="1"
+                        Content="Сохранить"
+                        Style="{StaticResource PrimaryButton}"
+                        Width="150"
+                        Height="38"
+                        Click="SaveButton_Click"/>
+
+                <Button x:Name="CancelButton"
+                        Grid.Column="3"
+                        Content="Отмена"
+                        Style="{StaticResource BaseButton}"
+                        Width="120"
+                        Height="38"
+                        Click="CancelButton_Click"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

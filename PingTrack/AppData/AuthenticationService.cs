@@ -10,26 +10,45 @@ namespace PingTrack.AppData
 {
     public sealed class AuthenticationService
     {
+        #region Поля
+
         private static Users _currentUser;
 
         public static Users CurrentUser => _currentUser;
 
-        #region Авторизация и аутентификация
+        #endregion
+
+        #region Авторизация
+
         public static bool Login(string login, string password)
         {
-            Users user = App.db.Users.FirstOrDefault(u => u.Login == login && u.Password == password && u.IsDeleted == false);
+            string normalizedLogin = login.Trim();
+
+            Users user = App.db.Users
+                .Include("Roles")
+                .FirstOrDefault(u =>
+                    u.Login == normalizedLogin &&
+                    u.Password == password &&
+                    u.IsDeleted == false);
+
             if (user == null)
                 return false;
 
             _currentUser = user;
+
             ActionLogService.LogSystem($"Пользователь {user.Login} вошёл в систему.");
+
             return true;
         }
 
         public static void Logout()
         {
-            string login = _currentUser?.Login ?? "Неизвестный пользователь";
+            string login = _currentUser != null
+                ? _currentUser.Login
+                : "Неизвестный пользователь";
+
             ActionLogService.LogSystem($"Пользователь {login} вышел из системы.");
+
             _currentUser = null;
         }
 
@@ -37,9 +56,11 @@ namespace PingTrack.AppData
         {
             return _currentUser != null;
         }
+
         #endregion
 
-        #region Получение данных пользователя
+        #region Данные пользователя
+
         public static string GetUserRole()
         {
             if (_currentUser == null || _currentUser.Roles == null)
@@ -50,13 +71,14 @@ namespace PingTrack.AppData
 
         public static string GetUserLogin()
         {
-            return _currentUser?.Login ?? string.Empty;
+            return _currentUser != null ? _currentUser.Login : string.Empty;
         }
 
         public static int GetUserId()
         {
-            return _currentUser?.ID_User ?? 0;
+            return _currentUser != null ? _currentUser.ID_User : 0;
         }
+
         #endregion
     }
 }

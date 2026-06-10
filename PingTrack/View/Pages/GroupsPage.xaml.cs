@@ -26,19 +26,24 @@ namespace PingTrack.View.Pages
         #endregion
 
         #region Конструктор
+
         public GroupsPage()
         {
             InitializeComponent();
+
             InitializeFilters();
-            LoadGroups();
+
             isInitialized = true;
+
+            LoadGroups();
         }
+
         #endregion
 
         #region Инициализация фильтров
         private void InitializeFilters()
         {
-            // Фильтруем тренеров: берем только тех, кто не удален
+            
             List<Users> coaches = App.db.Users
                 .Include("Roles")
                 .Where(u => u.Roles.Role_Name == "Тренер" && u.IsDeleted == false)
@@ -65,7 +70,7 @@ namespace PingTrack.View.Pages
         #region Загрузка данных
         private void LoadGroups()
         {
-            // Исключаем из загрузки удаленные группы
+            
             allGroups = App.db.Groups
                 .Include("Users")
                 .Include("Levels")
@@ -79,7 +84,7 @@ namespace PingTrack.View.Pages
                     Name = g.Group_Name,
                     Coach = g.Users.Full_Name,
                     Level = g.Levels.Level_Name,
-                    // Считаем только активных (не удаленных) игроков в группе
+                    
                     PlayerCount = g.Players.Count(p => p.IsDeleted == false)
                 })
                 .ToList();
@@ -225,7 +230,7 @@ namespace PingTrack.View.Pages
             if (group == null)
                 return;
 
-            // Проверяем только активных игроков перед удалением
+            
             int activePlayersCount = group.Players.Count(p => p.IsDeleted == false);
             if (activePlayersCount > 0)
             {
@@ -242,7 +247,7 @@ namespace PingTrack.View.Pages
 
             try
             {
-                // Применяем мягкое удаление вместо App.db.Groups.Remove(group);
+                
                 group.IsDeleted = true;
                 App.db.SaveChanges();
 

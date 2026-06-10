@@ -28,14 +28,20 @@ namespace PingTrack.View.Pages
         #endregion
 
         #region Конструктор
+
         public PlayersPage()
         {
             InitializeComponent();
+
             pagination = new PaginationService<PlayerGridItem>(15);
+
             InitializeFilters();
-            LoadPlayers();
+
             isInitialized = true;
+
+            LoadPlayers();
         }
+
         #endregion
 
         #region Инициализация фильтров

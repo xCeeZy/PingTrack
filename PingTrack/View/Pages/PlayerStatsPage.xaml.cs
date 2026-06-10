@@ -19,56 +19,80 @@ namespace PingTrack.View.Pages
     public partial class PlayerStatsPage : Page
     {
         #region Конструктор
+
         public PlayerStatsPage()
         {
             InitializeComponent();
+
+            InitializePeriod();
             LoadPlayers();
-            StartDatePicker.SelectedDate = DateTime.Now.AddMonths(-3);
-            EndDatePicker.SelectedDate = DateTime.Now;
         }
+
+        #endregion
+
+        #region Инициализация
+
+        private void InitializePeriod()
+        {
+            StartDatePicker.SelectedDate = DateTime.Now.AddMonths(-3).Date;
+            EndDatePicker.SelectedDate = DateTime.Now.Date;
+        }
+
         #endregion
 
         #region Загрузка данных
+
         private void LoadPlayers()
         {
             PlayerComboBox.ItemsSource = App.db.Players
+                .Where(p => p.IsDeleted == false)
                 .OrderBy(p => p.Full_Name)
                 .ToList();
         }
+
         #endregion
 
-        #region Обработчики событий
+        #region Загрузка статистики
+
         private void LoadStatsButton_Click(object sender, RoutedEventArgs e)
         {
             if (PlayerComboBox.SelectedValue == null)
             {
-                Feedback.ShowWarning("Ошибка", "Выберите игрока");
+                Feedback.ShowWarning("Ошибка", "Выберите игрока.");
                 return;
             }
 
             if (!StartDatePicker.SelectedDate.HasValue || !EndDatePicker.SelectedDate.HasValue)
             {
-                Feedback.ShowWarning("Ошибка", "Выберите период");
+                Feedback.ShowWarning("Ошибка", "Выберите период.");
+                return;
+            }
+
+            if (StartDatePicker.SelectedDate.Value.Date > EndDatePicker.SelectedDate.Value.Date)
+            {
+                Feedback.ShowWarning("Ошибка", "Дата начала не может быть позже даты окончания.");
                 return;
             }
 
             int playerId = (int)PlayerComboBox.SelectedValue;
-            DateTime startDate = StartDatePicker.SelectedDate.Value;
-            DateTime endDate = EndDatePicker.SelectedDate.Value;
+            DateTime startDate = StartDatePicker.SelectedDate.Value.Date;
+            DateTime endDate = EndDatePicker.SelectedDate.Value.Date;
 
             PlayerDetailedStats stats = PlayerStatisticsService.GetPlayerStats(playerId, startDate, endDate);
 
             if (stats == null)
             {
-                Feedback.ShowError("Ошибка", "Не удалось загрузить статистику");
+                Feedback.ShowError("Ошибка", "Не удалось загрузить статистику.");
                 return;
             }
 
             DisplayStats(stats);
         }
+
         #endregion
 
         #region Отображение статистики
+
         private void DisplayStats(PlayerDetailedStats stats)
         {
             PlaceholderText.Visibility = Visibility.Collapsed;
@@ -76,6 +100,7 @@ namespace PingTrack.View.Pages
 
             PlayerNameText.Text = stats.PlayerName;
             GroupNameText.Text = stats.GroupName;
+
             LastAttendanceText.Text = stats.LastAttendance != DateTime.MinValue
                 ? stats.LastAttendance.ToString("dd.MM.yyyy")
                 : "Нет данных";
@@ -84,14 +109,14 @@ namespace PingTrack.View.Pages
             AttendedText.Text = stats.AttendedTrainings.ToString();
             AttendancePercentText.Text = $"{stats.AttendancePercent}%";
             AvgScoreText.Text = stats.AverageScore > 0 ? stats.AverageScore.ToString("0.0") : "—";
-
             BestStreakText.Text = $"{stats.BestStreak} подряд";
             CurrentStreakText.Text = $"{stats.CurrentStreak} подряд";
 
             PreferredTypesList.ItemsSource = stats.PreferredTrainingTypes.Any()
                 ? stats.PreferredTrainingTypes
-                : new System.Collections.Generic.List<string> { "Нет данных" };
+                : new List<string> { "Нет данных" };
         }
+
         #endregion
     }
 }

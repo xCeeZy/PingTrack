@@ -18,108 +18,158 @@ using System.Windows.Shapes;
 
 namespace PingTrack.View.Pages
 {
-    public sealed class TrainingGridItem
-    {
-        public int ID_Training { get; set; }
-        public string Date { get; set; }
-        public string Time { get; set; }
-        public string Group { get; set; }
-        public string Coach { get; set; }
-        public string Type { get; set; }
-        public string Note { get; set; }
-    }
-
     public partial class TrainingsPage : Page
     {
         #region Поля
+
         private List<TrainingGridItem> allTrainings;
         private bool isInitialized = false;
+
         #endregion
 
         #region Конструктор
+
         public TrainingsPage()
         {
             InitializeComponent();
+
             InitializeFilters();
-            LoadTrainings();
+
             isInitialized = true;
+
+            LoadTrainings();
         }
+
         #endregion
 
-        #region Инициализация фильтров
+        #region Инициализация
+
         private void InitializeFilters()
         {
-            StartDatePicker.SelectedDate = DateTime.Now.AddMonths(-1);
-            EndDatePicker.SelectedDate = DateTime.Now.AddMonths(1);
+            InitializeDateFilters();
+            InitializeGroupFilter();
+            InitializeCoachFilter();
+            InitializeTypeFilter();
+        }
 
-            List<Groups> groups = App.db.Groups.OrderBy(g => g.Group_Name).ToList();
-            Groups allGroupsOption = new Groups { ID_Group = 0, Group_Name = "Все группы" };
+        private void InitializeDateFilters()
+        {
+            StartDatePicker.SelectedDate = DateTime.Now.AddMonths(-1).Date;
+            EndDatePicker.SelectedDate = DateTime.Now.AddMonths(1).Date;
+        }
+
+        private void InitializeGroupFilter()
+        {
+            List<Groups> groups = App.db.Groups
+                .Where(g => g.IsDeleted == false)
+                .OrderBy(g => g.Group_Name)
+                .ToList();
+
+            Groups allGroupsOption = new Groups
+            {
+                ID_Group = 0,
+                Group_Name = "Все группы"
+            };
+
             groups.Insert(0, allGroupsOption);
+
             GroupFilter.ItemsSource = groups;
             GroupFilter.DisplayMemberPath = "Group_Name";
             GroupFilter.SelectedIndex = 0;
-            GroupFilter.SelectionChanged += Filter_SelectionChanged;
 
+            GroupFilter.SelectionChanged -= Filter_SelectionChanged;
+            GroupFilter.SelectionChanged += Filter_SelectionChanged;
+        }
+
+        private void InitializeCoachFilter()
+        {
             List<Users> coaches = App.db.Users
                 .Include("Roles")
-                .Where(u => u.Roles.Role_Name == "Тренер")
+                .Where(u => u.Roles.Role_Name == "Тренер" && u.IsDeleted == false)
                 .OrderBy(u => u.Full_Name)
                 .ToList();
-            Users allCoachesOption = new Users { ID_User = 0, Full_Name = "Все тренеры" };
+
+            Users allCoachesOption = new Users
+            {
+                ID_User = 0,
+                Full_Name = "Все тренеры"
+            };
+
             coaches.Insert(0, allCoachesOption);
+
             CoachFilter.ItemsSource = coaches;
             CoachFilter.DisplayMemberPath = "Full_Name";
             CoachFilter.SelectedIndex = 0;
-            CoachFilter.SelectionChanged += Filter_SelectionChanged;
 
-            List<Training_Types> types = App.db.Training_Types.OrderBy(t => t.Type_Name).ToList();
-            Training_Types allTypesOption = new Training_Types { ID_Type = 0, Type_Name = "Все типы" };
+            CoachFilter.SelectionChanged -= Filter_SelectionChanged;
+            CoachFilter.SelectionChanged += Filter_SelectionChanged;
+        }
+
+        private void InitializeTypeFilter()
+        {
+            List<Training_Types> types = App.db.Training_Types
+                .OrderBy(t => t.Type_Name)
+                .ToList();
+
+            Training_Types allTypesOption = new Training_Types
+            {
+                ID_Type = 0,
+                Type_Name = "Все типы"
+            };
+
             types.Insert(0, allTypesOption);
+
             TypeFilter.ItemsSource = types;
             TypeFilter.DisplayMemberPath = "Type_Name";
             TypeFilter.SelectedIndex = 0;
+
+            TypeFilter.SelectionChanged -= Filter_SelectionChanged;
             TypeFilter.SelectionChanged += Filter_SelectionChanged;
         }
+
         #endregion
 
         #region Загрузка данных
+
         private void LoadTrainings()
         {
             allTrainings = App.db.Trainings
                 .Include("Groups")
                 .Include("Users")
                 .Include("Training_Types")
+                .Where(t => t.IsDeleted == false)
                 .ToList()
                 .OrderByDescending(t => t.Date)
                 .ThenBy(t => t.Time)
                 .Select(t => new TrainingGridItem
                 {
                     ID_Training = t.ID_Training,
+                    DateValue = t.Date.Date,
                     Date = t.Date.ToString("dd.MM.yyyy"),
                     Time = t.Time.ToString(@"hh\:mm"),
                     Group = t.Groups != null ? t.Groups.Group_Name : "-",
                     Coach = t.Users != null ? t.Users.Full_Name : "-",
                     Type = t.Training_Types != null ? t.Training_Types.Type_Name : "-",
-                    Note = string.IsNullOrEmpty(t.Note) ? "" : (t.Note.Length > 30 ? t.Note.Substring(0, 30) + "..." : t.Note)
+                    Note = string.IsNullOrWhiteSpace(t.Note) ? string.Empty : (t.Note.Length > 30 ? t.Note.Substring(0, 30) + "..." : t.Note)
                 })
                 .ToList();
 
             ApplyFilters();
         }
 
-        private void UpdateCountDisplay()
+        private void UpdateCountDisplay(int filteredCount)
         {
-            int displayedCount = TrainingsDataGrid.Items.Count;
-            int totalCount = allTrainings.Count;
+            int totalCount = allTrainings != null ? allTrainings.Count : 0;
 
-            if (displayedCount == totalCount)
-                CountTextBlock.Text = $"Всего тренировок: {totalCount}";
-            else
-                CountTextBlock.Text = $"Показано: {displayedCount} из {totalCount}";
+            CountTextBlock.Text = filteredCount == totalCount
+                ? $"Всего тренировок: {totalCount}"
+                : $"Показано: {filteredCount} из {totalCount}";
         }
+
         #endregion
 
         #region Фильтрация
+
         private void ApplyFilters()
         {
             if (!isInitialized || allTrainings == null)
@@ -131,33 +181,56 @@ namespace PingTrack.View.Pages
 
             IEnumerable<TrainingGridItem> filtered = allTrainings;
 
-            if (StartDatePicker.SelectedDate.HasValue && EndDatePicker.SelectedDate.HasValue)
-            {
-                DateTime startDate = StartDatePicker.SelectedDate.Value;
-                DateTime endDate = EndDatePicker.SelectedDate.Value;
+            filtered = ApplyDateFilter(filtered);
+            filtered = ApplyGroupFilter(filtered, selectedGroup);
+            filtered = ApplyCoachFilter(filtered, selectedCoach);
+            filtered = ApplyTypeFilter(filtered, selectedType);
 
-                filtered = filtered.Where(t =>
-                {
-                    DateTime trainingDate = DateTime.ParseExact(t.Date, "dd.MM.yyyy", null);
-                    return trainingDate >= startDate && trainingDate <= endDate;
-                });
-            }
+            List<TrainingGridItem> filteredList = filtered.ToList();
 
-            if (selectedGroup != null && selectedGroup.ID_Group != 0)
-                filtered = filtered.Where(t => t.Group == selectedGroup.Group_Name);
-
-            if (selectedCoach != null && selectedCoach.ID_User != 0)
-                filtered = filtered.Where(t => t.Coach == selectedCoach.Full_Name);
-
-            if (selectedType != null && selectedType.ID_Type != 0)
-                filtered = filtered.Where(t => t.Type == selectedType.Type_Name);
-
-            TrainingsDataGrid.ItemsSource = filtered.ToList();
-            UpdateCountDisplay();
+            TrainingsDataGrid.ItemsSource = filteredList;
+            UpdateCountDisplay(filteredList.Count);
         }
+
+        private IEnumerable<TrainingGridItem> ApplyDateFilter(IEnumerable<TrainingGridItem> trainings)
+        {
+            if (StartDatePicker.SelectedDate.HasValue)
+                trainings = trainings.Where(t => t.DateValue >= StartDatePicker.SelectedDate.Value.Date);
+
+            if (EndDatePicker.SelectedDate.HasValue)
+                trainings = trainings.Where(t => t.DateValue <= EndDatePicker.SelectedDate.Value.Date);
+
+            return trainings;
+        }
+
+        private IEnumerable<TrainingGridItem> ApplyGroupFilter(IEnumerable<TrainingGridItem> trainings, Groups selectedGroup)
+        {
+            if (selectedGroup == null || selectedGroup.ID_Group == 0)
+                return trainings;
+
+            return trainings.Where(t => t.Group == selectedGroup.Group_Name);
+        }
+
+        private IEnumerable<TrainingGridItem> ApplyCoachFilter(IEnumerable<TrainingGridItem> trainings, Users selectedCoach)
+        {
+            if (selectedCoach == null || selectedCoach.ID_User == 0)
+                return trainings;
+
+            return trainings.Where(t => t.Coach == selectedCoach.Full_Name);
+        }
+
+        private IEnumerable<TrainingGridItem> ApplyTypeFilter(IEnumerable<TrainingGridItem> trainings, Training_Types selectedType)
+        {
+            if (selectedType == null || selectedType.ID_Type == 0)
+                return trainings;
+
+            return trainings.Where(t => t.Type == selectedType.Type_Name);
+        }
+
         #endregion
 
         #region Обработчики фильтров
+
         private void DateFilter_Changed(object sender, SelectionChangedEventArgs e)
         {
             ApplyFilters();
@@ -167,49 +240,150 @@ namespace PingTrack.View.Pages
         {
             ApplyFilters();
         }
+
         #endregion
 
-        #region Обработчики DataGrid
+        #region Работа с таблицей
+
         private void TrainingsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             TrainingGridItem selectedTraining = TrainingsDataGrid.SelectedItem as TrainingGridItem;
             bool hasSelection = selectedTraining != null;
 
+            AttendanceButton.IsEnabled = hasSelection;
             EditTrainingButton.IsEnabled = hasSelection;
             DeleteTrainingButton.IsEnabled = hasSelection;
-
-            if (hasSelection)
-                SelectionInfoTextBlock.Text = $"Выбрана тренировка: {selectedTraining.Date} {selectedTraining.Time} - {selectedTraining.Group}";
-            else
-                SelectionInfoTextBlock.Text = "Выберите тренировку для редактирования или удаления";
         }
 
         private void TrainingsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (TrainingsDataGrid.SelectedItem == null)
-                return;
+            TrainingGridItem selectedTraining = TrainingsDataGrid.SelectedItem as TrainingGridItem;
 
+            if (selectedTraining != null)
+                OpenEditTrainingWindow();
+        }
+
+        #endregion
+
+        #region Посещаемость
+
+        private void AttendanceButton_Click(object sender, RoutedEventArgs e)
+        {
             TrainingGridItem selected = TrainingsDataGrid.SelectedItem as TrainingGridItem;
+
             if (selected == null)
+            {
+                Feedback.ShowWarning("Предупреждение", "Выберите тренировку для отметки посещаемости.");
                 return;
+            }
+
+            GroupAttendanceWindow window = new GroupAttendanceWindow(selected.ID_Training);
+
+            if (window.ShowDialog() == true)
+                LoadTrainings();
+        }
+
+        #endregion
+
+        #region Добавление и изменение
+
+        private void AddTrainingButton_Click(object sender, RoutedEventArgs e)
+        {
+            AddEditTrainingWindow window = new AddEditTrainingWindow();
+
+            if (window.ShowDialog() == true)
+                LoadTrainings();
+        }
+
+        private void EditTrainingButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenEditTrainingWindow();
+        }
+
+        private void OpenEditTrainingWindow()
+        {
+            TrainingGridItem selected = TrainingsDataGrid.SelectedItem as TrainingGridItem;
+
+            if (selected == null)
+            {
+                Feedback.ShowWarning("Предупреждение", "Выберите тренировку для редактирования.");
+                return;
+            }
 
             Trainings training = App.db.Trainings.FirstOrDefault(x => x.ID_Training == selected.ID_Training);
+
             if (training == null)
                 return;
 
             AddEditTrainingWindow window = new AddEditTrainingWindow(training);
+
             if (window.ShowDialog() == true)
                 LoadTrainings();
         }
+
         #endregion
 
-        #region Обработчики кнопок
-        private void AddTrainingButton_Click(object sender, RoutedEventArgs e)
+        #region Удаление
+
+        private void DeleteTrainingButton_Click(object sender, RoutedEventArgs e)
         {
-            AddEditTrainingWindow window = new AddEditTrainingWindow();
-            if (window.ShowDialog() == true)
+            TrainingGridItem selected = TrainingsDataGrid.SelectedItem as TrainingGridItem;
+
+            if (selected == null)
+            {
+                Feedback.ShowWarning("Предупреждение", "Выберите тренировку для удаления.");
+                return;
+            }
+
+            Trainings training = App.db.Trainings.FirstOrDefault(x => x.ID_Training == selected.ID_Training);
+
+            if (training == null)
+                return;
+
+            int attendanceCount = App.db.Attendance.Count(a => a.ID_Training == training.ID_Training && a.IsDeleted == false);
+
+            string warningText = attendanceCount > 0
+                ? $"К этой тренировке привязано записей посещаемости: {attendanceCount}.\nПри удалении тренировки эти записи также будут скрыты из статистики.\n\n"
+                : string.Empty;
+
+            bool confirm = Feedback.AskQuestion(
+                "Подтверждение удаления",
+                $"{warningText}Вы уверены, что хотите удалить тренировку?\n\nДата: {selected.Date}\nВремя: {selected.Time}\nГруппа: {selected.Group}");
+
+            if (!confirm)
+                return;
+
+            try
+            {
+                training.IsDeleted = true;
+
+                List<Attendance> attendanceRecords = App.db.Attendance
+                    .Where(a => a.ID_Training == training.ID_Training)
+                    .ToList();
+
+                foreach (Attendance attendance in attendanceRecords)
+                    attendance.IsDeleted = true;
+
+                App.db.SaveChanges();
+
+                ActionLogService.LogDelete(
+                    "Trainings",
+                    training.ID_Training,
+                    $"Удалена тренировка: {selected.Date} {selected.Time}, группа: {selected.Group}. Скрыто записей посещаемости: {attendanceRecords.Count}.");
+
+                Feedback.ShowSuccess("Успешно", "Тренировка успешно удалена.");
                 LoadTrainings();
+            }
+            catch (Exception ex)
+            {
+                Feedback.ShowError("Ошибка удаления", $"Не удалось удалить тренировку.\n\n{ex.Message}");
+            }
         }
+
+        #endregion
+
+        #region Экспорт и обновление
+
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
             if (allTrainings == null || allTrainings.Count == 0)
@@ -218,7 +392,7 @@ namespace PingTrack.View.Pages
                 return;
             }
 
-            List<int> trainingIds = allTrainings.Select(t => t.ID_Training).ToList();
+            List<int> trainingIds = GetDisplayedTrainingIds();
 
             List<Trainings> trainingsToExport = App.db.Trainings
                 .Include("Groups")
@@ -230,65 +404,12 @@ namespace PingTrack.View.Pages
             ExportService.ExportTrainingsToText(trainingsToExport);
         }
 
-        private void EditTrainingButton_Click(object sender, RoutedEventArgs e)
+        private List<int> GetDisplayedTrainingIds()
         {
-            if (TrainingsDataGrid.SelectedItem == null)
-            {
-                Feedback.ShowWarning("Предупреждение", "Выберите тренировку для редактирования.");
-                return;
-            }
-
-            TrainingGridItem selected = TrainingsDataGrid.SelectedItem as TrainingGridItem;
-            if (selected == null)
-                return;
-
-            Trainings training = App.db.Trainings.FirstOrDefault(x => x.ID_Training == selected.ID_Training);
-            if (training == null)
-                return;
-
-            AddEditTrainingWindow window = new AddEditTrainingWindow(training);
-            if (window.ShowDialog() == true)
-                LoadTrainings();
-        }
-
-        private void DeleteTrainingButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (TrainingsDataGrid.SelectedItem == null)
-            {
-                Feedback.ShowWarning("Предупреждение", "Выберите тренировку для удаления.");
-                return;
-            }
-
-            TrainingGridItem selected = TrainingsDataGrid.SelectedItem as TrainingGridItem;
-            if (selected == null)
-                return;
-
-            Trainings training = App.db.Trainings.FirstOrDefault(x => x.ID_Training == selected.ID_Training);
-            if (training == null)
-                return;
-
-            int attendanceCount = App.db.Attendance.Count(a => a.ID_Training == training.ID_Training);
-            string warningText = attendanceCount > 0
-                ? $"К этой тренировке привязано записей посещаемости: {attendanceCount}.\nПри удалении тренировки эти записи также будут удалены!\n\n"
-                : "";
-
-            bool confirm = Feedback.AskQuestion("Подтверждение удаления",
-                $"{warningText}Вы уверены, что хотите удалить тренировку?\n\nДата: {selected.Date}\nВремя: {selected.Time}\nГруппа: {selected.Group}\n\nЭто действие нельзя отменить.");
-
-            if (!confirm)
-                return;
-
-            try
-            {
-                App.db.Trainings.Remove(training);
-                App.db.SaveChanges();
-                Feedback.ShowSuccess("Успешно", "Тренировка успешно удалена.");
-                LoadTrainings();
-            }
-            catch (Exception ex)
-            {
-                Feedback.ShowError("Ошибка удаления", $"Не удалось удалить тренировку.\n\n{ex.Message}");
-            }
+            return TrainingsDataGrid.Items
+                .Cast<TrainingGridItem>()
+                .Select(t => t.ID_Training)
+                .ToList();
         }
 
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
@@ -296,6 +417,23 @@ namespace PingTrack.View.Pages
             LoadTrainings();
             Feedback.ShowInfo("Обновление", "Расписание тренировок обновлено.");
         }
+
         #endregion
     }
+
+    #region Модели отображения
+
+    public sealed class TrainingGridItem
+    {
+        public int ID_Training { get; set; }
+        public DateTime DateValue { get; set; }
+        public string Date { get; set; }
+        public string Time { get; set; }
+        public string Group { get; set; }
+        public string Coach { get; set; }
+        public string Type { get; set; }
+        public string Note { get; set; }
+    }
+
+    #endregion
 }

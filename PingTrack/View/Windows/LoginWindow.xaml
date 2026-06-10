@@ -7,8 +7,9 @@
         mc:Ignorable="d"
         Title="PingTrack — Авторизация"
         WindowStartupLocation="CenterScreen"
-        Width="440" Height="620"
-        Background="White"
+        Width="440"
+        Height="620"
+        Background="{StaticResource PanelBrush}"
         ResizeMode="NoResize">
 
     <Grid>
@@ -28,19 +29,25 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="50"/>
         </Grid.ColumnDefinitions>
-        <Viewbox Grid.Row="1" Grid.Column="1"
+
+        <Viewbox Grid.Row="1"
+                 Grid.Column="1"
                  Height="120"
                  HorizontalAlignment="Center">
             <Image Source="/Resources/Images/logo.png"
                    RenderOptions.BitmapScalingMode="HighQuality"/>
         </Viewbox>
-        <TextBlock Grid.Row="3" Grid.Column="1"
+
+        <TextBlock Grid.Row="3"
+                   Grid.Column="1"
                    Text="Вход в систему"
                    FontSize="20"
                    FontWeight="Bold"
-                   Foreground="#1F2937"
+                   Foreground="{StaticResource TextBrush}"
                    HorizontalAlignment="Center"/>
-        <Border Grid.Row="5" Grid.Column="1"
+
+        <Border Grid.Row="5"
+                Grid.Column="1"
                 Background="#F9FAFB"
                 CornerRadius="12">
             <Grid>
@@ -64,17 +71,19 @@
                     <ColumnDefinition Width="25"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Row="1" Grid.Column="1"
+                <TextBlock Grid.Row="1"
+                           Grid.Column="1"
                            Text="Логин"
                            FontSize="13"
                            FontWeight="SemiBold"
-                           Foreground="#374151"/>
+                           Foreground="{StaticResource TextBrush}"/>
 
-                <Border Grid.Row="3" Grid.Column="1"
-                        BorderBrush="#D1D5DB"
+                <Border Grid.Row="3"
+                        Grid.Column="1"
+                        BorderBrush="{StaticResource StrokeStrongBrush}"
                         BorderThickness="1"
                         CornerRadius="8"
-                        Background="White"
+                        Background="{StaticResource PanelBrush}"
                         Height="44">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -83,26 +92,29 @@
                             <ColumnDefinition Width="12"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBox Grid.Column="1"
-                                 x:Name="LoginTextBox"
+                        <TextBox x:Name="LoginTextBox"
+                                 Grid.Column="1"
                                  FontSize="15"
                                  BorderThickness="0"
                                  Background="Transparent"
                                  VerticalContentAlignment="Center"
-                                 Foreground="#1F2937"/>
+                                 Foreground="{StaticResource TextBrush}"/>
                     </Grid>
                 </Border>
-                <TextBlock Grid.Row="5" Grid.Column="1"
+
+                <TextBlock Grid.Row="5"
+                           Grid.Column="1"
                            Text="Пароль"
                            FontSize="13"
                            FontWeight="SemiBold"
-                           Foreground="#374151"/>
+                           Foreground="{StaticResource TextBrush}"/>
 
-                <Border Grid.Row="7" Grid.Column="1"
-                        BorderBrush="#D1D5DB"
+                <Border Grid.Row="7"
+                        Grid.Column="1"
+                        BorderBrush="{StaticResource StrokeStrongBrush}"
                         BorderThickness="1"
                         CornerRadius="8"
-                        Background="White"
+                        Background="{StaticResource PanelBrush}"
                         Height="44">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -111,39 +123,42 @@
                             <ColumnDefinition Width="44"/>
                         </Grid.ColumnDefinitions>
 
-                        <PasswordBox Grid.Column="1"
-                                     x:Name="PasswordBox"
+                        <PasswordBox x:Name="PasswordBox"
+                                     Grid.Column="1"
                                      FontSize="15"
                                      BorderThickness="0"
                                      Background="Transparent"
                                      VerticalContentAlignment="Center"
-                                     Foreground="#1F2937"/>
+                                     Foreground="{StaticResource TextBrush}"/>
 
-                        <TextBox Grid.Column="1"
-                                 x:Name="VisiblePasswordBox"
+                        <TextBox x:Name="VisiblePasswordBox"
+                                 Grid.Column="1"
                                  FontSize="15"
                                  BorderThickness="0"
                                  Background="Transparent"
                                  VerticalContentAlignment="Center"
-                                 Foreground="#1F2937"
+                                 Foreground="{StaticResource TextBrush}"
                                  Visibility="Collapsed"/>
 
-                        <Button Grid.Column="2"
-                                x:Name="TogglePasswordButton"
+                        <Button x:Name="TogglePasswordButton"
+                                Grid.Column="2"
                                 Width="44"
                                 Background="Transparent"
                                 BorderThickness="0"
                                 Cursor="Hand"
                                 Click="TogglePasswordButton_Click">
-                            <Image x:Name="EyeIcon" 
-                                   Source="/Resources/Images/eye_closed.png" 
-                                   Width="20" Height="20" 
+                            <Image x:Name="EyeIcon"
+                                   Source="/Resources/Images/eye_closed.png"
+                                   Width="20"
+                                   Height="20"
                                    Opacity="0.6"/>
                         </Button>
                     </Grid>
                 </Border>
+
                 <TextBlock x:Name="CapsLockWarning"
-                           Grid.Row="8" Grid.Column="1"
+                           Grid.Row="8"
+                           Grid.Column="1"
                            Text="Включен Caps Lock"
                            Foreground="#EF4444"
                            FontSize="12"
@@ -152,48 +167,24 @@
                            Margin="0,2,0,0"
                            Visibility="Collapsed"/>
 
-                <Button Grid.Row="9" Grid.Column="1"
-                        x:Name="LoginButton"
-                        Content="Войти в систему"
-                        Height="46"
-                        FontSize="15"
-                        FontWeight="Bold"
-                        Foreground="White"
-                        Background="{StaticResource PrimaryBrush}"
-                        BorderThickness="0"
-                        Cursor="Hand"
-                        Click="LoginButton_Click">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border x:Name="border"
-                                                Background="{TemplateBinding Background}"
-                                                CornerRadius="8">
-                                            <ContentPresenter HorizontalAlignment="Center"
-                                                              VerticalAlignment="Center"/>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="border" Property="Opacity" Value="0.9"/>
-                                            </Trigger>
-                                            <Trigger Property="IsPressed" Value="True">
-                                                <Setter TargetName="border" Property="Opacity" Value="0.8"/>
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </Button.Style>
-                </Button>
+                <Button x:Name="LoginButton"
+        Grid.Row="9"
+        Grid.Column="1"
+        Content="Войти в систему"
+        Style="{StaticResource PrimaryButton}"
+        Height="46"
+        FontSize="15"
+        FontWeight="Bold"
+        IsDefault="True"
+        Click="LoginButton_Click"/>
             </Grid>
         </Border>
-        <TextBlock Grid.Row="7" Grid.Column="1"
+
+        <TextBlock Grid.Row="7"
+                   Grid.Column="1"
                    Text="© 2026 PingTrack. Все права защищены."
                    FontSize="11"
-                   Foreground="#9CA3AF"
+                   Foreground="{StaticResource TextMutedBrush}"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"/>
     </Grid>
