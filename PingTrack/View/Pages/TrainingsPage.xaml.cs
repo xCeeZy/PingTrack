@@ -61,7 +61,6 @@ namespace PingTrack.View.Pages
         private void InitializeGroupFilter()
         {
             List<Groups> groups = App.db.Groups
-                .Where(g => g.IsDeleted == false)
                 .OrderBy(g => g.Group_Name)
                 .ToList();
 
@@ -85,7 +84,7 @@ namespace PingTrack.View.Pages
         {
             List<Users> coaches = App.db.Users
                 .Include("Roles")
-                .Where(u => u.Roles.Role_Name == "Тренер" && u.IsDeleted == false)
+                .Where(u => u.Roles.Role_Name == "Тренер")
                 .OrderBy(u => u.Full_Name)
                 .ToList();
 
@@ -137,9 +136,8 @@ namespace PingTrack.View.Pages
                 .Include("Groups")
                 .Include("Users")
                 .Include("Training_Types")
-                .Where(t => t.IsDeleted == false)
                 .ToList()
-                .OrderByDescending(t => t.Date)
+                .OrderBy(t => t.Date)
                 .ThenBy(t => t.Time)
                 .Select(t => new TrainingGridItem
                 {
@@ -277,7 +275,7 @@ namespace PingTrack.View.Pages
                 return;
             }
 
-            GroupAttendanceWindow window = new GroupAttendanceWindow(selected.ID_Training);
+            AddEditAttendanceWindow window = new AddEditAttendanceWindow(selected.ID_Training);
 
             if (window.ShowDialog() == true)
                 LoadTrainings();
@@ -340,10 +338,10 @@ namespace PingTrack.View.Pages
             if (training == null)
                 return;
 
-            int attendanceCount = App.db.Attendance.Count(a => a.ID_Training == training.ID_Training && a.IsDeleted == false);
+            int attendanceCount = App.db.Attendance.Count(a => a.ID_Training == training.ID_Training);
 
             string warningText = attendanceCount > 0
-                ? $"К этой тренировке привязано записей посещаемости: {attendanceCount}.\nПри удалении тренировки эти записи также будут скрыты из статистики.\n\n"
+                ? $"К этой тренировке привязано записей посещаемости: {attendanceCount}.\nПри удалении тренировки эти записи также будут полностью удалены из базы данных.\n\n"
                 : string.Empty;
 
             bool confirm = Feedback.AskQuestion(
@@ -355,21 +353,17 @@ namespace PingTrack.View.Pages
 
             try
             {
-                training.IsDeleted = true;
+                if (attendanceCount > 0)
+                {
+                    var attendanceRecords = App.db.Attendance.Where(a => a.ID_Training == training.ID_Training).ToList();
+                    foreach (var record in attendanceRecords)
+                    {
+                        App.db.Attendance.Remove(record);
+                    }
+                }
 
-                List<Attendance> attendanceRecords = App.db.Attendance
-                    .Where(a => a.ID_Training == training.ID_Training)
-                    .ToList();
-
-                foreach (Attendance attendance in attendanceRecords)
-                    attendance.IsDeleted = true;
-
+                App.db.Trainings.Remove(training);
                 App.db.SaveChanges();
-
-                ActionLogService.LogDelete(
-                    "Trainings",
-                    training.ID_Training,
-                    $"Удалена тренировка: {selected.Date} {selected.Time}, группа: {selected.Group}. Скрыто записей посещаемости: {attendanceRecords.Count}.");
 
                 Feedback.ShowSuccess("Успешно", "Тренировка успешно удалена.");
                 LoadTrainings();

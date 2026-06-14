@@ -19,11 +19,37 @@ namespace PingTrack.View.Windows
     public partial class AddEditAttendanceWindow : Window
     {
         #region Поля
+
         private Attendance currentAttendance;
         private readonly string userRole;
+
         #endregion
 
         #region Конструкторы
+
+        public AddEditAttendanceWindow(int trainingId)
+        {
+            InitializeComponent();
+
+            userRole = string.Empty;
+
+            PlayerComboBox.ItemsSource = App.db.Players.ToList();
+
+            TrainingComboBox.ItemsSource = App.db.Trainings
+                .ToList()
+                .Select(t => new
+                {
+                    t.ID_Training,
+                    TrainingDisplay = t.Date.ToString("dd.MM.yyyy") + " " +
+                                      t.Time.ToString(@"hh\:mm") + " (" +
+                                      (t.Groups != null ? t.Groups.Group_Name : "-") + ")"
+                })
+                .ToList();
+
+            TrainingComboBox.SelectedValue = trainingId;
+            TrainingComboBox.IsEnabled = false;
+        }
+
         public AddEditAttendanceWindow(string role) : this(role, null) { }
 
         public AddEditAttendanceWindow(string role, Attendance attendance)
@@ -35,15 +61,15 @@ namespace PingTrack.View.Windows
             PlayerComboBox.ItemsSource = App.db.Players.ToList();
 
             TrainingComboBox.ItemsSource = App.db.Trainings
-    .ToList()
-    .Select(t => new
-    {
-        t.ID_Training,
-        TrainingDisplay = t.Date.ToString("dd.MM.yyyy") + " " +
-                          t.Time.ToString(@"hh\:mm") + " (" +
-                          (t.Groups != null ? t.Groups.Group_Name : "-") + ")"
-    })
-    .ToList();
+                .ToList()
+                .Select(t => new
+                {
+                    t.ID_Training,
+                    TrainingDisplay = t.Date.ToString("dd.MM.yyyy") + " " +
+                                      t.Time.ToString(@"hh\:mm") + " (" +
+                                      (t.Groups != null ? t.Groups.Group_Name : "-") + ")"
+                })
+                .ToList();
 
             if (attendance != null)
             {
@@ -54,9 +80,11 @@ namespace PingTrack.View.Windows
                 ScoreBox.Text = attendance.Score.HasValue ? attendance.Score.Value.ToString() : string.Empty;
             }
         }
+
         #endregion
 
         #region Проверка роли
+
         public bool CanOpenForRole()
         {
             if (userRole == "Игрок")
@@ -66,9 +94,11 @@ namespace PingTrack.View.Windows
             }
             return true;
         }
+
         #endregion
 
         #region Сохранение данных
+
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (PlayerComboBox.SelectedValue == null || TrainingComboBox.SelectedValue == null)
@@ -81,10 +111,14 @@ namespace PingTrack.View.Windows
             int trainingId = (int)TrainingComboBox.SelectedValue;
 
             Attendance existing = App.db.Attendance.FirstOrDefault(a => a.ID_Player == playerId && a.ID_Training == trainingId);
-            if (existing != null && currentAttendance == null)
+
+            if (existing != null)
             {
-                Feedback.ShowError("Ошибка", "Этот игрок уже отмечен на выбранной тренировке.");
-                return;
+                if (currentAttendance == null || currentAttendance.ID_Record != existing.ID_Record)
+                {
+                    Feedback.ShowError("Ошибка", "Этот игрок уже отмечен на выбранной тренировке.");
+                    return;
+                }
             }
 
             bool isPresent = IsPresentCheckBox.IsChecked == true;
@@ -92,7 +126,9 @@ namespace PingTrack.View.Windows
             int parsed;
             if (int.TryParse(ScoreBox.Text, out parsed)) score = parsed;
 
-            if (currentAttendance == null)
+            bool isNew = currentAttendance == null;
+
+            if (isNew)
             {
                 currentAttendance = new Attendance
                 {
@@ -117,18 +153,30 @@ namespace PingTrack.View.Windows
                 Feedback.ShowSuccess("Успешно", "Изменения успешно сохранены.");
                 DialogResult = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Feedback.ShowError("Ошибка", "Не удалось сохранить изменения. Проверьте данные.");
+                if (isNew)
+                {
+                    App.db.Attendance.Remove(currentAttendance);
+                }
+                else
+                {
+                    App.db.Entry(currentAttendance).Reload();
+                }
+
+                Feedback.ShowError("Ошибка", $"Не удалось сохранить изменения.\n{ex.Message}");
             }
         }
+
         #endregion
 
         #region Отмена
+
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
         }
+
         #endregion
     }
 }
