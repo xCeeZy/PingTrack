@@ -30,21 +30,8 @@ namespace PingTrack.View.Windows
         public AddEditAttendanceWindow(int trainingId)
         {
             InitializeComponent();
-
             userRole = string.Empty;
-
-            PlayerComboBox.ItemsSource = App.db.Players.ToList();
-
-            TrainingComboBox.ItemsSource = App.db.Trainings
-                .ToList()
-                .Select(t => new
-                {
-                    t.ID_Training,
-                    TrainingDisplay = t.Date.ToString("dd.MM.yyyy") + " " +
-                                      t.Time.ToString(@"hh\:mm") + " (" +
-                                      (t.Groups != null ? t.Groups.Group_Name : "-") + ")"
-                })
-                .ToList();
+            InitializeComboBoxData();
 
             TrainingComboBox.SelectedValue = trainingId;
             TrainingComboBox.IsEnabled = false;
@@ -57,7 +44,24 @@ namespace PingTrack.View.Windows
             InitializeComponent();
             userRole = role;
             currentAttendance = attendance;
+            InitializeComboBoxData();
 
+            if (attendance != null)
+            {
+                Title = "Редактирование отметки";
+                PlayerComboBox.SelectedValue = attendance.ID_Player;
+                TrainingComboBox.SelectedValue = attendance.ID_Training;
+                IsPresentCheckBox.IsChecked = attendance.Is_Present;
+                ScoreBox.Text = attendance.Score.HasValue ? attendance.Score.Value.ToString() : string.Empty;
+            }
+        }
+
+        #endregion
+
+        #region Инициализация
+
+        private void InitializeComboBoxData()
+        {
             PlayerComboBox.ItemsSource = App.db.Players.ToList();
 
             TrainingComboBox.ItemsSource = App.db.Trainings
@@ -71,14 +75,8 @@ namespace PingTrack.View.Windows
                 })
                 .ToList();
 
-            if (attendance != null)
-            {
-                Title = "Редактирование отметки";
-                PlayerComboBox.SelectedValue = attendance.ID_Player;
-                TrainingComboBox.SelectedValue = attendance.ID_Training;
-                IsPresentCheckBox.IsChecked = attendance.Is_Present;
-                ScoreBox.Text = attendance.Score.HasValue ? attendance.Score.Value.ToString() : string.Empty;
-            }
+            TrainingComboBox.DisplayMemberPath = "TrainingDisplay";
+            TrainingComboBox.SelectedValuePath = "ID_Training";
         }
 
         #endregion

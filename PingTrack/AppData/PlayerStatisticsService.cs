@@ -10,6 +10,7 @@ namespace PingTrack.AppData
     public static class PlayerStatisticsService
     {
         #region Детальная статистика игрока
+
         public static PlayerDetailedStats GetPlayerStats(int playerId, DateTime startDate, DateTime endDate)
         {
             Players player = App.db.Players
@@ -25,7 +26,8 @@ namespace PingTrack.AppData
                 .Where(a => a.ID_Player == playerId
                        && a.Trainings.Date >= startDate
                        && a.Trainings.Date <= endDate)
-                .OrderBy(a => a.Trainings.Date)
+                .ToList()
+                .OrderBy(a => a.Trainings.Date.Add(a.Trainings.Time))
                 .ToList();
 
             int totalTrainings = attendances.Count;
@@ -63,7 +65,7 @@ namespace PingTrack.AppData
             return new PlayerDetailedStats
             {
                 PlayerName = player.Full_Name,
-                GroupName = player.Groups.Group_Name,
+                GroupName = player.Groups != null ? player.Groups.Group_Name : "-",
                 TotalTrainings = totalTrainings,
                 AttendedTrainings = attendedTrainings,
                 AttendancePercent = attendancePercent,
@@ -80,7 +82,7 @@ namespace PingTrack.AppData
             int bestStreak = 0;
             int currentStreak = 0;
 
-            foreach (Attendance att in attendances.OrderBy(a => a.Trainings.Date))
+            foreach (Attendance att in attendances.OrderBy(a => a.Trainings.Date.Add(a.Trainings.Time)))
             {
                 if (att.Is_Present)
                 {
@@ -101,7 +103,7 @@ namespace PingTrack.AppData
         {
             int currentStreak = 0;
 
-            foreach (Attendance att in attendances.OrderByDescending(a => a.Trainings.Date))
+            foreach (Attendance att in attendances.OrderByDescending(a => a.Trainings.Date.Add(a.Trainings.Time)))
             {
                 if (att.Is_Present)
                     currentStreak++;
@@ -111,17 +113,21 @@ namespace PingTrack.AppData
 
             return currentStreak;
         }
+
         #endregion
 
         #region Список игроков в зоне риска
+
         public static List<PlayerRiskInfo> GetAtRiskPlayers()
         {
             return RiskAnalysisService.GetAtRiskPlayers();
         }
+
         #endregion
     }
 
     #region Классы данных
+
     public class PlayerDetailedStats
     {
         public string PlayerName { get; set; }
@@ -135,5 +141,6 @@ namespace PingTrack.AppData
         public DateTime LastAttendance { get; set; }
         public List<string> PreferredTrainingTypes { get; set; }
     }
+
     #endregion
 }

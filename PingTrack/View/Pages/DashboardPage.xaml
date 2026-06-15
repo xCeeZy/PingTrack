@@ -11,7 +11,6 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid>
-            <!--#region Основная структура-->
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="20"/>
@@ -30,9 +29,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="30"/>
             </Grid.ColumnDefinitions>
-            <!--#endregion-->
 
-            <!--#region Заголовок страницы-->
             <Border Grid.Row="0" Grid.Column="1"
                     Style="{StaticResource Card}">
                 <Grid>
@@ -88,7 +85,6 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!--#region Карточка: Игроки-->
                 <Border Grid.Column="0" Style="{StaticResource Card}">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -126,9 +122,7 @@
                         </StackPanel>
                     </Grid>
                 </Border>
-                <!--#endregion-->
 
-                <!--#region Карточка: Группы-->
                 <Border Grid.Column="2" Style="{StaticResource Card}">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -166,9 +160,7 @@
                         </StackPanel>
                     </Grid>
                 </Border>
-                <!--#endregion-->
 
-                <!--#region Карточка: Ближайшие тренировки-->
                 <Border Grid.Column="4" Style="{StaticResource Card}">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -206,9 +198,7 @@
                         </StackPanel>
                     </Grid>
                 </Border>
-                <!--#endregion-->
 
-                <!--#region Карточка: Посещаемость-->
                 <Border Grid.Column="6" Style="{StaticResource Card}">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -246,11 +236,8 @@
                         </StackPanel>
                     </Grid>
                 </Border>
-                <!--#endregion-->
             </Grid>
-            <!--#endregion-->
 
-            <!--#region Последние тренировки-->
             <Border Grid.Row="4" Grid.Column="1"
                     Style="{StaticResource Card}">
                 <Grid>
@@ -259,7 +246,6 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!--#region Заголовок таблицы-->
                     <Border Grid.Row="0"
                             Background="#FFF8F9FA"
                             BorderBrush="{StaticResource StrokeBrush}"
@@ -279,17 +265,17 @@
                                        VerticalAlignment="Center"/>
                         </Grid>
                     </Border>
-                    <!--#endregion-->
 
-                    <!--#region DataGrid-->
+                  
                     <DataGrid Grid.Row="1"
                               x:Name="RecentTrainingsGrid"
                               AutoGenerateColumns="False">
 
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Дата и время" 
-                                                Binding="{Binding DateTime}" 
-                                                Width="160"/>
+                            <DataGridTextColumn Header="Дата и время"
+                    Binding="{Binding DateTime}"
+                    SortMemberPath="TrainingDateTime"
+                    Width="160"/>
 
                             <DataGridTextColumn Header="Группа" 
                                                 Binding="{Binding Group}" 
@@ -335,12 +321,9 @@
                             </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <!--#endregion-->
                 </Grid>
             </Border>
-            <!--#endregion-->
 
-            <!--#region Игроки в зоне риска-->
             <Border Grid.Row="6" Grid.Column="1"
                     Style="{StaticResource Card}">
                 <Grid>
@@ -349,7 +332,6 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!--#region Заголовок-->
                     <Border Grid.Row="0"
                             Background="#FFF8F9FA"
                             BorderBrush="{StaticResource StrokeBrush}"
@@ -369,9 +351,7 @@
                                        VerticalAlignment="Center"/>
                         </Grid>
                     </Border>
-                    <!--#endregion-->
 
-                    <!--#region DataGrid-->
                     <DataGrid Grid.Row="1"
                               x:Name="RiskPlayersGrid"
                               AutoGenerateColumns="False">
@@ -399,12 +379,9 @@
                                                 Width="200"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <!--#endregion-->
                 </Grid>
             </Border>
-            <!--#endregion-->
 
-            <!--#region График посещаемости-->
             <Border Grid.Row="8" Grid.Column="1"
                     Style="{StaticResource Card}">
                 <Grid>
@@ -419,7 +396,6 @@
                         <ColumnDefinition Width="20"/>
                     </Grid.ColumnDefinitions>
 
-                    <!--#region Заголовок-->
                     <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
                             Background="#FFF8F9FA"
                             BorderBrush="{StaticResource StrokeBrush}"
@@ -439,9 +415,7 @@
                                        VerticalAlignment="Center"/>
                         </Grid>
                     </Border>
-                    <!--#endregion-->
 
-                    <!--#region Область графика-->
                     <ScrollViewer Grid.Row="1" Grid.Column="1"
                                   VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Disabled">
@@ -506,10 +480,8 @@
                             </ItemsControl>
                         </Grid>
                     </ScrollViewer>
-                    <!--#endregion-->
                 </Grid>
             </Border>
-            <!--#endregion-->
         </Grid>
     </ScrollViewer>
 </Page>

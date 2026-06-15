@@ -1,4 +1,5 @@
-﻿using PingTrack.AppData;
+﻿using PingTrack;
+using PingTrack.AppData;
 using PingTrack.Model;
 using PingTrack.View.Windows;
 using System;
@@ -15,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml.Linq;
 
 namespace PingTrack.View.Pages
 {
@@ -138,12 +140,15 @@ namespace PingTrack.View.Pages
                 .Select(a => new JournalGridItem
                 {
                     ID_Record = a.ID_Record,
-                    DateValue = a.Trainings != null ? a.Trainings.Date.Date : DateTime.MinValue,
+                    ID_Training = a.ID_Training,
+                    RawDate = a.Trainings != null ? a.Trainings.Date.Date : DateTime.MinValue,
                     Date = a.Trainings != null ? a.Trainings.Date.ToString("dd.MM.yyyy") : "-",
-                    Player = a.Players != null ? a.Players.Full_Name : "-",
-                    Group = a.Players != null && a.Players.Groups != null ? a.Players.Groups.Group_Name : "-",
+                    Time = a.Trainings != null ? a.Trainings.Time.ToString(@"hh\:mm") : "-",
+                    PlayerName = a.Players != null ? a.Players.Full_Name : "-",
+                    GroupName = a.Players != null && a.Players.Groups != null ? a.Players.Groups.Group_Name : "-",
                     Training = a.Trainings != null && a.Trainings.Training_Types != null ? a.Trainings.Training_Types.Type_Name : "-",
-                    IsPresent = a.Is_Present
+                    IsPresent = a.Is_Present,
+                    Score = a.Score.HasValue ? a.Score.Value.ToString() : "-"
                 })
                 .ToList();
 
@@ -190,7 +195,7 @@ namespace PingTrack.View.Pages
             if (selectedGroup == null || selectedGroup.ID_Group == 0)
                 return records;
 
-            return records.Where(r => r.Group == selectedGroup.Group_Name);
+            return records.Where(r => r.GroupName == selectedGroup.Group_Name);
         }
 
         private IEnumerable<JournalGridItem> ApplyPresenceFilter(IEnumerable<JournalGridItem> records, FilterOption selectedPresence)
@@ -205,10 +210,10 @@ namespace PingTrack.View.Pages
         private IEnumerable<JournalGridItem> ApplyDateFilter(IEnumerable<JournalGridItem> records, DateTime? startDate, DateTime? endDate)
         {
             if (startDate.HasValue)
-                records = records.Where(r => r.DateValue.Date >= startDate.Value.Date);
+                records = records.Where(r => r.RawDate.Date >= startDate.Value.Date);
 
             if (endDate.HasValue)
-                records = records.Where(r => r.DateValue.Date <= endDate.Value.Date);
+                records = records.Where(r => r.RawDate.Date <= endDate.Value.Date);
 
             return records;
         }
@@ -218,7 +223,7 @@ namespace PingTrack.View.Pages
             if (string.IsNullOrWhiteSpace(searchText) || searchText == "поиск по игроку")
                 return records;
 
-            return records.Where(r => r.Player.ToLower().Contains(searchText));
+            return records.Where(r => r.PlayerName.ToLower().Contains(searchText));
         }
 
         #endregion
@@ -344,7 +349,7 @@ namespace PingTrack.View.Pages
 
             bool confirm = Feedback.AskQuestion(
                 "Подтверждение удаления",
-                $"Вы уверены, что хотите удалить запись о посещении?\n\nИгрок: {selected.Player}\nДата: {selected.Date}\n\nОна будет скрыта из статистики, но сохранится в логах.");
+                $"Вы уверены, что хотите удалить запись о посещении?\n\nИгрок: {selected.PlayerName}\nДата: {selected.Date}\n\nОна будет скрыта из статистики, но сохранится в логах.");
 
             if (!confirm)
                 return;
@@ -357,7 +362,7 @@ namespace PingTrack.View.Pages
                 ActionLogService.LogDelete(
                     "Attendance",
                     record.ID_Record,
-                    $"Удалена запись посещаемости. Игрок: {selected.Player}, дата: {selected.Date}, статус: {selected.PresenceText}.");
+                    $"Удалена запись посещаемости. Игрок: {selected.PlayerName}, дата: {selected.Date}, статус: {selected.PresenceText}.");
 
                 Feedback.ShowSuccess("Успешно", "Запись успешно удалена.");
                 LoadJournal();
@@ -388,12 +393,15 @@ namespace PingTrack.View.Pages
     public class JournalGridItem
     {
         public int ID_Record { get; set; }
-        public DateTime DateValue { get; set; }
+        public int ID_Training { get; set; }
+        public DateTime RawDate { get; set; }
         public string Date { get; set; }
-        public string Player { get; set; }
-        public string Group { get; set; }
+        public string Time { get; set; }
+        public string PlayerName { get; set; }
+        public string GroupName { get; set; }
         public string Training { get; set; }
         public bool IsPresent { get; set; }
+        public string Score { get; set; }
 
         public string PresenceText
         {

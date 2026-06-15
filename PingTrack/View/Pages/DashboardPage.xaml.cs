@@ -52,8 +52,13 @@ namespace PingTrack.View.Pages
             int groupsCount = App.db.Groups.Count(g => g.IsDeleted == false);
             GroupsCountText.Text = groupsCount.ToString();
 
-            DateTime today = DateTime.Now.Date;
-            int upcomingTrainings = App.db.Trainings.Count(t => t.Date >= today && t.IsDeleted == false);
+            DateTime now = DateTime.Now;
+
+            int upcomingTrainings = App.db.Trainings
+                .ToList()
+                .Count(t =>
+                    t.IsDeleted == false &&
+                    t.Date.Add(t.Time) >= now);
             UpcomingTrainingsText.Text = upcomingTrainings.ToString();
 
             int totalAttendance = App.db.Attendance.Count(a => a.IsDeleted == false);
@@ -84,6 +89,7 @@ namespace PingTrack.View.Pages
                 .ToList()
                 .Select(t => new TrainingDashboardItem
                 {
+                    TrainingDateTime = t.Date.Add(t.Time),
                     DateTime = string.Format("{0:dd.MM.yyyy} {1:hh\\:mm}", t.Date, t.Time),
                     Group = t.Groups?.Group_Name ?? "-",
                     Type = t.Training_Types?.Type_Name ?? "-",
@@ -193,6 +199,7 @@ namespace PingTrack.View.Pages
 
     public class TrainingDashboardItem
     {
+        public DateTime TrainingDateTime { get; set; }
         public string DateTime { get; set; }
         public string Group { get; set; }
         public string Type { get; set; }

@@ -224,26 +224,27 @@
                           SelectionChanged="JournalDataGrid_SelectionChanged">
 
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Дата"
-                                            Binding="{Binding Date}"
-                                            Width="120"/>
+                        <DataGridTextColumn Header="Дата" 
+                        Binding="{Binding Date}" 
+                        SortMemberPath="RawDate" 
+                        Width="110"/>
 
                         <DataGridTextColumn Header="Игрок"
-                                            Binding="{Binding Player}"
-                                            Width="*"
-                                            MinWidth="180"/>
+                        Binding="{Binding PlayerName}"
+                        Width="*"
+                        MinWidth="180"/>
 
                         <DataGridTextColumn Header="Группа"
-                                            Binding="{Binding Group}"
-                                            Width="150"/>
+                        Binding="{Binding GroupName}"
+                        Width="150"/>
 
                         <DataGridTextColumn Header="Тип тренировки"
-                                            Binding="{Binding Training}"
-                                            Width="180"/>
+                        Binding="{Binding Training}"
+                        Width="180"/>
 
                         <DataGridTextColumn Header="Присутствие"
-                                            Binding="{Binding PresenceText}"
-                                            Width="150">
+                        Binding="{Binding PresenceText}"
+                        Width="150">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Center"/>

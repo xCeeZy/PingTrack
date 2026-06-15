@@ -216,9 +216,9 @@
 
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Дата"
-                                            Binding="{Binding Date}"
-                                            SortMemberPath="DateValue"
-                                            Width="110"/>
+                    Binding="{Binding Date}"
+                    SortMemberPath="DateValue"
+                    Width="110"/>
 
                         <DataGridTextColumn Header="Время"
                                             Binding="{Binding Time}"

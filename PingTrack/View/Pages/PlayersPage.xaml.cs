@@ -22,9 +22,11 @@ namespace PingTrack.View.Pages
     public partial class PlayersPage : Page
     {
         #region Поля
+
         private PaginationService<PlayerGridItem> pagination;
         private List<PlayerGridItem> allPlayers;
         private bool isInitialized = false;
+
         #endregion
 
         #region Конструктор
@@ -45,19 +47,23 @@ namespace PingTrack.View.Pages
         #endregion
 
         #region Инициализация фильтров
+
         private void InitializeFilters()
         {
-            List<Groups> groups = App.db.Groups.OrderBy(g => g.Group_Name).ToList();
+            List<Groups> groups = App.db.Groups.Where(g => g.IsDeleted == false).OrderBy(g => g.Group_Name).ToList();
             Groups allGroupsOption = new Groups { ID_Group = 0, Group_Name = "Все группы" };
             groups.Insert(0, allGroupsOption);
+
             GroupFilter.ItemsSource = groups;
             GroupFilter.DisplayMemberPath = "Group_Name";
             GroupFilter.SelectedIndex = 0;
             GroupFilter.SelectionChanged += Filter_SelectionChanged;
         }
+
         #endregion
 
         #region Загрузка данных
+
         private void LoadPlayers()
         {
             allPlayers = App.db.Players
@@ -99,9 +105,11 @@ namespace PingTrack.View.Pages
             else
                 CountTextBlock.Text = $"Показано: {displayedCount} из {totalCount}";
         }
+
         #endregion
 
         #region Фильтрация
+
         private void ApplyFilters()
         {
             if (!isInitialized || allPlayers == null)
@@ -126,9 +134,11 @@ namespace PingTrack.View.Pages
             UpdatePage();
             UpdateCountDisplay();
         }
+
         #endregion
 
         #region Обработчики событий поиска и фильтров
+
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             ApplyFilters();
@@ -138,7 +148,7 @@ namespace PingTrack.View.Pages
         {
             if (SearchBox.Text == "Поиск по ФИО или телефону")
             {
-                SearchBox.Text = "";
+                SearchBox.Text = string.Empty;
                 SearchBox.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1F2937"));
             }
         }
@@ -156,9 +166,11 @@ namespace PingTrack.View.Pages
         {
             ApplyFilters();
         }
+
         #endregion
 
         #region Пагинация
+
         private void UpdatePage()
         {
             List<PlayerGridItem> current = pagination.GetCurrentPage();
@@ -184,9 +196,11 @@ namespace PingTrack.View.Pages
             pagination.PreviousPage();
             UpdatePage();
         }
+
         #endregion
 
         #region Обработчики DataGrid
+
         private void PlayersDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             PlayerGridItem selectedPlayer = PlayersDataGrid.SelectedItem as PlayerGridItem;
@@ -205,9 +219,11 @@ namespace PingTrack.View.Pages
             PlayerCardInfoWindow window = new PlayerCardInfoWindow(selectedItem.ID_Player);
             window.ShowDialog();
         }
+
         #endregion
 
         #region Обработчики кнопок
+
         private void AddPlayerButton_Click(object sender, RoutedEventArgs e)
         {
             AddEditPlayerWindow window = new AddEditPlayerWindow();
@@ -224,6 +240,8 @@ namespace PingTrack.View.Pages
                 return;
             }
 
+            // Используем корректный поиск по ID_Player вместо FirstOrDefault без критерия
+            string selectedName = selectedItem.Full_Name;
             Players player = App.db.Players.FirstOrDefault(p => p.ID_Player == selectedItem.ID_Player);
             if (player == null)
                 return;
@@ -249,7 +267,7 @@ namespace PingTrack.View.Pages
             int attendanceCount = App.db.Attendance.Count(a => a.ID_Player == player.ID_Player);
             string warningText = attendanceCount > 0
                 ? $"У этого игрока есть записи посещаемости ({attendanceCount} шт.).\nПри удалении игрока эти записи также будут удалены!\n\n"
-                : "";
+                : string.Empty;
 
             bool confirm = Feedback.AskQuestion("Подтверждение удаления",
                 $"{warningText}Вы уверены, что хотите удалить игрока \"{player.Full_Name}\"?\n\nЭто действие нельзя отменить.");
@@ -289,17 +307,32 @@ namespace PingTrack.View.Pages
             LoadPlayers();
             Feedback.ShowInfo("Обновление", "Список игроков обновлён.");
         }
+
         #endregion
     }
 
     #region Карточка игрока
+
     public class PlayerCardInfoWindow : Window
     {
         #region Поля
+
         private readonly int playerId;
+        private TextBlock nameText;
+        private TextBlock groupText;
+        private TextBlock ageText;
+        private TextBlock phoneText;
+        private TextBlock medicalText;
+        private TextBlock totalText;
+        private TextBlock presentText;
+        private TextBlock absentText;
+        private TextBlock percentText;
+        private DataGrid lastAttendanceGrid;
+
         #endregion
 
         #region Конструктор
+
         public PlayerCardInfoWindow(int selectedPlayerId)
         {
             playerId = selectedPlayerId;
@@ -311,22 +344,11 @@ namespace PingTrack.View.Pages
             Content = BuildContent();
             LoadPlayerInfo();
         }
-        #endregion
 
-        #region Элементы интерфейса
-        private TextBlock nameText;
-        private TextBlock groupText;
-        private TextBlock ageText;
-        private TextBlock phoneText;
-        private TextBlock medicalText;
-        private TextBlock totalText;
-        private TextBlock presentText;
-        private TextBlock absentText;
-        private TextBlock percentText;
-        private DataGrid lastAttendanceGrid;
         #endregion
 
         #region Построение интерфейса
+
         private UIElement BuildContent()
         {
             Grid root = new Grid { Margin = new Thickness(24) };
@@ -442,9 +464,11 @@ namespace PingTrack.View.Pages
                 Child = grid
             };
         }
+
         #endregion
 
         #region Заполнение данных
+
         private void LoadPlayerInfo()
         {
             Players player = App.db.Players.Include("Groups").FirstOrDefault(p => p.ID_Player == playerId);
@@ -487,9 +511,11 @@ namespace PingTrack.View.Pages
 
             ActionLogService.LogView("Players", player.ID_Player, $"Открыта карточка игрока: {player.Full_Name}.");
         }
+
         #endregion
 
         #region Вспомогательные методы
+
         private TextBlock CreateValueBlock(Grid grid, string title, int column)
         {
             StackPanel panel = new StackPanel();
@@ -519,6 +545,7 @@ namespace PingTrack.View.Pages
                 age--;
             return age;
         }
+
         #endregion
     }
 
@@ -528,9 +555,11 @@ namespace PingTrack.View.Pages
         public string TrainingType { get; set; }
         public string Status { get; set; }
     }
+
     #endregion
 
     #region Вспомогательный класс для отображения
+
     public class PlayerGridItem
     {
         public int ID_Player { get; set; }
@@ -541,5 +570,6 @@ namespace PingTrack.View.Pages
         public string GroupName { get; set; }
         public Groups Groups { get; set; }
     }
+
     #endregion
 }

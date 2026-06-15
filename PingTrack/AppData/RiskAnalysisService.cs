@@ -33,7 +33,7 @@ namespace PingTrack.AppData
                                  && t.Date >= startDate
                                  && t.Date <= endDate
                                  && t.IsDeleted == false)
-                        .OrderByDescending(t => t.Date)
+                        .OrderByDescending(t => t.Date.Add(t.Time))
                         .ToList();
 
                     if (!groupTrainings.Any())
@@ -42,12 +42,12 @@ namespace PingTrack.AppData
                     List<int> trainingIds = groupTrainings.Select(t => t.ID_Training).ToList();
 
                     List<Attendance> attendances = App.db.Attendance
-                        .Include("Trainings")
-                        .Where(a => a.ID_Player == player.ID_Player
-                                 && trainingIds.Contains(a.ID_Training)
-                                 && a.IsDeleted == false)
-                        .OrderByDescending(a => a.Trainings.Date)
-                        .ToList();
+    .Include("Trainings")
+    .Where(a => a.ID_Player == player.ID_Player
+             && trainingIds.Contains(a.ID_Training)
+             && a.IsDeleted == false)
+    .OrderByDescending(a => a.Trainings.Date.Add(a.Trainings.Time))
+    .ToList();
 
                     int totalTrainings = groupTrainings.Count;
                     int attendedCount = attendances.Count(a => a.Is_Present);
@@ -60,8 +60,8 @@ namespace PingTrack.AppData
 
                     Attendance lastAttendance = attendances
                         .Where(a => a.Is_Present)
-                        .OrderByDescending(a => a.Trainings.Date)
-                        .FirstOrDefault();
+                        .OrderByDescending(a => a.Trainings.Date.Add(a.Trainings.Time))
+.FirstOrDefault();
 
                     DateTime? lastAttendanceDate = lastAttendance?.Trainings.Date;
                     int daysSinceLastVisit = lastAttendanceDate.HasValue
@@ -129,7 +129,7 @@ namespace PingTrack.AppData
         {
             int missedInRow = 0;
 
-            foreach (Trainings training in groupTrainings.OrderByDescending(t => t.Date))
+            foreach (Trainings training in groupTrainings.OrderByDescending(t => t.Date.Add(t.Time)))
             {
                 Attendance attendance = attendances.FirstOrDefault(a => a.ID_Training == training.ID_Training);
 

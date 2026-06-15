@@ -58,11 +58,11 @@
                        Foreground="{StaticResource TextBrush}"
                        VerticalAlignment="Bottom"/>
             <ComboBox x:Name="CoachComboBox"
-                      Grid.Row="1"
-                      FontSize="14"
-                      Height="32"
-                      DisplayMemberPath="Login"
-                      SelectedValuePath="ID_User"/>
+          Grid.Row="1"
+          FontSize="14"
+          Height="32"
+          DisplayMemberPath="Full_Name"
+          SelectedValuePath="ID_User"/>
         </Grid>
 
         <Grid Grid.Row="3" Grid.Column="1">
