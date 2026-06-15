@@ -30,9 +30,9 @@ namespace PingTrack.View.Pages
         public UsersPage()
         {
             InitializeComponent();
+            isInitialized = true; 
             LoadRoles();
-            LoadUsers();
-            isInitialized = true;
+            LoadUsers();         
         }
         #endregion
 

@@ -170,6 +170,7 @@
                 </Border>
 
                 <DataGrid x:Name="PlayersDataGrid"
+                          Grid.Row="1"
           AutoGenerateColumns="False"
           CanUserSortColumns="False" 
           SelectionChanged="PlayersDataGrid_SelectionChanged"

@@ -95,15 +95,14 @@ namespace PingTrack.View.Pages
             return age;
         }
 
-        private void UpdateCountDisplay()
+        private void UpdateCountDisplay(int filteredCount)
         {
-            int displayedCount = pagination.GetCurrentPage().Count;
             int totalCount = allPlayers.Count;
 
-            if (displayedCount == totalCount)
+            if (filteredCount == totalCount)
                 CountTextBlock.Text = $"Всего игроков: {totalCount}";
             else
-                CountTextBlock.Text = $"Показано: {displayedCount} из {totalCount}";
+                CountTextBlock.Text = $"Показано: {filteredCount} из {totalCount}";
         }
 
         #endregion
@@ -130,9 +129,10 @@ namespace PingTrack.View.Pages
                     (p.Phone != "-" && p.Phone.Contains(searchText)));
             }
 
-            pagination.SetItems(filtered.ToList());
+            List<PlayerGridItem> filteredList = filtered.ToList();
+            pagination.SetItems(filteredList);
             UpdatePage();
-            UpdateCountDisplay();
+            UpdateCountDisplay(filteredList.Count);
         }
 
         #endregion
@@ -240,8 +240,6 @@ namespace PingTrack.View.Pages
                 return;
             }
 
-            // Используем корректный поиск по ID_Player вместо FirstOrDefault без критерия
-            string selectedName = selectedItem.Full_Name;
             Players player = App.db.Players.FirstOrDefault(p => p.ID_Player == selectedItem.ID_Player);
             if (player == null)
                 return;

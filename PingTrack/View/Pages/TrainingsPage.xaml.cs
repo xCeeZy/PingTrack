@@ -38,11 +38,24 @@ namespace PingTrack.View.Pages
             isInitialized = true;
 
             LoadTrainings();
+            ConfigureUIForPlayer();
         }
 
         #endregion
 
         #region Инициализация
+
+        private void ConfigureUIForPlayer()
+        {
+            string role = AuthenticationService.GetUserRole();
+            if (role == "Игрок")
+            {
+                AttendanceButton.Visibility = Visibility.Collapsed;
+                AddTrainingButton.Visibility = Visibility.Collapsed;
+                EditTrainingButton.Visibility = Visibility.Collapsed;
+                DeleteTrainingButton.Visibility = Visibility.Collapsed;
+            }
+        }
 
         private void InitializeFilters()
         {
@@ -132,10 +145,25 @@ namespace PingTrack.View.Pages
 
         private void LoadTrainings()
         {
-            allTrainings = App.db.Trainings
+            string role = AuthenticationService.GetUserRole();
+            int currentUserId = AuthenticationService.GetUserId();
+
+            var query = App.db.Trainings
                 .Include("Groups")
                 .Include("Users")
                 .Include("Training_Types")
+                .Where(t => t.IsDeleted == false);
+
+            if (role == "Игрок")
+            {
+                var player = App.db.Players.FirstOrDefault(p => p.ID_User == currentUserId && p.IsDeleted == false);
+                if (player != null)
+                {
+                    query = query.Where(t => t.ID_Group == player.ID_Group);
+                }
+            }
+
+            allTrainings = query
                 .ToList()
                 .OrderBy(t => t.Date)
                 .ThenBy(t => t.Time)
@@ -245,6 +273,9 @@ namespace PingTrack.View.Pages
 
         private void TrainingsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            string role = AuthenticationService.GetUserRole();
+            if (role == "Игрок") return;
+
             TrainingGridItem selectedTraining = TrainingsDataGrid.SelectedItem as TrainingGridItem;
             bool hasSelection = selectedTraining != null;
 
@@ -255,6 +286,9 @@ namespace PingTrack.View.Pages
 
         private void TrainingsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            string role = AuthenticationService.GetUserRole();
+            if (role == "Игрок") return;
+
             TrainingGridItem selectedTraining = TrainingsDataGrid.SelectedItem as TrainingGridItem;
 
             if (selectedTraining != null)

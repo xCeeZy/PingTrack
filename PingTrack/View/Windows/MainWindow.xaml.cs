@@ -30,7 +30,16 @@ namespace PingTrack.View.Windows
             userName = login;
             currentUserId = userId;
 
-            UserNameText.Text = login;
+            var user = App.db.Users.FirstOrDefault(u => u.ID_User == userId);
+            if (user != null && !string.IsNullOrWhiteSpace(user.Full_Name))
+            {
+                UserNameText.Text = user.Full_Name;
+            }
+            else
+            {
+                UserNameText.Text = login;
+            }
+
             RoleNameText.Text = role;
 
             if (!string.IsNullOrEmpty(login))
@@ -38,20 +47,13 @@ namespace PingTrack.View.Windows
 
             ApplyRolePermissions();
             CheckSystemRisksAsync();
-
-            if (userRole == "Игрок")
-            {
-                MainFrame.Navigate(new PlayerDashboardPage(login));
-            }
-            else
-            {
-                MainFrame.Navigate(new DashboardPage());
-            }
         }
 
         #region Системная логика и контроль рисков
         private async void CheckSystemRisksAsync()
         {
+            if (userRole == "Игрок") return;
+
             if (userRole == "Администратор" || userRole == "Тренер")
             {
                 int expiredCount = await Task.Run(() =>
@@ -71,20 +73,29 @@ namespace PingTrack.View.Windows
         #region Разграничение прав доступа
         private void ApplyRolePermissions()
         {
+            SidebarBorder.Visibility = Visibility.Visible;
+            SidebarColumn.Width = new GridLength(240);
+
+            DashboardBtn.Visibility = Visibility.Visible;
+            TrainingsBtn.Visibility = Visibility.Visible;
+            JournalBtn.Visibility = Visibility.Visible;
+            PlayersBtn.Visibility = Visibility.Visible;
+
+            GroupsBtn.Visibility = Visibility.Visible;
+            UsersBtn.Visibility = Visibility.Visible;
+            LogsBtn.Visibility = Visibility.Visible;
+            ReportsBtn.Visibility = Visibility.Visible;
+
             if (userRole == "Игрок")
             {
-                SidebarBorder.Visibility = Visibility.Collapsed;
-                SidebarColumn.Width = new GridLength(0);
-
-                PlayersBtn.Visibility = Visibility.Collapsed;
                 GroupsBtn.Visibility = Visibility.Collapsed;
-                TrainingsBtn.Visibility = Visibility.Collapsed;
-                PlayerStatsBtn.Visibility = Visibility.Collapsed;
-                ReportsBtn.Visibility = Visibility.Collapsed;
                 UsersBtn.Visibility = Visibility.Collapsed;
-                JournalBtn.Visibility = Visibility.Collapsed;
-                DashboardBtn.Visibility = Visibility.Collapsed;
                 LogsBtn.Visibility = Visibility.Collapsed;
+                ReportsBtn.Visibility = Visibility.Collapsed;
+                PlayersBtn.Visibility = Visibility.Collapsed;
+                PlayerStatsBtn.Visibility = Visibility.Collapsed;
+
+                MainFrame.Navigate(new DashboardPage());
             }
 
             if (userRole == "Тренер")
@@ -93,6 +104,8 @@ namespace PingTrack.View.Windows
                 ReportsBtn.Visibility = Visibility.Collapsed;
                 UsersBtn.Visibility = Visibility.Collapsed;
                 LogsBtn.Visibility = Visibility.Collapsed;
+
+                MainFrame.Navigate(new DashboardPage());
             }
 
             if (userRole == "Администратор")
@@ -101,6 +114,8 @@ namespace PingTrack.View.Windows
                 ReportsBtn.Visibility = Visibility.Visible;
                 UsersBtn.Visibility = Visibility.Visible;
                 LogsBtn.Visibility = Visibility.Visible;
+
+                MainFrame.Navigate(new DashboardPage());
             }
         }
         #endregion
@@ -167,7 +182,7 @@ namespace PingTrack.View.Windows
                 "Назначение: Автоматизация процессов спортивного менеджмента, включая интеллектуальный сквозной учет посещаемости, предиктивный контроль медицинских допусков, финансовый биллинг активных абонементов и распределенный аудит действий персонала.\n\n" +
                 "Лицензия: № NGT-PT-2026-X904 (Академическая подписка корпоративного уровня)\n" +
                 "Спецификация ядра: Релиз сборки v1.1.264 (Архитектура синхронизации клиент-сервер на базе MS SQL Node)\n\n" +
-                "Обнаружен активный канал связи с сервером обновлений NextGen-Cloud.\n" +
+                "Обнаружен active канал связи с сервером обновлений NextGen-Cloud.\n" +
                 "Выполнить принудительную верификацию текущего хэша сборки и проверить наличие патчей?");
 
             if (confirmCheck)

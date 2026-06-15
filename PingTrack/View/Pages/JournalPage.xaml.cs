@@ -117,6 +117,8 @@ namespace PingTrack.View.Pages
             {
                 AddButton.Visibility = Visibility.Collapsed;
                 DeleteButton.Visibility = Visibility.Collapsed;
+                GroupFilter.IsEnabled = false;
+                SearchBox.IsEnabled = false;
             }
         }
 
@@ -126,14 +128,23 @@ namespace PingTrack.View.Pages
 
         private void LoadJournal()
         {
-            allRecords = App.db.Attendance
+            int currentUserId = AuthenticationService.GetUserId();
+
+            var query = App.db.Attendance
                 .Include("Trainings")
                 .Include("Players")
                 .Include("Trainings.Training_Types")
                 .Include("Players.Groups")
                 .Where(a => a.IsDeleted == false
                          && a.Players.IsDeleted == false
-                         && a.Trainings.IsDeleted == false)
+                         && a.Trainings.IsDeleted == false);
+
+            if (userRole == "Игрок")
+            {
+                query = query.Where(a => a.Players.ID_User == currentUserId);
+            }
+
+            allRecords = query
                 .ToList()
                 .OrderByDescending(a => a.Trainings != null ? a.Trainings.Date : DateTime.MinValue)
                 .ThenBy(a => a.Players != null ? a.Players.Full_Name : string.Empty)
@@ -178,10 +189,14 @@ namespace PingTrack.View.Pages
 
             IEnumerable<JournalGridItem> filtered = allRecords;
 
-            filtered = ApplyGroupFilter(filtered, selectedGroup);
-            filtered = ApplyPresenceFilter(filtered, selectedPresence);
             filtered = ApplyDateFilter(filtered, startDate, endDate);
-            filtered = ApplySearchFilter(filtered, searchText);
+            filtered = ApplyPresenceFilter(filtered, selectedPresence);
+
+            if (userRole != "Игрок")
+            {
+                filtered = ApplyGroupFilter(filtered, selectedGroup);
+                filtered = ApplySearchFilter(filtered, searchText);
+            }
 
             List<JournalGridItem> filteredList = filtered.ToList();
 
@@ -304,6 +319,8 @@ namespace PingTrack.View.Pages
 
         private void JournalDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            if (userRole == "Игрок") return;
+
             JournalGridItem selected = JournalDataGrid.SelectedItem as JournalGridItem;
 
             if (selected == null)
@@ -326,6 +343,8 @@ namespace PingTrack.View.Pages
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
+            if (userRole == "Игрок") return;
+
             AddEditAttendanceWindow window = new AddEditAttendanceWindow(userRole);
 
             if (window.ShowDialog() == true)
@@ -334,6 +353,8 @@ namespace PingTrack.View.Pages
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
+            if (userRole == "Игрок") return;
+
             JournalGridItem selected = JournalDataGrid.SelectedItem as JournalGridItem;
 
             if (selected == null)
